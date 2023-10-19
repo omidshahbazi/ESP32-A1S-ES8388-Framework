@@ -123,6 +123,8 @@ private:
 public:
 	static bool Initialize(Modules Module, BitsPerSamples BitsPerSample, InputModes InputMode, OutputModes OutputMode, Formats Format)
 	{
+		Log::WriteInfo(TAG, "Intializing");
+
 		CHECK_CALL(SetRegisters(InputMode, OutputMode));
 
 		CHECK_CALL(ConfigI2S(BitsPerSample, Format));
@@ -136,6 +138,8 @@ public:
 
 	static bool SetVolume(int32 Volume)
 	{
+		Log::WriteInfo(TAG, "Setting the volume: %i", Volume);
+
 		if (Volume < 0)
 			Volume = 0;
 		else if (Volume > 100)
@@ -153,6 +157,8 @@ public:
 
 	static bool SetMute(bool Enabled)
 	{
+		Log::WriteInfo(TAG, "Setting the Mute: %i", Enabled);
+
 		I2CWrite((uint8)DACRegisters::Control3, (I2CRead((uint8)DACRegisters::Control3) & 0xFB) | (((int32)Enabled) << 2));
 
 		return true;
@@ -161,6 +167,8 @@ public:
 private:
 	static bool SetRegisters(InputModes InputMode, OutputModes OutputMode)
 	{
+		Log::WriteInfo(TAG, "Setting the Registers");
+
 		enum class MasterModes
 		{
 			None = -1,
@@ -186,10 +194,10 @@ private:
 
 		SetDACVolume(0, 0); // 0db
 
-		LOG_INFO(FRAMEWORK_TAG, "Setting DAC Output: %02x", OutputMode);
+		Log::WriteInfo(TAG, "Setting DAC Output: %02x", OutputMode);
 		I2CWrite((uint8)DACRegisters::Power, (uint8)OutputMode);
 
-		LOG_INFO(FRAMEWORK_TAG, "Setting ADC Input: %02x", InputMode);
+		Log::WriteInfo(TAG, "Setting ADC Input: %02x", InputMode);
 		I2CWrite((uint8)ADCRegisters::Power, 0xFF);
 		I2CWrite((uint8)ADCRegisters::Control1, 0xbb); // MIC Left and Right channel PGA gain
 		I2CWrite((uint8)ADCRegisters::Control2, (uint8)InputMode);
@@ -207,16 +215,16 @@ private:
 
 	static bool ConfigI2S(BitsPerSamples BitsPerSample, Formats Format) // Modules Module,
 	{
-		LOG_INFO(FRAMEWORK_TAG, "Setting I2S ADC Format: %x", Format);
+		Log::WriteInfo(TAG, "Setting I2S ADC Format: %x", Format);
 		I2CWrite((uint8)ADCRegisters::Control4, (I2CRead((uint8)ADCRegisters::Control4) & 0xfc) | (uint8)Format);
 
-		LOG_INFO(FRAMEWORK_TAG, "Setting I2S DAC Format: %x", Format);
+		Log::WriteInfo(TAG, "Setting I2S DAC Format: %x", Format);
 		I2CWrite((uint8)DACRegisters::Control1, (I2CRead((uint8)DACRegisters::Control1) & 0xf9) | ((uint8)Format << 1));
 
-		LOG_INFO(FRAMEWORK_TAG, "Setting I2S ADC Bits: %x", BitsPerSample);
+		Log::WriteInfo(TAG, "Setting I2S ADC Bits: %x", BitsPerSample);
 		I2CWrite((uint8)ADCRegisters::Control4, (I2CRead((uint8)ADCRegisters::Control4) & 0xe3) | ((int32)BitsPerSample << 2));
 
-		LOG_INFO(FRAMEWORK_TAG, "Setting I2S DAC Bits: %x", BitsPerSample);
+		Log::WriteInfo(TAG, "Setting I2S DAC Bits: %x", BitsPerSample);
 		I2CWrite((uint8)DACRegisters::Control1, (I2CRead((uint8)DACRegisters::Control1) & 0xc7) | ((int32)BitsPerSample << 3));
 
 		return true;
@@ -242,7 +250,7 @@ private:
 
 		if (prevData != data)
 		{
-			LOG_INFO(FRAMEWORK_TAG, "Resetting State Machine");
+			Log::WriteInfo(TAG, "Resetting State Machine");
 
 			I2CWrite((uint8)ChipRegisters::Power, 0xF0); // start state machine
 			// I2CWrite((uint8)ChipRegisters::Control1, 0x16);
@@ -253,14 +261,14 @@ private:
 
 		if (Bitwise::IsEnabled(Module, Modules::ADC) || Bitwise::IsEnabled(Module, Modules::Line))
 		{
-			LOG_INFO(FRAMEWORK_TAG, "Powering up ADC");
+			Log::WriteInfo(TAG, "Starting the ADC");
 
 			I2CWrite((uint8)ADCRegisters::Power, 0x00);
 		}
 
 		if (Bitwise::IsEnabled(Module, Modules::DAC) || Bitwise::IsEnabled(Module, Modules::Line))
 		{
-			LOG_INFO(FRAMEWORK_TAG, "Powering up DAC");
+			Log::WriteInfo(TAG, "Starting the DAC");
 
 			I2CWrite((uint8)DACRegisters::Power, 0x3c);
 
@@ -294,7 +302,7 @@ private:
 	{
 		if (Volume < -96 || Volume > 0)
 		{
-			LOG_WARNING(FRAMEWORK_TAG, "Warning: volume < -96! or > 0!");
+			Log::WriteWarning(TAG, "Warning: volume < -96! or > 0!");
 
 			if (Volume < -96)
 				Volume = -96;
@@ -320,9 +328,11 @@ private:
 	}
 
 private:
+	static const char *TAG;
 	static const int32 ADDRESS;
 };
 
+const char *ES8388::TAG = "ES8388";
 const int32 ES8388::ADDRESS = 0b0010000;
 
 #endif

@@ -54,6 +54,8 @@ public:
 public:
 	static bool Initialize(Configs *Configs)
 	{
+		Log::WriteInfo(TAG, "Initializing");
+
 		CHECK_CALL(InitializeI2C(Configs));
 
 		ES8388::Modules modules = (ES8388::Modules)0;
@@ -91,6 +93,8 @@ public:
 	template <typename T>
 	static bool Write(const T *Data, uint32 Count, uint32 *WrittenByteCount, int32 TicksToWait = -1)
 	{
+		Log::WriteDebug(TAG, "Writing %ib on the I2S with %iticks for timeout", Count * sizeof(T), TicksToWait);
+
 		ESP_CHECK_CALL(i2s_write(I2S_PORT, Data, Count * sizeof(T), WrittenByteCount, TicksToWait));
 
 		return true;
@@ -99,6 +103,8 @@ public:
 private:
 	static bool InitializeI2C(Configs *Configs)
 	{
+		Log::WriteInfo(TAG, "Initializing I2C");
+
 		i2c_config_t config = {};
 		config.mode = (Configs->Mode == Modes::Master ? I2C_MODE_MASTER : I2C_MODE_SLAVE);
 		config.sda_pullup_en = GPIO_PULLUP_ENABLE;
@@ -127,6 +133,8 @@ private:
 
 	static bool InitializeI2S(Configs *Configs)
 	{
+		Log::WriteInfo(TAG, "Initializing I2S");
+
 		i2s_bits_per_sample_t bps = I2S_BITS_PER_SAMPLE_8BIT;
 		switch (Configs->BitsPerSample)
 		{
@@ -195,7 +203,12 @@ private:
 			masterClockPin = GPIO_NUM_0;
 		}
 		else
+		{
+			Log::WriteError(TAG, "%i for version of the module is not supported", Configs->Version);
 			return false;
+		}
+
+		Log::WriteInfo(TAG, "Setting the connection pins for I2S%i, WS: GPIO%i, DO: GPIO%i, DI: GPIO%i, BCK: GPIO%i", I2S_PORT, config.ws_io_num, config.data_out_num, config.data_in_num, config.bck_io_num);
 
 		ESP_CHECK_CALL(i2s_set_pin(I2S_PORT, &config));
 
@@ -209,7 +222,7 @@ private:
 		ASSERT(Port != I2S_NUM_MAX, "Setting MasterClockPin", "Does not support I2S_NUM_MAX");
 		ASSERT(GPIO == GPIO_NUM_0 || GPIO == GPIO_NUM_1 || GPIO == GPIO_NUM_3, "Setting MasterClockPin", "GPIO_NUM_0, GPIO_NUM_1 and GPIO_NUM_3 are only supported for master");
 
-		LOG_INFO(FRAMEWORK_TAG, "Setting master clock for I2S%d on GPIO%d", Port, GPIO);
+		Log::WriteInfo(TAG, "Setting the master clock for I2S%d on GPIO%d", Port, GPIO);
 
 		if (Port == I2S_NUM_0)
 		{
@@ -250,10 +263,12 @@ private:
 	}
 
 private:
+	static const char *TAG;
 	static const i2c_port_t I2C_PORT;
 	static const i2s_port_t I2S_PORT;
 };
 
+const char *ESP32A1SAudioModule::TAG = "ESP32";
 const i2c_port_t ESP32A1SAudioModule::I2C_PORT = I2C_NUM_0;
 const i2s_port_t ESP32A1SAudioModule::I2S_PORT = I2S_NUM_0;
 
