@@ -21,10 +21,14 @@ public:
 		return Value;
 	}
 
+public:
+	static const double PI;
+
 private:
 	static const char *TAG;
 };
 
+const double Math::PI = 3.14159265;
 const char *Math::TAG = "Math";
 
 #endif

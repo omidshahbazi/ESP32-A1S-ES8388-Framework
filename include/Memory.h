@@ -18,4 +18,10 @@ T *Allocate(uint16 Count = 1)
 	return mem;
 }
 
+template <typename T>
+void Deallocate(T *Memory)
+{
+	free(Memory);
+}
+
 #endif
