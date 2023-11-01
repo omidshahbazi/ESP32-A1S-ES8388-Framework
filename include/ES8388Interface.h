@@ -547,7 +547,7 @@ public:
 
 	static bool SetInputMute(bool Mute)
 	{
-		Log::WriteInfo(TAG, "Setting input Mute: %i", Mute);
+		Log::WriteInfo(TAG, "Setting Input Mute: %i", Mute);
 
 		ES8388Control::Write(
 			ES8388Control::Registers::ADCControl7,
@@ -564,7 +564,7 @@ public:
 
 	static bool SetOutputMute(bool Mute)
 	{
-		Log::WriteInfo(TAG, "Setting output Mute: %i", Mute);
+		Log::WriteInfo(TAG, "Setting Output Mute: %i", Mute);
 
 		ES8388Control::Write(
 			ES8388Control::Registers::DACControl3,
