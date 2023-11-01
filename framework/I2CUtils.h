@@ -11,26 +11,25 @@ class I2CUtils
 public:
 	static uint8 Read(uint8 BusAddress, uint8 Register)
 	{
-		uint8 buffer[2];
-		buffer[0] = Register;
-
 		i2c_cmd_handle_t cmd = i2c_cmd_link_create();
 
 		// Write the register address to be read
 		ESP_CHECK_CALL(i2c_master_start(cmd));
 		ESP_CHECK_CALL(i2c_master_write_byte(cmd, BusAddress << 1 | I2C_MASTER_WRITE, ACK_CHECK_EN));
-		ESP_CHECK_CALL(i2c_master_write_byte(cmd, buffer[0], ACK_CHECK_EN));
+		ESP_CHECK_CALL(i2c_master_write_byte(cmd, Register, ACK_CHECK_EN));
 
 		// Read the data for the register from the slave
 		ESP_CHECK_CALL(i2c_master_start(cmd));
 		ESP_CHECK_CALL(i2c_master_write_byte(cmd, BusAddress << 1 | I2C_MASTER_READ, ACK_CHECK_EN));
-		ESP_CHECK_CALL(i2c_master_read_byte(cmd, &buffer[0], I2C_MASTER_NACK));
+
+		uint8 value;
+		ESP_CHECK_CALL(i2c_master_read_byte(cmd, &value, I2C_MASTER_NACK));
 		ESP_CHECK_CALL(i2c_master_stop(cmd));
 		ESP_CHECK_CALL(i2c_master_cmd_begin(MASTER_NUM, cmd, 1000 / portTICK_RATE_MS));
 
 		i2c_cmd_link_delete(cmd);
 
-		return buffer[0];
+		return value;
 	}
 
 	static bool WriteBulk(uint8 BusAddress, uint8 Register, uint8 *Data, uint8 Length)
