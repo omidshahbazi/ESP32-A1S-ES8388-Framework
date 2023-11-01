@@ -76,11 +76,14 @@ public:
 		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
 			CHECK_CALL(ES8388Interface::SetDigitalVolume(0));
 
-		CHECK_CALL(SetMicrophoneGain(24));
+		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
+			CHECK_CALL(SetMicrophoneGain(24));
 
-		CHECK_CALL(SetInputVolume(0));
+		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
+			CHECK_CALL(SetInputVolume(0));
 
-		CHECK_CALL(SetOutputVolume(4.5F));
+		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
+			CHECK_CALL(SetOutputVolume(4.5F));
 
 		CHECK_CALL(SetMute(false));
 	}

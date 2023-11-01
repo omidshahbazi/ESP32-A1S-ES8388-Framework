@@ -16,12 +16,6 @@ public:
 		V2974
 	};
 
-	enum class Modes
-	{
-		Master = I2S_MODE_MASTER,
-		Slave = I2S_MODE_SLAVE
-	};
-
 	enum class TransmissionModes
 	{
 		Transmit = I2S_MODE_TX,
@@ -42,7 +36,6 @@ public:
 	{
 	public:
 		Versions Version;
-		Modes Mode;
 		TransmissionModes TransmissionMode;
 		uint32 SampleRate;
 		ES8388::BitsPerSamples BitsPerSample;
@@ -173,7 +166,7 @@ private:
 		Log::WriteInfo(TAG, "Initializing I2C");
 
 		i2c_config_t config = {};
-		config.mode = (Configs->Mode == Modes::Master ? I2C_MODE_MASTER : I2C_MODE_SLAVE);
+		config.mode = I2C_MODE_MASTER;
 		config.sda_pullup_en = GPIO_PULLUP_ENABLE;
 		config.scl_pullup_en = GPIO_PULLUP_ENABLE;
 		config.master.clk_speed = 100 * KHz;
@@ -219,7 +212,7 @@ private:
 		}
 
 		i2s_config_t config = {};
-		config.mode = (i2s_mode_t)(Configs->Mode | Configs->TransmissionMode);
+		config.mode = (i2s_mode_t)(I2S_MODE_MASTER | Configs->TransmissionMode);
 		config.sample_rate = Configs->SampleRate;
 		config.bits_per_sample = bps;
 		config.channel_format = (i2s_channel_fmt_t)Configs->ChannelFormat;
