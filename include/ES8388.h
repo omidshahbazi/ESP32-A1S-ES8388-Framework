@@ -54,7 +54,7 @@ public:
 	{
 		Log::WriteInfo(TAG, "Intializing");
 
-		CHECK_CALL(ES8388Interface::TurnOn(false, ES8388Interface::MiddleVoltageResistances::R500K));
+		CHECK_CALL(ES8388Interface::TurnOn(false, ES8388Interface::MiddleVoltageResistances::R50K));
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
 			CHECK_CALL(ES8388Interface::SetADCPowered(true, false, ES8388Interface::IOModes::All));
@@ -71,19 +71,21 @@ public:
 			CHECK_CALL(ES8388Interface::SetDACFormat(ES8388Interface::Formats::I2S));
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
+		{
 			CHECK_CALL(ES8388Interface::SetInputToMixerGain(6));
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
-			CHECK_CALL(ES8388Interface::SetDigitalVolume(0));
+			CHECK_CALL(SetMicrophoneBoostGainRange(0, 0));
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
 			CHECK_CALL(SetMicrophoneGain(24));
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
 			CHECK_CALL(SetInputVolume(0));
+		}
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
+		{
+			CHECK_CALL(ES8388Interface::SetDigitalVolume(0));
 			CHECK_CALL(SetOutputVolume(4.5F));
+		}
 
 		CHECK_CALL(SetMute(false));
 	}
@@ -108,6 +110,18 @@ public:
 			return (BitsPerSamples)ES8388Interface::GetDACBitsPerSample();
 
 		return BitsPerSamples::BPS16;
+	}
+
+	//[-12dB, 30dB]
+	//[-6.5dB, 35.5dB]
+	bool SetMicrophoneBoostGainRange(float dBMin, float dbMax)
+	{
+		if (!Bitwise::IsEnabled(m_Modules, Modules::ADC))
+			return false;
+
+		CHECK_CALL(ES8388Interface::SetMicrophoneBoostGainRange(dBMin, dbMax));
+
+		return true;
 	}
 
 	//[0dB, 24dB]

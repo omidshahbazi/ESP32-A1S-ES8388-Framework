@@ -28,10 +28,14 @@ public:
 		Right1 = 0b00000010,
 		Left2 = 0b00000100,
 		Right2 = 0b00001000,
-		Differentiate = 0b00010000,
+		Differential = 0b00010000,
 		LeftAndRight1 = Left1 | Right1,
 		LeftAndRight2 = Left2 | Right2,
-		All = LeftAndRight1 | LeftAndRight2
+		All = LeftAndRight1 | LeftAndRight2,
+
+		Differential1 = Differential | LeftAndRight1,
+		Differential2 = Differential | LeftAndRight2,
+		Differential1And2 = Differential1 | Differential2
 	};
 
 	enum class Formats
@@ -166,6 +170,8 @@ public:
 				ES8388Control::Registers::ADCPower,
 				(Powered ? ES8388Control::Values::ADCPower_PdnAINL_0 : ES8388Control::Values::ADCPower_PdnAINL_1), ES8388Control::Masks::ADCPower_PdnAINL);
 		}
+
+		CHECK_CALL(SetALCEnabled(Powered, IOModes));
 
 		ES8388Control::Write(ES8388Control::Registers::ADCControl4, ES8388Control::Values::ADCControl4_DATSEL_00, ES8388Control::Masks::ADCControl4_DATSEL);
 
@@ -412,6 +418,24 @@ public:
 		return (BitsPerSamples)0;
 	}
 
+	//[-12dB, 30dB]
+	//[-6.5dB, 35.5dB]
+	static bool SetMicrophoneBoostGainRange(float dBMin, float dbMax)
+	{
+		dBMin = Math::Clamp(dBMin, -12, 30);
+		dbMax = Math::Clamp(dbMax, -6.5, 35.5);
+
+		Log::WriteInfo(TAG, "Setting Microphone Boost Gain: [%.1fdB, %.1fdb]", dBMin, dbMax);
+
+		uint8 value = (dBMin + 12) / 6;
+		ES8388Control::Write(ES8388Control::Registers::ADCControl10, (ES8388Control::Values)value, ES8388Control::Masks::ADCControl10_MINGAIN);
+
+		value = (dbMax + 6.5) / 6;
+		ES8388Control::Write(ES8388Control::Registers::ADCControl10, (ES8388Control::Values)(value << 3), ES8388Control::Masks::ADCControl10_MAXGAIN);
+
+		return true;
+	}
+
 	//[0dB, 24dB]
 	static bool SetMicrophoneGain(float dB)
 	{
@@ -439,7 +463,7 @@ public:
 	{
 		dbFS = Math::Clamp(dbFS, -76.5, -30);
 
-		Log::WriteInfo(TAG, "Setting Microphone Noise gate: %.1fdBFS", dbFS);
+		Log::WriteInfo(TAG, "Setting Microphone Noise Gate: %.1fdBFS", dbFS);
 
 		uint8 value = (dbFS + 76.5) / -1.5;
 
@@ -603,9 +627,9 @@ private:
 		Log::WriteInfo(TAG, "Setting Chip Control Middle Voltage Resistance: %i, Reset Control Port: %i, Powered On: %i", MiddleVoltageResistance, ResetControlPort, PoweredOn);
 
 		ES8388Control::Write(ES8388Control::Registers::ChipControl1, (ES8388Control::Values)MiddleVoltageResistance, ES8388Control::Masks::ChipControl1_VMIDSEL);
-		ES8388Control::Write(ES8388Control::Registers::ChipControl1, ES8388Control::Values::ChipControl1_EnRef_0, ES8388Control::Masks::ChipControl1_EnRef);
+		ES8388Control::Write(ES8388Control::Registers::ChipControl1, ES8388Control::Values::ChipControl1_EnRef_1, ES8388Control::Masks::ChipControl1_EnRef);
 		ES8388Control::Write(ES8388Control::Registers::ChipControl1, ES8388Control::Values::ChipControl1_SeqEn_0, ES8388Control::Masks::ChipControl1_SeqEn);
-		ES8388Control::Write(ES8388Control::Registers::ChipControl1, ES8388Control::Values::ChipControl1_SameFs_1, ES8388Control::Masks::ChipControl1_SameFs);
+		ES8388Control::Write(ES8388Control::Registers::ChipControl1, ES8388Control::Values::ChipControl1_SameFs_0, ES8388Control::Masks::ChipControl1_SameFs);
 		ES8388Control::Write(ES8388Control::Registers::ChipControl1, ES8388Control::Values::ChipControl1_DACMCLK_0, ES8388Control::Masks::ChipControl1_DACMCLK);
 		ES8388Control::Write(ES8388Control::Registers::ChipControl1, ES8388Control::Values::ChipControl1_LRCM_0, ES8388Control::Masks::ChipControl1_LRCM);
 		ES8388Control::Write(
@@ -704,6 +728,27 @@ private:
 
 		ES8388Control::Write(ES8388Control::Registers::DACControl20, ES8388Control::Values::DACControl20_RI2RO_0, ES8388Control::Masks::DACControl20_RI2RO);
 		ES8388Control::Write(ES8388Control::Registers::DACControl20, ES8388Control::Values::DACControl20_RD2RO_1, ES8388Control::Masks::DACControl20_RD2RO);
+
+		return true;
+	}
+
+	static bool SetALCEnabled(bool Enabled, IOModes IOModes)
+	{
+		Log::WriteInfo(TAG, "Setting ALC Enabled: %i, Right: %i, Left: %i", Enabled,
+					   Bitwise::IsEnabled(IOModes, IOModes::Right1 | IOModes::Right2),
+					   Bitwise::IsEnabled(IOModes, IOModes::Left1 | IOModes::Left1));
+
+		ES8388Control::Values value = ES8388Control::Values::ADCControl10_ALCSEL_00;
+		if (Enabled)
+		{
+			if (Bitwise::IsEnabled(IOModes, IOModes::Right1 | IOModes::Right2))
+				value |= ES8388Control::Values::ADCControl10_ALCSEL_01;
+
+			if (Bitwise::IsEnabled(IOModes, IOModes::Left1 | IOModes::Left2))
+				value |= ES8388Control::Values::ADCControl10_ALCSEL_10;
+		}
+
+		ES8388Control::Write(ES8388Control::Registers::ADCControl10, value, ES8388Control::Masks::ADCControl10_ALCSEL);
 
 		return true;
 	}

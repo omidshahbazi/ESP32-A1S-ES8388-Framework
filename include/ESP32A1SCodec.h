@@ -193,6 +193,8 @@ private:
 
 	static bool InitializeI2S(Configs *Configs)
 	{
+		Configs->BufferLegth = Math::Clamp(Configs->BufferLegth, 1, 1024);
+
 		Log::WriteInfo(TAG, "Initializing I2S");
 
 		i2s_bits_per_sample_t bps = I2S_BITS_PER_SAMPLE_8BIT;

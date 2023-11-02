@@ -83,8 +83,7 @@ private:
 		{
 			double sinVal = sin(i / 2 * 2 * Math::PI / SamplePerCycle) * m_Amplitude;
 
-			m_Buffer[i] = (int32)sinVal & Mask;
-			m_Buffer[i + 1] = (int32)sinVal & Mask;
+			m_Buffer[i] = m_Buffer[i + 1] = (int32)sinVal & Mask;
 		}
 	}
 
