@@ -29,11 +29,11 @@ public:
 		Left2 = 0b00000100,
 		Right2 = 0b00001000,
 
-		Single1 = Left1 | Right1,
-		Single2 = Left2 | Right2,
+		SingleEnded1 = Left1 | Right1,
+		SingleEnded2 = Left2 | Right2,
 
-		Differential1 = 0b00010000 | Single1,
-		Differential2 = 0b00010000 | Single2,
+		Differential1 = 0b00010000 | SingleEnded1,
+		Differential2 = 0b00010000 | SingleEnded2,
 
 		BothDifferential = Differential1 | Differential2
 	};
@@ -141,7 +141,7 @@ public:
 		Log::WriteInfo(TAG, "Setting ADC Powered: %i, Microphone Bias Powered: %i, R: %i, L: %i, D: %i", Powered, (Powered && MicrophoneBiasPowered),
 					   Bitwise::IsEnabled(InputMode, InputModes::Right1 | InputModes::Right2),
 					   Bitwise::IsEnabled(InputMode, InputModes::Left1 | InputModes::Left2),
-					   Bitwise::IsEnabled(InputMode, (~(uint8)InputModes::Single1 & (uint8)InputModes::Differential1)));
+					   Bitwise::IsEnabled(InputMode, (~(uint8)InputModes::SingleEnded1 & (uint8)InputModes::Differential1)));
 
 		ES8388Control::Write(
 			ES8388Control::Registers::ADCPower,
@@ -174,12 +174,12 @@ public:
 			if (Bitwise::IsEnabled(InputMode, InputModes::Differential1))
 			{
 				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_RINSEL_11, ES8388Control::Masks::ADCControl2_RINSEL);
-				ES8388Control::Write(ES8388Control::Registers::ADCControl3, ES8388Control::Values::ADCControl3_DS_0, ES8388Control::Masks::ADCControl3_DS);
+				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSR_0, ES8388Control::Masks::ADCControl2_DSR);
 			}
-			if (Bitwise::IsEnabled(InputMode, InputModes::Differential2))
+			else if (Bitwise::IsEnabled(InputMode, InputModes::Differential2))
 			{
 				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_RINSEL_11, ES8388Control::Masks::ADCControl2_RINSEL);
-				ES8388Control::Write(ES8388Control::Registers::ADCControl3, ES8388Control::Values::ADCControl3_DS_1, ES8388Control::Masks::ADCControl3_DS);
+				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSR_1, ES8388Control::Masks::ADCControl2_DSR);
 			}
 			else if (Bitwise::IsEnabled(InputMode, InputModes::Right1))
 			{
@@ -204,12 +204,12 @@ public:
 			if (Bitwise::IsEnabled(InputMode, InputModes::Differential1))
 			{
 				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_LINSEL_11, ES8388Control::Masks::ADCControl2_LINSEL);
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl3_DS_0, ES8388Control::Masks::ADCControl3_DS);
+				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSR_0, ES8388Control::Masks::ADCControl2_DSR);
 			}
-			if (Bitwise::IsEnabled(InputMode, InputModes::Differential2))
+			else if (Bitwise::IsEnabled(InputMode, InputModes::Differential2))
 			{
 				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_LINSEL_11, ES8388Control::Masks::ADCControl2_LINSEL);
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl3_DS_1, ES8388Control::Masks::ADCControl3_DS);
+				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSR_1, ES8388Control::Masks::ADCControl2_DSR);
 			}
 			else if (Bitwise::IsEnabled(InputMode, InputModes::Right1))
 			{
