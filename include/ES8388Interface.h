@@ -139,8 +139,8 @@ public:
 	static bool SetADCPowered(bool Powered, bool MicrophoneBiasPowered, InputModes InputMode)
 	{
 		Log::WriteInfo(TAG, "Setting ADC Powered: %i, Microphone Bias Powered: %i, R: %i, L: %i, D: %i", Powered, (Powered && MicrophoneBiasPowered),
-					   Bitwise::IsEnabled(InputMode, InputModes::Right1 | InputModes::Right2),
-					   Bitwise::IsEnabled(InputMode, InputModes::Left1 | InputModes::Left2),
+					   Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2),
+					   Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2),
 					   Bitwise::IsEnabled(InputMode, (~(uint8)InputModes::SingleEnded1 & (uint8)InputModes::Differential1)));
 
 		ES8388Control::Write(
@@ -161,7 +161,7 @@ public:
 
 		ES8388Control::Write(ES8388Control::Registers::ADCControl3, ES8388Control::Values::ADCControl3_MONOMIX_00, ES8388Control::Masks::ADCControl3_MONOMIX);
 
-		if (Bitwise::IsEnabled(InputMode, InputModes::Right1 | InputModes::Right2))
+		if (Bitwise::IsEnabled(InputMode, InputModes::Right2) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
 		{
 			ES8388Control::Write(
 				ES8388Control::Registers::ADCPower,
@@ -191,7 +191,7 @@ public:
 			}
 		}
 
-		if (Bitwise::IsEnabled(InputMode, InputModes::Left1 | InputModes::Left2))
+		if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2))
 		{
 			ES8388Control::Write(
 				ES8388Control::Registers::ADCPower,
@@ -257,12 +257,12 @@ public:
 				ES8388Control::Registers::DACPower,
 				(Powered ? ES8388Control::Values::DACPower_LOUT1_1 : ES8388Control::Values::DACPower_LOUT1_0), ES8388Control::Masks::DACPower_LOUT1);
 
-		if (Bitwise::IsEnabled(OutputMode, OutputModes::Right1 | OutputModes::Right2))
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2))
 			ES8388Control::Write(
 				ES8388Control::Registers::DACPower,
 				(Powered ? ES8388Control::Values::DACPower_PdnDACR_0 : ES8388Control::Values::DACPower_PdnDACR_1), ES8388Control::Masks::DACPower_PdnDACR);
 
-		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1 | OutputModes::Left2))
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2))
 			ES8388Control::Write(
 				ES8388Control::Registers::DACPower,
 				(Powered ? ES8388Control::Values::DACPower_PdnDACL_0 : ES8388Control::Values::DACPower_PdnDACL_1), ES8388Control::Masks::DACPower_PdnDACL);
@@ -785,16 +785,16 @@ private:
 	static bool SetALCEnabled(bool Enabled, InputModes InputMode)
 	{
 		Log::WriteInfo(TAG, "Setting ALC Enabled: %i, Right: %i, Left: %i", Enabled,
-					   Bitwise::IsEnabled(InputMode, InputModes::Right1 | InputModes::Right2),
-					   Bitwise::IsEnabled(InputMode, InputModes::Left1 | InputModes::Left1));
+					   Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2),
+					   Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2));
 
 		ES8388Control::Values value = ES8388Control::Values::ADCControl10_ALCSEL_00;
 		if (Enabled)
 		{
-			if (Bitwise::IsEnabled(InputMode, InputModes::Right1 | InputModes::Right2))
+			if (Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
 				value |= ES8388Control::Values::ADCControl10_ALCSEL_01;
 
-			if (Bitwise::IsEnabled(InputMode, InputModes::Left1 | InputModes::Left2))
+			if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2))
 				value |= ES8388Control::Values::ADCControl10_ALCSEL_10;
 		}
 
