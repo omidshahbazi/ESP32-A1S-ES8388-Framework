@@ -57,12 +57,12 @@ public:
 		CHECK_CALL(ES8388Interface::TurnOn(false, ES8388Interface::MiddleVoltageResistances::R50K));
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
-			CHECK_CALL(ES8388Interface::SetADCPowered(true, false, ES8388Interface::IOModes::All));
+			CHECK_CALL(ES8388Interface::SetADCPowered(true, false, ES8388Interface::InputModes::Differential1));
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
-			CHECK_CALL(ES8388Interface::SetDACPowered(true, ES8388Interface::IOModes::All, ES8388Interface::OutputResistances::R1K5));
+			CHECK_CALL(ES8388Interface::SetDACPowered(true, ES8388Interface::OutputModes::All, ES8388Interface::OutputResistances::R1K5));
 
-		CHECK_CALL(SetBitsPerSample(BitsPerSamples::BPS24));
+		CHECK_CALL(SetBitsPerSample(BitsPerSamples::BPS16));
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
 			CHECK_CALL(ES8388Interface::SetADCFormat(ES8388Interface::Formats::I2S));

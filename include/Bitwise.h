@@ -7,8 +7,8 @@
 class Bitwise
 {
 public:
-	template <typename T>
-	static bool IsEnabled(T Mask, T Bits)
+	template <typename T, typename U>
+	static bool IsEnabled(T Mask, U Bits)
 	{
 		return (((int32)Mask & (int32)Bits) == (int32)Bits);
 	}

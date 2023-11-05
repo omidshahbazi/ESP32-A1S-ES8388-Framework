@@ -58,7 +58,7 @@ public:
 			modules |= ES8388::Modules::DAC;
 
 		m_Codec = new ES8388(modules, Configs->InputMode, Configs->OutputMode);
-		m_Codec->SetBitsPerSample(Configs->BitsPerSample);
+		CHECK_CALL(m_Codec->SetBitsPerSample(Configs->BitsPerSample));
 
 		CHECK_CALL(InitializeI2S(Configs));
 
