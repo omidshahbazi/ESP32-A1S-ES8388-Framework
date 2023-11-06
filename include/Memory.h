@@ -6,22 +6,31 @@
 #include "Debug.h"
 #include <memory.h>
 
-template <typename T>
-T *Allocate(uint16 Count = 1)
+class Memory
 {
-	T *mem = reinterpret_cast<T *>(malloc(sizeof(T) * Count));
+public:
+	template <typename T>
+	static T *Allocate(uint16 Count = 1)
+	{
+		T *mem = reinterpret_cast<T *>(malloc(sizeof(T) * Count));
 
-	ASSERT(mem != nullptr, "Memory", "Couldn't allocate memory: %i of %iB", Count, sizeof(T));
+		ASSERT(mem != nullptr, "Memory", "Couldn't allocate memory: %i of %iB", Count, sizeof(T));
 
-	memset(mem, 0, sizeof(T) * Count);
+		Set(mem, (T)0, Count);
 
-	return mem;
-}
+		return mem;
+	}
 
-template <typename T>
-void Deallocate(T *Memory)
-{
-	free(Memory);
-}
+	template <typename T>
+	static void Deallocate(T *Memory)
+	{
+		free(Memory);
+	}
 
+	template <typename T>
+	static void Set(T *Memory, T Value, uint16 Count = 1)
+	{
+		memset(Memory, Value, sizeof(T) * Count);
+	}
+};
 #endif
