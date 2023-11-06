@@ -32,5 +32,11 @@ public:
 	{
 		memset(Memory, Value, sizeof(T) * Count);
 	}
+
+	template <typename T>
+	static void Copy(const T *Source, T *Destination, uint16 Count = 1)
+	{
+		memccpy(Destination, Source, sizeof(T) * Count);
+	}
 };
 #endif
