@@ -5,7 +5,6 @@
 #include "Wave.h"
 #include "Tables.h"
 #include "../Math.h"
-#include <math.h>
 
 class WaveShaper : public Wave
 {

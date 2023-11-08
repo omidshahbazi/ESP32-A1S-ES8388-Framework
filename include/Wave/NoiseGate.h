@@ -3,7 +3,7 @@
 #define WAVE_SHAPER_H
 
 #include "BiquadFilter.h"
-#include <math.h>
+#include "../Math.h"
 
 class NoiseGate : public Wave
 {

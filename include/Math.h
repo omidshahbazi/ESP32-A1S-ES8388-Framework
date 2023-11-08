@@ -3,6 +3,7 @@
 #define Math_H
 
 #include "Debug.h"
+#include <math.h>
 
 class Math
 {

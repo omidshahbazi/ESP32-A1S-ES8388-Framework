@@ -4,65 +4,48 @@
 
 #include "Wave.h"
 
+#include "Wave.h"
+#include "../Math.h"
+
 class HighPassFilter : public Wave
 {
 public:
 	HighPassFilter(void)
-		: m_SampleRate(44100),
-		  m_Time(0),
-		  m_CapacitorVoltage(0)
+		: m_CutoffFrequency(0),
+		  m_TimeConstant(0),
+		  m_PreviousInput(0),
+		  m_PreviousOutput(0)
 	{
-		SetCutOffTime(20);
+		SetCutoffFrequencye(1000);
 	}
 
-	void SetSampleRate(uint16 Value)
+	void SetCutoffFrequencye(float Value)
 	{
-		m_SampleRate = Value;
-
-		Update();
+		m_TimeConstant = 1 / (2 * Math::PI * Value);
 	}
-	uint16 GetSampleRate(void) const
+	float GetCutoffFrequencye(void) const
 	{
-		return m_SampleRate;
-	}
-
-	void SetConstantTime(float Value)
-	{
-		m_Time = Value;
-
-		Update();
-	}
-	void SetCutOffTime(float Value)
-	{
-		m_Time = 1 / (6.283 * Value);
-
-		Update();
-	}
-	float GetTime(void) const
-	{
-		return m_Time;
+		return m_CutoffFrequency;
 	}
 
 	float Process(float Value) override
 	{
-		float delta = (Value - m_CapacitorVoltage) / m_Devision;
+		double alpha = m_TimeConstant / (1 + m_TimeConstant);
 
-		m_CapacitorVoltage += delta;
+		double output = alpha * (m_PreviousOutput + Value - m_PreviousInput);
 
-		return Value - m_CapacitorVoltage;
-	}
+		m_PreviousInput = Value;
+		m_PreviousOutput = output;
 
-private:
-	void Update(void)
-	{
-		m_Devision = m_Time * m_SampleRate;
+		return output;
 	}
 
 private:
 	uint16 m_SampleRate;
-	float m_Time;
-	float m_Devision;
-	float m_CapacitorVoltage;
+	float m_CutoffFrequency;
+	float m_TimeConstant;
+	float m_PreviousInput;
+	float m_PreviousOutput;
 };
 
 #endif
