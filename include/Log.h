@@ -38,29 +38,34 @@ public:
 		const int16 SIZE = 512;
 		char buff[SIZE];
 
-		int32 index = 0;
+		int16 index = 0;
 
-		index += snprintf(buff + index, SIZE, "[");
+		buff[index++] = '[';
+
 		if (Bitwise::IsEnabled(Type, Types::Debug))
-			index += snprintf(buff + index, SIZE, "D");
+			buff[index++] = 'D';
+
 		if (Bitwise::IsEnabled(Type, Types::Info))
-			index += snprintf(buff + index, SIZE, "I");
+			buff[index++] = 'I';
+
 		if (Bitwise::IsEnabled(Type, Types::Warning))
-			index += snprintf(buff + index, SIZE, "W");
+			buff[index++] = 'W';
+
 		if (Bitwise::IsEnabled(Type, Types::Error))
-			index += snprintf(buff + index, SIZE, "E");
+			buff[index++] = 'E';
+
 		if (Bitwise::IsEnabled(Type, Types::Critical))
-			index += snprintf(buff + index, SIZE, "C");
-		index += snprintf(buff + index, SIZE, "] ");
+			buff[index++] = 'C';
+
+		buff[index++] = ']';
 
 		if (Tag != nullptr)
-			index += snprintf(buff + index, SIZE, "[%s] ", Tag);
+			index += snprintf(buff + index, SIZE - index, "[%s] ", Tag);
 
-		index += snprintf(buff + index, SIZE, FormattedMessage, Args...);
+		index += snprintf(buff + index, SIZE - index, FormattedMessage, Args...);
 
-		index += snprintf(buff + index, SIZE, "\n");
-
-		buff[index] = '\0';
+		buff[index++] = '\n';
+		buff[index++] = '\0';
 
 		printf(buff);
 	}

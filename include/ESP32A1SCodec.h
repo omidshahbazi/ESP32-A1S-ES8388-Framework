@@ -47,7 +47,7 @@ public:
 	};
 
 public:
-	static bool Initialize(Configs *Configs)
+	static void Initialize(Configs *Configs)
 	{
 		CHECK_CALL(InitializeI2C(Configs));
 
@@ -61,49 +61,47 @@ public:
 		CHECK_CALL(m_Codec->SetBitsPerSample(Configs->BitsPerSample));
 
 		CHECK_CALL(InitializeI2S(Configs));
-
-		return true;
 	}
 
 	//[0dB, 24dB]
-	void SetMicrophoneGain(float dB)
+	static void SetMicrophoneGain(float dB)
 	{
 		CHECK_CALL(m_Codec->SetMicrophoneGain(dB));
 	}
 
-	float GetMicrophoneGain(void)
+	static float GetMicrophoneGain(void)
 	{
 		return m_Codec->GetMicrophoneGain();
 	}
 
 	//[-96dB, 0dB]
-	void SetInputVolume(float dB)
+	static void SetInputVolume(float dB)
 	{
 		CHECK_CALL(m_Codec->SetInputVolume(dB));
 	}
 
-	float GetInputVolume(void)
+	static float GetInputVolume(void)
 	{
 		return m_Codec->GetInputVolume();
 	}
 
 	//[-45dB, 4.5dB]
-	void SetOutputVolume(float dB)
+	static void SetOutputVolume(float dB)
 	{
 		CHECK_CALL(m_Codec->SetOutputVolume(dB));
 	}
 
-	float GetOutputVolume(void)
+	static float GetOutputVolume(void)
 	{
 		return m_Codec->GetOutputVolume();
 	}
 
-	void SetMute(bool Mute)
+	static void SetMute(bool Mute)
 	{
 		CHECK_CALL(m_Codec->SetMute(Mute));
 	}
 
-	bool GetMute(void)
+	static bool GetMute(void)
 	{
 		return m_Codec->GetMute();
 	}
@@ -111,53 +109,49 @@ public:
 	// Optimize the analog to digital conversion range
 	//[0, 4]
 	//(1Vrms/2.83Vpp, 0.5Vrms/1.41Vpp, 0.25Vrms/707mVpp, 0.125Vrms/354mVpp, 0.625Vrms/177mVpp)
-	void OptimizeConversion(uint Range = 2)
+	static void OptimizeConversion(uint8 Range = 2)
 	{
 		CHECK_CALL(m_Codec->OptimizeConversion(Range));
 	}
 
 	template <typename T>
-	static bool Read(T *Buffer, uint32 Count, int32 TicksToWait = -1)
+	static void Read(T *Buffer, uint32 Count, int32 TicksToWait = -1)
 	{
 		uint32 readByteCount = 0;
-		return Read(Buffer, Count, &readByteCount, TicksToWait);
+		Read(Buffer, Count, &readByteCount, TicksToWait);
 	}
 
 	template <typename T>
-	static bool Read(T *Buffer, uint32 Count, uint32 *ReadByteCount, int32 TicksToWait = -1)
+	static void Read(T *Buffer, uint32 Count, uint32 *ReadByteCount, int32 TicksToWait = -1)
 	{
-		return ReadRaw(Buffer, Count * sizeof(T), ReadByteCount, TicksToWait);
+		ReadRaw(Buffer, Count * sizeof(T), ReadByteCount, TicksToWait);
 	}
 
-	static bool ReadRaw(void *Buffer, uint32 Length, uint32 *ReadByteCount, int32 TicksToWait = -1)
+	static void ReadRaw(void *Buffer, uint32 Length, uint32 *ReadByteCount, int32 TicksToWait = -1)
 	{
 		ESP_CHECK_CALL(i2s_read(I2S_PORT, Buffer, Length, ReadByteCount, TicksToWait));
 
 		Log::WriteDebug(TAG, "Read %ib from the I2S in a %ib long buffer with %iticks for timeout", *ReadByteCount, Length, TicksToWait);
-
-		return true;
 	}
 
 	template <typename T>
-	static bool Write(const T *Buffer, uint32 Count, int32 TicksToWait = -1)
+	static void Write(const T *Buffer, uint32 Count, int32 TicksToWait = -1)
 	{
 		uint32 writtenByteCount = 0;
-		return Write(Buffer, Count, &writtenByteCount, TicksToWait);
+		Write(Buffer, Count, &writtenByteCount, TicksToWait);
 	}
 
 	template <typename T>
-	static bool Write(const T *Buffer, uint32 Count, uint32 *WrittenByteCount, int32 TicksToWait = -1)
+	static void Write(const T *Buffer, uint32 Count, uint32 *WrittenByteCount, int32 TicksToWait = -1)
 	{
-		return WriteRaw(Buffer, Count * sizeof(T), WrittenByteCount, TicksToWait);
+		WriteRaw(Buffer, Count * sizeof(T), WrittenByteCount, TicksToWait);
 	}
 
-	static bool WriteRaw(const void *Buffer, uint32 Length, uint32 *WrittenByteCount, int32 TicksToWait = -1)
+	static void WriteRaw(const void *Buffer, uint32 Length, uint32 *WrittenByteCount, int32 TicksToWait = -1)
 	{
 		ESP_CHECK_CALL(i2s_write(I2S_PORT, Buffer, Length, WrittenByteCount, TicksToWait));
 
 		Log::WriteDebug(TAG, "Wrote %ib to the I2S from a %ib long buffer with %iticks for timeout", *WrittenByteCount, Length, TicksToWait);
-
-		return true;
 	}
 
 private:
@@ -227,9 +221,6 @@ private:
 		config.mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT;
 		config.fixed_mclk = 33868800;
 
-		// PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
-		// WRITE_PERI_REG(PIN_CTRL, READ_PERI_REG(PIN_CTRL) & 0xFFFFFFF0);
-
 		ESP_CHECK_CALL(i2s_driver_install(I2S_PORT, &config, 0, nullptr));
 
 		CHECK_CALL(SetI2SPin(Configs));
@@ -284,6 +275,9 @@ private:
 
 	static void SetMasterClockPin(i2s_port_t Port, gpio_num_t GPIO)
 	{
+		// PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
+		// WRITE_PERI_REG(PIN_CTRL, READ_PERI_REG(PIN_CTRL) & 0xFFFFFFF0);
+
 		ASSERT(Port != I2S_NUM_MAX, "Setting MasterClockPin", "Does not support I2S_NUM_MAX");
 		ASSERT(GPIO == GPIO_NUM_0 || GPIO == GPIO_NUM_1 || GPIO == GPIO_NUM_3, "Setting MasterClockPin", "GPIO_NUM_0, GPIO_NUM_1 and GPIO_NUM_3 are only supported for master");
 

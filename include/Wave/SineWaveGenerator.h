@@ -2,7 +2,7 @@
 #ifndef SINE_WAVE_GENERATOR_H
 #define SINE_WAVE_GENERATOR_H
 
-#include "../include/ESP32A1SCodec.h"
+#include "../../include/ESP32A1SCodec.h"
 #include <math.h>
 
 template <typename T>
@@ -73,10 +73,10 @@ private:
 		const uint16 SamplePerCycle = m_SampleRate / m_Frequency;
 
 		if (m_Buffer != nullptr)
-			Deallocate(m_Buffer);
+			Memory::Deallocate(m_Buffer);
 
 		m_BufferLength = SamplePerCycle * 2;
-		m_Buffer = Allocate<T>(m_BufferLength);
+		m_Buffer = Memory::Allocate<T>(m_BufferLength);
 
 		const int32 Mask = 0x0FFFFFFF >> (sizeof(int32) - sizeof(T));
 		for (int32 i = 0; i < m_BufferLength; i += 2)

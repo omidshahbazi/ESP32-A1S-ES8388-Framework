@@ -666,7 +666,7 @@ public:
 
 		Range = Math::Clamp(Range, 0, 4);
 
-		Log::WriteInfo(TAG, "Optimizing Conversion: %i, InputGain: %idb, Output Volume: %idb", Range, INPUT_GAIN[Range], OUTPUT_VOLUME[Range]);
+		Log::WriteInfo(TAG, "Optimizing Conversion: %i, Input Gain: %.1ffdb, Output Volume: %.1ffdb", Range, INPUT_GAIN[Range], OUTPUT_VOLUME[Range]);
 
 		CHECK_CALL(SetMicrophoneGain(INPUT_GAIN[Range]));
 		CHECK_CALL(SetOutputVolume(OUTPUT_VOLUME[Range]));

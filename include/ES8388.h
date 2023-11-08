@@ -207,7 +207,7 @@ public:
 	// Optimize the analog to digital conversion range
 	//[0, 4]
 	//(1Vrms/2.83Vpp, 0.5Vrms/1.41Vpp, 0.25Vrms/707mVpp, 0.125Vrms/354mVpp, 0.625Vrms/177mVpp)
-	bool OptimizeConversion(uint Range = 2)
+	bool OptimizeConversion(uint8 Range = 2)
 	{
 		return ES8388Interface::OptimizeConversion(Range);
 	}
