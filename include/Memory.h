@@ -16,7 +16,7 @@ public:
 
 		ASSERT(mem != nullptr, "Memory", "Couldn't allocate memory: %i of %iB", Count, sizeof(T));
 
-		Set(mem, (T)0, Count);
+		Set(mem, 0, Count);
 
 		return mem;
 	}
@@ -28,7 +28,7 @@ public:
 	}
 
 	template <typename T>
-	static void Set(T *Memory, T Value, uint16 Count = 1)
+	static void Set(T *Memory, int32 Value, uint16 Count = 1)
 	{
 		memset(Memory, Value, sizeof(T) * Count);
 	}
@@ -36,7 +36,7 @@ public:
 	template <typename T>
 	static void Copy(const T *Source, T *Destination, uint16 Count = 1)
 	{
-		memccpy(Destination, Source, sizeof(T) * Count);
+		memcpy(Destination, Source, sizeof(T) * Count);
 	}
 };
 #endif
