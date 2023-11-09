@@ -64,7 +64,7 @@ public:
 		return m_Phase;
 	}
 
-	float Process(float Value) override
+	double Process(double Value) override
 	{
 		if (m_WaveTable == nullptr)
 			return 0;

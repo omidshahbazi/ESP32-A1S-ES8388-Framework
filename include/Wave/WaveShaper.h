@@ -19,7 +19,7 @@ public:
 		}
 	}
 
-	float Process(float Value) override
+	double Process(double Value) override
 	{
 		float val = (Value + 1.0f) * 127.5f;
 		val = Math::Clamp(val, 0.0f, 255.0f);

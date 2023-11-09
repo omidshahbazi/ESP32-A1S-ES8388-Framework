@@ -40,7 +40,7 @@ public:
 				m_States[i].Coef[j] = Values[(5 * i) + j];
 	}
 
-	float Process(float Value) override
+	double Process(double Value) override
 	{
 		for (uint8 i = 0; i < m_StateCount; ++i)
 		{

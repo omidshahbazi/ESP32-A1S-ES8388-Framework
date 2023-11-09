@@ -34,7 +34,7 @@ public:
 		m_LowerThreshold = m_UpperThreshold / 2.0f;
 	}
 
-	float Process(float Value) override
+	double Process(double Value) override
 	{
 		m_Envelope = 1.4142 * m_BiquadFilter.Process(fabsf(Value));
 

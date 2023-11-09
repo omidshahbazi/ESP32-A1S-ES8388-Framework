@@ -25,7 +25,7 @@ public:
 		return m_CutoffFrequency;
 	}
 
-	float Process(float Value) override
+	double Process(double Value) override
 	{
 		double alpha = 1 / (1 + m_TimeConstant);
 

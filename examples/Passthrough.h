@@ -24,7 +24,7 @@ public:
 
 		CHECK_CALL(ESP32A1SCodec::Initialize(&configs));
 
-		xTaskCreatePinnedToCore(OutputTask, "PassthroughTask", 4096, nullptr, 10, nullptr, 1);
+		Task::Create(OutputTask);
 	}
 
 private:

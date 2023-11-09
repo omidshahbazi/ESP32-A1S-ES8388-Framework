@@ -43,7 +43,7 @@ public:
 		// esp_gap_register_callback(gap_event_handler);
 		// esp_gatts_register_callback(gatts_event_handler);
 
-		// xTaskCreatePinnedToCore(OutputTask, "SineWaveGeneratorTask", 4096, nullptr, 10, nullptr, 1);
+		// Task::Create(OutputTask);
 	}
 
 private:
