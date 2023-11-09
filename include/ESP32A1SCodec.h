@@ -212,7 +212,7 @@ private:
 		config.sample_rate = Configs->SampleRate;
 		config.bits_per_sample = bps;
 		config.channel_format = (i2s_channel_fmt_t)Configs->ChannelFormat;
-		config.communication_format = I2S_COMM_FORMAT_STAND_MSB;
+		config.communication_format = I2S_COMM_FORMAT_STAND_I2S;
 		config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;
 		config.dma_buf_count = Configs->BufferCount;
 		config.dma_buf_len = Configs->BufferLegth;
@@ -275,9 +275,6 @@ private:
 
 	static void SetMasterClockPin(i2s_port_t Port, gpio_num_t GPIO)
 	{
-		// PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
-		// WRITE_PERI_REG(PIN_CTRL, READ_PERI_REG(PIN_CTRL) & 0xFFFFFFF0);
-
 		ASSERT(Port != I2S_NUM_MAX, "Setting MasterClockPin", "Does not support I2S_NUM_MAX");
 		ASSERT(GPIO == GPIO_NUM_0 || GPIO == GPIO_NUM_1 || GPIO == GPIO_NUM_3, "Setting MasterClockPin", "GPIO_NUM_0, GPIO_NUM_1 and GPIO_NUM_3 are only supported for master");
 
@@ -288,7 +285,8 @@ private:
 			if (GPIO == GPIO_NUM_0)
 			{
 				PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
-				WRITE_PERI_REG(PIN_CTRL, 0xFFF0);
+				// WRITE_PERI_REG(PIN_CTRL, 0xFFF0);
+				WRITE_PERI_REG(PIN_CTRL, READ_PERI_REG(PIN_CTRL) & 0xFFFFFFF0);
 			}
 			else if (GPIO == GPIO_NUM_1)
 			{
@@ -306,7 +304,8 @@ private:
 			if (GPIO == GPIO_NUM_0)
 			{
 				PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
-				WRITE_PERI_REG(PIN_CTRL, 0xFFFF);
+				// WRITE_PERI_REG(PIN_CTRL, 0xFFFF);
+				WRITE_PERI_REG(PIN_CTRL, READ_PERI_REG(PIN_CTRL) & 0xFFFFFFFF);
 			}
 			else if (GPIO == GPIO_NUM_1)
 			{
