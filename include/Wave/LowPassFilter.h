@@ -18,7 +18,9 @@ public:
 
 	void SetCutoffFrequencye(float Value)
 	{
-		m_TimeConstant = 1 / (2 * Math::PI * Value);
+		m_CutoffFrequency = Value;
+
+		m_TimeConstant = 1 / (2 * Math::PI * m_CutoffFrequency);
 	}
 	float GetCutoffFrequencye(void) const
 	{
