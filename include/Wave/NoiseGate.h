@@ -36,16 +36,16 @@ public:
 
 	double Process(double Value) override
 	{
-		m_Envelope = 1.4142 * m_BiquadFilter.Process(fabsf(Value));
+		float envelope = 1.4142 * m_BiquadFilter.Process(fabsf(Value));
 
 		// detecting the gate and expansion area
-		if (m_Envelope < m_LowerThreshold)
+		if (envelope < m_LowerThreshold)
 		{
 			Value = 0;
 		}
-		else if (m_Envelope < m_UpperThreshold)
+		else if (envelope < m_UpperThreshold)
 		{
-			Value *= (m_Envelope - m_LowerThreshold) / (m_UpperThreshold - m_LowerThreshold);
+			Value *= (envelope - m_LowerThreshold) / (m_UpperThreshold - m_LowerThreshold);
 		}
 
 		return Value;
@@ -55,6 +55,5 @@ private:
 	BiquadFilter m_BiquadFilter;
 	float m_LowerThreshold;
 	float m_UpperThreshold;
-	float m_Envelope;
 };
 #endif
