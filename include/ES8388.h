@@ -12,7 +12,7 @@
 
 class ES8388
 {
-public:
+private:
 	enum class Modules
 	{
 		ADC = 0x1,
@@ -20,6 +20,7 @@ public:
 		Both = ADC | DAC
 	};
 
+public:
 	enum class BitsPerSamples
 	{
 		BPS16 = (uint8)ES8388Interface::BitsPerSamples::BPS16,
@@ -49,10 +50,15 @@ public:
 	};
 
 public:
-	ES8388(Modules Modules, InputModes InputMode, OutputModes OutputMode)
-		: m_Modules(Modules)
+	ES8388(InputModes InputMode, OutputModes OutputMode)
+		: m_Modules((Modules)0)
 	{
 		Log::WriteInfo(TAG, "Intializing");
+
+		if (InputMode != InputModes::None)
+			m_Modules |= Modules::ADC;
+		if (OutputMode != OutputModes::None)
+			m_Modules |= Modules::DAC;
 
 		CHECK_CALL(ES8388Interface::TurnOn(false, ES8388Interface::MiddleVoltageResistances::R50K));
 

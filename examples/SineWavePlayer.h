@@ -14,7 +14,6 @@ public:
 
 		ESP32A1SCodec::Configs configs;
 		configs.Version = ESP32A1SCodec::Versions::V2974;
-		configs.TransmissionMode = ESP32A1SCodec::TransmissionModes::Transmit;
 		configs.SampleRate = SAMPLE_RATE;
 		configs.BitsPerSample = ES8388::BitsPerSamples::BPS16;
 		configs.ChannelFormat = ESP32A1SCodec::ChannelFormats::SeparatedLeftAndRight;
@@ -33,8 +32,8 @@ private:
 	{
 		SineWaveGenerator<int16> sineWave(SAMPLE_RATE);
 
-		int amplitude = sineWave.GetAmplitude();
-		int step = 25;
+		int32 amplitude = sineWave.GetAmplitude();
+		int32 step = 25;
 
 		while (true)
 		{

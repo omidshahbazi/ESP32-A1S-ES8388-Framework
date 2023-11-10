@@ -16,13 +16,6 @@ public:
 		V2974
 	};
 
-	enum class TransmissionModes
-	{
-		Transmit = I2S_MODE_TX,
-		Receive = I2S_MODE_RX,
-		Both = Transmit | Receive
-	};
-
 	enum class ChannelFormats
 	{
 		SeparatedLeftAndRight = I2S_CHANNEL_FMT_RIGHT_LEFT,
@@ -36,7 +29,6 @@ public:
 	{
 	public:
 		Versions Version;
-		TransmissionModes TransmissionMode;
 		uint32 SampleRate;
 		ES8388::BitsPerSamples BitsPerSample;
 		ChannelFormats ChannelFormat;
@@ -51,13 +43,7 @@ public:
 	{
 		CHECK_CALL(InitializeI2C(Configs));
 
-		ES8388::Modules modules = (ES8388::Modules)0;
-		if (Bitwise::IsEnabled(Configs->TransmissionMode, TransmissionModes::Receive))
-			modules |= ES8388::Modules::ADC;
-		if (Bitwise::IsEnabled(Configs->TransmissionMode, TransmissionModes::Transmit))
-			modules |= ES8388::Modules::DAC;
-
-		m_Codec = new ES8388(modules, Configs->InputMode, Configs->OutputMode);
+		m_Codec = new ES8388(Configs->InputMode, Configs->OutputMode);
 		CHECK_CALL(m_Codec->SetBitsPerSample(Configs->BitsPerSample));
 
 		CHECK_CALL(InitializeI2S(Configs));
@@ -191,6 +177,12 @@ private:
 
 		Log::WriteInfo(TAG, "Initializing I2S");
 
+		i2s_mode_t modes = I2S_MODE_MASTER;
+		if (Configs->OutputMode != ES8388::OutputModes::None)
+			modes |= I2S_MODE_TX;
+		if (Configs->InputMode != ES8388::InputModes::None)
+			modes |= I2S_MODE_RX;
+
 		i2s_bits_per_sample_t bps = I2S_BITS_PER_SAMPLE_8BIT;
 		switch (Configs->BitsPerSample)
 		{
@@ -208,7 +200,7 @@ private:
 		}
 
 		i2s_config_t config = {};
-		config.mode = (i2s_mode_t)(I2S_MODE_MASTER | Configs->TransmissionMode);
+		config.mode = modes;
 		config.sample_rate = Configs->SampleRate;
 		config.bits_per_sample = bps;
 		config.channel_format = (i2s_channel_fmt_t)Configs->ChannelFormat;

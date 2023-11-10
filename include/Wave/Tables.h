@@ -527,7 +527,7 @@ const uint16 TABLE_SIZE = 256;
 // Ranges from 0.0 to 255.0
 float LookupLinear(const float *Table, float Value)
 {
-	int index = (int)Value;
+	int32 index = (int32)Value;
 	float frac = Value - (float)index;
 	return Table[index] + (frac * (Table[index + 1] - Table[index]));
 }
