@@ -44,7 +44,7 @@ public:
 	void SetBlinking(float BlinkRate)
 	{
 		m_IsBlinking = true;
-		m_BlinkRate = BlinkRate;
+		m_BlinkRate = Math::Clamp(BlinkRate, 0.0001F, 1000);
 	}
 	bool GetBlinking(void) const
 	{
