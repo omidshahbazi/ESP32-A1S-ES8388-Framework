@@ -79,9 +79,10 @@ public:
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
 		{
+			CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGate(-40.5F));
 			CHECK_CALL(ES8388Interface::SetInputToMixerGain(6));
 
-			CHECK_CALL(SetMicrophoneBoostGainRange(0, 0));
+			CHECK_CALL(SetAutomaticLevelControlParameters(0, 0, -1.5F, 500, 50, 200));
 
 			CHECK_CALL(SetMicrophoneGain(24));
 
@@ -119,14 +120,18 @@ public:
 		return BitsPerSamples::BPS16;
 	}
 
-	//[-12dB, 30dB]
-	//[-6.5dB, 35.5dB]
-	bool SetMicrophoneBoostGainRange(float dBMin, float dbMax)
+	// dBMin [-12dB, 30dB]
+	// dBMax [-6.5dB, 35.5dB]
+	// dBTarget [-16.5dB, -1.5dB]
+	// HoldTime [0ms, 1360ms]
+	// AttackTime [0.104ms/0.0227ms, 106ms/23.2ms]
+	// DecayTime [0.410ms/0.0908ms, 420ms/93ms]
+	bool SetAutomaticLevelControlParameters(float dBMin, float dBMax, float dBTarget, float HoldTime, float AttackTime, float DecayTime)
 	{
 		if (!Bitwise::IsEnabled(m_Modules, Modules::ADC))
 			return false;
 
-		CHECK_CALL(ES8388Interface::SetMicrophoneBoostGainRange(dBMin, dbMax));
+		CHECK_CALL(ES8388Interface::SetAutomaticLevelControlParameters(dBMin, dBMax, dBTarget, HoldTime, AttackTime, DecayTime));
 
 		return true;
 	}

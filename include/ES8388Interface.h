@@ -176,6 +176,8 @@ public:
 				Log::WriteError("R Differential1");
 				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_RINSEL_11, ES8388Control::Masks::ADCControl2_RINSEL);
 				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSR_0, ES8388Control::Masks::ADCControl2_DSR);
+				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSSEL_0, ES8388Control::Masks::ADCControl2_DSSEL);
+				ES8388Control::Write(ES8388Control::Registers::ADCControl3, ES8388Control::Values::ADCControl3_DS_0, ES8388Control::Masks::ADCControl3_DS);
 			}
 			else if (Bitwise::IsEnabled(InputMode, InputModes::Differential2))
 			{
@@ -210,6 +212,10 @@ public:
 				Log::WriteError("L Differential1");
 				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_LINSEL_11, ES8388Control::Masks::ADCControl2_LINSEL);
 				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSR_0, ES8388Control::Masks::ADCControl2_DSR);
+				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSSEL_0, ES8388Control::Masks::ADCControl2_DSSEL);
+				ES8388Control::Write(ES8388Control::Registers::ADCControl3, ES8388Control::Values::ADCControl3_DS_0, ES8388Control::Masks::ADCControl3_DS);
+
+				ES8388Control::Write(ES8388Control::Registers::ADCControl4, ES8388Control::Values::ADCControl4_DATSEL_01, ES8388Control::Masks::ADCControl4_DATSEL);
 			}
 			else if (Bitwise::IsEnabled(InputMode, InputModes::Differential2))
 			{
@@ -229,9 +235,7 @@ public:
 			}
 		}
 
-		CHECK_CALL(SetALCEnabled(Powered, InputMode));
-
-		ES8388Control::Write(ES8388Control::Registers::ADCControl4, ES8388Control::Values::ADCControl4_DATSEL_00, ES8388Control::Masks::ADCControl4_DATSEL);
+		CHECK_CALL(SetAutomaticLevelControlEnabled(Powered, InputMode));
 
 		return true;
 	}
@@ -481,7 +485,7 @@ public:
 
 	//[-12dB, 30dB]
 	//[-6.5dB, 35.5dB]
-	static bool SetMicrophoneBoostGainRange(float dBMin, float dbMax)
+	static bool SetAutomaticLevelControlGainRange(float dBMin, float dbMax)
 	{
 		dBMin = Math::Clamp(dBMin, -12, 30);
 		dbMax = Math::Clamp(dbMax, -6.5, 35.5);
@@ -493,6 +497,44 @@ public:
 
 		value = (dbMax + 6.5) / 6;
 		ES8388Control::Write(ES8388Control::Registers::ADCControl10, (ES8388Control::Values)(value << 3), ES8388Control::Masks::ADCControl10_MAXGAIN);
+
+		return true;
+	}
+
+	// dBMin [-12dB, 30dB]
+	// dBMax [-6.5dB, 35.5dB]
+	// dBTarget [-16.5dB, -1.5dB]
+	// HoldTime [0ms, 1360ms]
+	// AttackTime [0.104ms/0.0227ms, 106ms/23.2ms]
+	// DecayTime [0.410ms/0.0908ms, 420ms/93ms]
+	static bool SetAutomaticLevelControlParameters(float dBMin, float dBMax, float dBTarget, float HoldTime, float AttackTime, float DecayTime)
+	{
+		dBMin = Math::Clamp(dBMin, -12, 30);
+		dBMax = Math::Clamp(dBMax, -6.5, 35.5);
+		dBTarget = Math::Clamp(dBTarget, -16.5, -1.5);
+		HoldTime = Math::Clamp(HoldTime, 0, 1360);
+		AttackTime = Math::Clamp(AttackTime, 0.104, 106);
+		DecayTime = Math::Clamp(DecayTime, 0.410, 420);
+
+		Log::WriteInfo(TAG, "Setting Automatic Level Control Parameters, Min: %.1fdB, Max: %.1fdB, Target: %.1fdB, Hold Time: %.1fms, Attack Time: %.1fms, Decay Time: %.1fms", dBMin, dBMax, dBTarget, HoldTime, AttackTime, DecayTime);
+
+		uint8 value = (dBMin + 12) / 6;
+		ES8388Control::Write(ES8388Control::Registers::ADCControl10, (ES8388Control::Values)value, ES8388Control::Masks::ADCControl10_MINGAIN);
+
+		value = (dBMax + 6.5) / 6;
+		ES8388Control::Write(ES8388Control::Registers::ADCControl10, (ES8388Control::Values)(value << 3), ES8388Control::Masks::ADCControl10_MAXGAIN);
+
+		value = (dBTarget + 16.5F) / 1.5F;
+		ES8388Control::Write(ES8388Control::Registers::ADCControl11, (ES8388Control::Values)(value << 4), ES8388Control::Masks::ADCControl11_ALCLVL);
+
+		value = log2(((HoldTime + 1000) / 0.67F) - 1000);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl11, (ES8388Control::Values)value, ES8388Control::Masks::ADCControl11_ALCHLD);
+
+		value = log2(AttackTime / 0.053F);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl12, (ES8388Control::Values)value, ES8388Control::Masks::ADCControl12_ALCATK);
+
+		value = log2(DecayTime / 0.21F);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl12, (ES8388Control::Values)(value << 4), ES8388Control::Masks::ADCControl12_ALCDCY);
 
 		return true;
 	}
@@ -520,13 +562,13 @@ public:
 	}
 
 	//[-76.5dBFS, -30dBFS]
-	static bool SetMicrophoneNoiseGate(float dbFS)
+	static bool SetMicrophoneNoiseGate(float dBFS)
 	{
-		dbFS = Math::Clamp(dbFS, -76.5, -30);
+		dBFS = Math::Clamp(dBFS, -76.5, -30);
 
-		Log::WriteInfo(TAG, "Setting Microphone Noise Gate: %.1fdBFS", dbFS);
+		Log::WriteInfo(TAG, "Setting Microphone Noise Gate: %.1fdBFS", dBFS);
 
-		uint8 value = (dbFS + 76.5) / -1.5;
+		uint8 value = (dBFS + 76.5) / -1.5;
 
 		ES8388Control::Write(ES8388Control::Registers::ADCControl14, (ES8388Control::Values)(value << 3), ES8388Control::Masks::ADCControl14_NGTH);
 
@@ -545,7 +587,7 @@ public:
 	{
 		dB = Math::Clamp(dB, -15, 6);
 
-		Log::WriteInfo(TAG, "Setting Input to Mixer gain: %.1fdB", dB);
+		Log::WriteInfo(TAG, "Setting Input to Mixer Gain: %.1fdB", dB);
 
 		uint8 value = 7 - (uint8)((dB + 15) / 3.0F);
 
@@ -674,7 +716,7 @@ public:
 
 		Range = Math::Clamp(Range, 0, 4);
 
-		Log::WriteInfo(TAG, "Optimizing Conversion: %i, Input Gain: %.1ffdb, Output Volume: %.1ffdb", Range, INPUT_GAIN[Range], OUTPUT_VOLUME[Range]);
+		Log::WriteInfo(TAG, "Optimizing Conversion: %i, Input Gain: %.1ffdB, Output Volume: %.1ffdB", Range, INPUT_GAIN[Range], OUTPUT_VOLUME[Range]);
 
 		CHECK_CALL(SetMicrophoneGain(INPUT_GAIN[Range]));
 		CHECK_CALL(SetOutputVolume(OUTPUT_VOLUME[Range]));
@@ -790,7 +832,7 @@ private:
 		return true;
 	}
 
-	static bool SetALCEnabled(bool Enabled, InputModes InputMode)
+	static bool SetAutomaticLevelControlEnabled(bool Enabled, InputModes InputMode)
 	{
 		Log::WriteInfo(TAG, "Setting ALC Enabled: %i, Right: %i, Left: %i", Enabled,
 					   Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2),
