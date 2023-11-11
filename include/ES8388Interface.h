@@ -483,24 +483,6 @@ public:
 		return (BitsPerSamples)0;
 	}
 
-	//[-12dB, 30dB]
-	//[-6.5dB, 35.5dB]
-	static bool SetAutomaticLevelControlGainRange(float dBMin, float dbMax)
-	{
-		dBMin = Math::Clamp(dBMin, -12, 30);
-		dbMax = Math::Clamp(dbMax, -6.5, 35.5);
-
-		Log::WriteInfo(TAG, "Setting Microphone Boost Gain: [%.1fdB, %.1fdb]", dBMin, dbMax);
-
-		uint8 value = (dBMin + 12) / 6;
-		ES8388Control::Write(ES8388Control::Registers::ADCControl10, (ES8388Control::Values)value, ES8388Control::Masks::ADCControl10_MINGAIN);
-
-		value = (dbMax + 6.5) / 6;
-		ES8388Control::Write(ES8388Control::Registers::ADCControl10, (ES8388Control::Values)(value << 3), ES8388Control::Masks::ADCControl10_MAXGAIN);
-
-		return true;
-	}
-
 	// dBMin [-12dB, 30dB]
 	// dBMax [-6.5dB, 35.5dB]
 	// dBTarget [-16.5dB, -1.5dB]
