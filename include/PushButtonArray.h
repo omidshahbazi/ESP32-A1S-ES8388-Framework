@@ -28,7 +28,7 @@ public:
 	PushButtonArray(GPIOPins Pin, uint8 ButtonCount)
 		: m_Pin(Pin),
 		  m_Bindings(nullptr),
-		  m_BindingCount(m_BindingCount)
+		  m_BindingCount(ButtonCount)
 	{
 		uint16 diff = 1024 / (m_BindingCount + 1);
 
