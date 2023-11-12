@@ -25,29 +25,42 @@ public:
 
 	enum class ChannelFormats
 	{
-		SeparatedLeftAndRight = I2S_CHANNEL_FMT_RIGHT_LEFT,
+		LeftAndRight = I2S_CHANNEL_FMT_RIGHT_LEFT,
+
 		AllFromLeft = I2S_CHANNEL_FMT_ALL_LEFT,
 		AllFromRight = I2S_CHANNEL_FMT_ALL_RIGHT,
+
 		OnlyLeft = I2S_CHANNEL_FMT_ONLY_LEFT,
 		OnlyRight = I2S_CHANNEL_FMT_ONLY_RIGHT
 	};
 
 	enum class InputModes
 	{
-		None = 0b00000000,
-		LineL = 0b00000001,
-		LineR = 0b00000010,
-		Microphone1 = 0b00000100,
-		Microphone2 = 0b00001000,
+		None = (uint8)ES8388::InputModes::None,
+
+		Microphone1 = (uint8)ES8388::InputModes::Left1,
+		Microphone2 = (uint8)ES8388::InputModes::Right1,
+
+		LineL = (uint8)ES8388::InputModes::Left2,
+		LineR = (uint8)ES8388::InputModes::Right2,
 	};
 
 	enum class OutputModes
 	{
 		None = (uint8)ES8388::OutputModes::None,
+
 		SpeakerL = (uint8)ES8388::OutputModes::Left1,
 		SpeakerR = (uint8)ES8388::OutputModes::Right1,
+
 		HeadphoneL = (uint8)ES8388::OutputModes::Left2,
 		HeadphoneR = (uint8)ES8388::OutputModes::Right2,
+
+		SpeakerLAndHeadphoneL = (uint8)ES8388::OutputModes::Left1AndLeft2,
+		SpeakerRAndHeadphoneR = (uint8)ES8388::OutputModes::Right1AndRight2,
+
+		SpeakerLR = (uint8)ES8388::OutputModes::LeftAndRight1,
+		HeadphoneLR = (uint8)ES8388::OutputModes::LeftAndRight2,
+
 		All = (uint8)ES8388::OutputModes::All
 	};
 

@@ -12,9 +12,12 @@ private:
 	{
 		Left1 = 0b00000001,
 		Right1 = 0b00000010,
+
 		Left2 = 0b00000100,
 		Right2 = 0b00001000,
+
 		Differential = 0b00010000,
+
 		MonoMix = 0b00100000
 	};
 
@@ -35,18 +38,17 @@ public:
 
 	enum class InputModes
 	{
+		None = 0b00000000,
+
 		Left1 = (uint8)InputModeBits::Left1,
 		Right1 = (uint8)InputModeBits::Right1,
 		Left2 = (uint8)InputModeBits::Left2,
 		Right2 = (uint8)InputModeBits::Right2,
 
-		SingleEnded1 = Left1 | Right1,
-		SingleEnded2 = Left2 | Right2,
+		Left1AndRight1Differential = (uint8)InputModeBits::Differential | Left1 | Right1,
+		Left2AndRight2Differential = (uint8)InputModeBits::Differential | Left2 | Right2,
 
-		Differential1 = (uint8)InputModeBits::Differential | SingleEnded1,
-		Differential2 = (uint8)InputModeBits::Differential | SingleEnded2,
-
-		BothDifferential = Differential1 | Differential2,
+		BothDifferential = Left1AndRight1Differential | Left2AndRight2Differential,
 
 		MonoMixToLeft = (uint8)InputModeBits::MonoMix,
 		MonoMixToRight = (uint8)InputModeBits::MonoMix
@@ -55,10 +57,13 @@ public:
 	enum class OutputModes
 	{
 		None = 0b00000000,
+
 		Left1 = 0b00000001,
 		Right1 = 0b00000010,
+
 		Left2 = 0b00000100,
 		Right2 = 0b00001000,
+
 		All = Left1 | Right1 | Left2 | Right2
 	};
 
@@ -92,10 +97,7 @@ public:
 		ES8388Control::Write(ES8388Control::Registers::MasterMode, ES8388Control::Values::MasterMode_BCLKDIV_00000, ES8388Control::Masks::MasterMode_BCLKDIV);
 		ES8388Control::Write(ES8388Control::Registers::MasterMode, ES8388Control::Values::MasterMode_BCLK_INV_0, ES8388Control::Masks::MasterMode_BCLK_INV);
 		ES8388Control::Write(ES8388Control::Registers::MasterMode, ES8388Control::Values::MasterMode_MCLKDIV2_0, ES8388Control::Masks::MasterMode_MCLKDIV2);
-		ES8388Control::Write(
-			ES8388Control::Registers::MasterMode,
-			(MasterMode ? ES8388Control::Values::MasterMode_MSC_1 : ES8388Control::Values::MasterMode_MSC_0),
-			ES8388Control::Masks::MasterMode_MSC);
+		ES8388Control::Write(ES8388Control::Registers::MasterMode, (MasterMode ? ES8388Control::Values::MasterMode_MSC_1 : ES8388Control::Values::MasterMode_MSC_0), ES8388Control::Masks::MasterMode_MSC);
 
 		ES8388Control::Write(ES8388Control::Registers::DACControl21, ES8388Control::Values::DACControl21_dac_dll_pwd_0, ES8388Control::Masks::DACControl21_dac_dll_pwd);
 		ES8388Control::Write(ES8388Control::Registers::DACControl21, ES8388Control::Values::DACControl21_adc_dll_pwd_0, ES8388Control::Masks::DACControl21_adc_dll_pwd);
@@ -153,119 +155,120 @@ public:
 	// 	return true;
 	// }
 
+	// Bias
 	static bool SetADCPowered(bool Powered, bool MicrophoneBiasPowered, InputModes InputMode)
 	{
-		InputMode = InputModes::Left1;
+		InputMode = InputModes::Left1 | InputModes::Right1;
 
-		Log::WriteInfo(TAG, "Setting ADC Powered: %i, Microphone Bias Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Diffrential: %i, Mono Mix to Left: %i, Mono Mix to Right: %i", Powered, MicrophoneBiasPowered,
+		Log::WriteInfo(TAG, "Setting ADC Powered: %i, Microphone Bias Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Left1 and Right1 Diffrential: %i, Left2 and Right2 Diffrential: %i, Mono Mix to Left: %i, Mono Mix to Right: %i", Powered, MicrophoneBiasPowered,
 					   Bitwise::IsEnabled(InputMode, InputModes::Left1),
 					   Bitwise::IsEnabled(InputMode, InputModes::Right1),
 					   Bitwise::IsEnabled(InputMode, InputModes::Left2),
 					   Bitwise::IsEnabled(InputMode, InputModes::Right2),
-					   Bitwise::IsEnabled(InputMode, (~(uint8)InputModes::SingleEnded1 & (uint8)InputModes::Differential1)),
+					   Bitwise::IsEnabled(InputMode, InputModes::Left1AndRight1Differential),
+					   Bitwise::IsEnabled(InputMode, InputModes::Left2AndRight2Differential),
 					   Bitwise::IsEnabled(InputMode, InputModes::MonoMixToLeft),
 					   Bitwise::IsEnabled(InputMode, InputModes::MonoMixToRight));
 
-		ES8388Control::Write(
-			ES8388Control::Registers::ADCPower,
-			(Powered ? ES8388Control::Values::ADCPower_int1LP_0 : ES8388Control::Values::ADCPower_int1LP_1), ES8388Control::Masks::ADCPower_int1LP);
-
-		ES8388Control::Write(
-			ES8388Control::Registers::ADCPower,
-			(Powered ? ES8388Control::Values::ADCPower_flashLP_0 : ES8388Control::Values::ADCPower_flashLP_1), ES8388Control::Masks::ADCPower_flashLP);
-
-		bool anyLeftBitIsActive = Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2);
-
-		ES8388Control::Write(
-			ES8388Control::Registers::ADCPower,
-			(Powered && anyLeftBitIsActive ? ES8388Control::Values::ADCPower_PdnADCL_0 : ES8388Control::Values::ADCPower_PdnADCL_1), ES8388Control::Masks::ADCPower_PdnADCL);
-
-		ES8388Control::Write(
-			ES8388Control::Registers::ADCPower,
-			(Powered && anyLeftBitIsActive ? ES8388Control::Values::ADCPower_PdnAINL_0 : ES8388Control::Values::ADCPower_PdnAINL_1), ES8388Control::Masks::ADCPower_PdnAINL);
-
-		if (anyLeftBitIsActive)
+		ES8388Control::Values adcPower = ES8388Control::Values::ADCPower_int1LP_1;
+		ES8388Control::Values adcFlashPower = ES8388Control::Values::ADCPower_flashLP_1;
+		if (Powered)
 		{
-			if (Bitwise::IsEnabled(InputMode, InputModes::Differential1))
-			{
-				Log::WriteError("L Differential1");
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_LINSEL_11, ES8388Control::Masks::ADCControl2_LINSEL);
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSR_0, ES8388Control::Masks::ADCControl2_DSR);
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSSEL_0, ES8388Control::Masks::ADCControl2_DSSEL);
-				ES8388Control::Write(ES8388Control::Registers::ADCControl3, ES8388Control::Values::ADCControl3_DS_0, ES8388Control::Masks::ADCControl3_DS);
+			adcPower = ES8388Control::Values::ADCPower_int1LP_0;
+			adcFlashPower = ES8388Control::Values::ADCPower_flashLP_0;
+		}
 
-				ES8388Control::Write(ES8388Control::Registers::ADCControl4, ES8388Control::Values::ADCControl4_DATSEL_01, ES8388Control::Masks::ADCControl4_DATSEL);
-			}
-			else if (Bitwise::IsEnabled(InputMode, InputModes::Differential2))
+		ES8388Control::Write(ES8388Control::Registers::ADCPower, adcPower, ES8388Control::Masks::ADCPower_int1LP);
+		ES8388Control::Write(ES8388Control::Registers::ADCPower, adcFlashPower, ES8388Control::Masks::ADCPower_flashLP);
+
+		ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSSEL_1, ES8388Control::Masks::ADCControl2_DSSEL);
+
+		ES8388Control::Values leftADCPower = ES8388Control::Values::ADCPower_PdnADCL_1;
+		ES8388Control::Values leftAnalogInputPower = ES8388Control::Values::ADCPower_PdnAINL_1;
+		ES8388Control::Values lefInSelect = ES8388Control::Values::ADCControl2_LINSEL_00;
+		ES8388Control::Values leftDiffrentialInputSelect = ES8388Control::Values::ADCControl3_DS_0;
+
+		if (Powered && Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2))
+		{
+			leftADCPower = ES8388Control::Values::ADCPower_PdnADCL_0;
+			leftAnalogInputPower = ES8388Control::Values::ADCPower_PdnAINL_0;
+
+			if (Bitwise::IsEnabled(InputMode, InputModes::Left1AndRight1Differential))
 			{
-				Log::WriteError("L Differential2");
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_LINSEL_11, ES8388Control::Masks::ADCControl2_LINSEL);
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSR_1, ES8388Control::Masks::ADCControl2_DSR);
+				lefInSelect = ES8388Control::Values::ADCControl2_LINSEL_11;
+				leftDiffrentialInputSelect = ES8388Control::Values::ADCControl3_DS_0;
+			}
+			else if (Bitwise::IsEnabled(InputMode, InputModes::Left2AndRight2Differential))
+			{
+				lefInSelect = ES8388Control::Values::ADCControl2_LINSEL_11;
+				leftDiffrentialInputSelect = ES8388Control::Values::ADCControl3_DS_1;
+			}
+			else if (Bitwise::IsEnabled(InputMode, InputModes::Left1))
+				lefInSelect = ES8388Control::Values::ADCControl2_LINSEL_00;
+			else if (Bitwise::IsEnabled(InputMode, InputModes::Left2))
+				lefInSelect = ES8388Control::Values::ADCControl2_LINSEL_01;
+		}
+
+		ES8388Control::Write(ES8388Control::Registers::ADCPower, leftADCPower, ES8388Control::Masks::ADCPower_PdnADCL);
+		ES8388Control::Write(ES8388Control::Registers::ADCPower, leftAnalogInputPower, ES8388Control::Masks::ADCPower_PdnAINL);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl2, lefInSelect, ES8388Control::Masks::ADCControl2_LINSEL);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl3, leftDiffrentialInputSelect, ES8388Control::Masks::ADCControl3_DS);
+
+		ES8388Control::Values rightADCPower = ES8388Control::Values::ADCPower_PdnADCR_1;
+		ES8388Control::Values rightAnalogInputPower = ES8388Control::Values::ADCPower_PdnAINR_1;
+		ES8388Control::Values rightInSelect = ES8388Control::Values::ADCControl2_RINSEL_00;
+		ES8388Control::Values rightDiffrentialInputSelect = ES8388Control::Values::ADCControl2_DSR_0;
+
+		if (Powered && Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
+		{
+			rightADCPower = ES8388Control::Values::ADCPower_PdnADCR_0;
+			rightAnalogInputPower = ES8388Control::Values::ADCPower_PdnAINR_0;
+
+			if (Bitwise::IsEnabled(InputMode, InputModes::Left1AndRight1Differential))
+			{
+				rightInSelect = ES8388Control::Values::ADCControl2_RINSEL_11;
+				rightDiffrentialInputSelect = ES8388Control::Values::ADCControl2_DSR_0;
+			}
+			else if (Bitwise::IsEnabled(InputMode, InputModes::Left2AndRight2Differential))
+			{
+				rightInSelect = ES8388Control::Values::ADCControl2_RINSEL_11;
+				rightDiffrentialInputSelect = ES8388Control::Values::ADCControl2_DSR_1;
 			}
 			else if (Bitwise::IsEnabled(InputMode, InputModes::Right1))
-			{
-				Log::WriteError("L Left1");
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_LINSEL_00, ES8388Control::Masks::ADCControl2_LINSEL);
-			}
+				rightInSelect = ES8388Control::Values::ADCControl2_RINSEL_00;
 			else if (Bitwise::IsEnabled(InputMode, InputModes::Right2))
+				rightInSelect = ES8388Control::Values::ADCControl2_RINSEL_01;
+		}
+
+		ES8388Control::Write(ES8388Control::Registers::ADCPower, rightADCPower, ES8388Control::Masks::ADCPower_PdnADCR);
+		ES8388Control::Write(ES8388Control::Registers::ADCPower, rightAnalogInputPower, ES8388Control::Masks::ADCPower_PdnAINR);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl2, rightInSelect, ES8388Control::Masks::ADCControl2_RINSEL);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl2, rightDiffrentialInputSelect, ES8388Control::Masks::ADCControl2_DSR);
+
+		ES8388Control::Values monoMix = ES8388Control::Values::ADCControl3_MONOMIX_00;
+		ES8388Control::Values monoMixDataSelect = ES8388Control::Values::ADCControl4_DATSEL_00;
+
+		if (Powered)
+		{
+			if (Bitwise::IsEnabled(InputMode, InputModes::MonoMixToLeft))
 			{
-				Log::WriteError("L Left2");
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_LINSEL_01, ES8388Control::Masks::ADCControl2_LINSEL);
+				monoMix = ES8388Control::Values::ADCControl3_MONOMIX_01;
+				monoMixDataSelect = ES8388Control::Values::ADCControl4_DATSEL_01;
+			}
+			else if (Bitwise::IsEnabled(InputMode, InputModes::MonoMixToRight))
+			{
+				monoMix = ES8388Control::Values::ADCControl3_MONOMIX_10;
+				monoMixDataSelect = ES8388Control::Values::ADCControl4_DATSEL_10;
+			}
+			else
+			{
+				monoMix = ES8388Control::Values::ADCControl3_MONOMIX_00;
+				monoMixDataSelect = ES8388Control::Values::ADCControl4_DATSEL_00;
 			}
 		}
 
-		bool anyRightBitIsActive = Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2);
-
-		ES8388Control::Write(
-			ES8388Control::Registers::ADCPower,
-			(Powered && anyRightBitIsActive ? ES8388Control::Values::ADCPower_PdnADCR_0 : ES8388Control::Values::ADCPower_PdnADCR_1), ES8388Control::Masks::ADCPower_PdnADCR);
-
-		ES8388Control::Write(
-			ES8388Control::Registers::ADCPower,
-			(Powered && anyRightBitIsActive ? ES8388Control::Values::ADCPower_PdnAINR_0 : ES8388Control::Values::ADCPower_PdnAINR_1), ES8388Control::Masks::ADCPower_PdnAINR);
-
-		if (anyRightBitIsActive)
-		{
-			if (Bitwise::IsEnabled(InputMode, InputModes::Differential1))
-			{
-				Log::WriteError("R Differential1");
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_RINSEL_11, ES8388Control::Masks::ADCControl2_RINSEL);
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSR_0, ES8388Control::Masks::ADCControl2_DSR);
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSSEL_0, ES8388Control::Masks::ADCControl2_DSSEL);
-				ES8388Control::Write(ES8388Control::Registers::ADCControl3, ES8388Control::Values::ADCControl3_DS_0, ES8388Control::Masks::ADCControl3_DS);
-			}
-			else if (Bitwise::IsEnabled(InputMode, InputModes::Differential2))
-			{
-				Log::WriteError("R Differential2");
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_RINSEL_11, ES8388Control::Masks::ADCControl2_RINSEL);
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSR_1, ES8388Control::Masks::ADCControl2_DSR);
-			}
-			else if (Bitwise::IsEnabled(InputMode, InputModes::Right1))
-			{
-				Log::WriteError("R Right1");
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_RINSEL_00, ES8388Control::Masks::ADCControl2_RINSEL);
-			}
-			else if (Bitwise::IsEnabled(InputMode, InputModes::Right2))
-			{
-				Log::WriteError("R Right2");
-				ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_RINSEL_01, ES8388Control::Masks::ADCControl2_RINSEL);
-			}
-		}
-
-		ES8388Control::Write(
-			ES8388Control::Registers::ADCPower,
-			(Powered ? ES8388Control::Values::ADCPower_PdnADCBiasgen_0 : ES8388Control::Values::ADCPower_PdnADCBiasgen_1), ES8388Control::Masks::ADCPower_PdnADCBiasgen);
-
-		ES8388Control::Write(
-			ES8388Control::Registers::ADCPower,
-			(Powered && MicrophoneBiasPowered ? ES8388Control::Values::ADCPower_PdnMICB_0 : ES8388Control::Values::ADCPower_PdnMICB_1), ES8388Control::Masks::ADCPower_PdnMICB);
-
-		if (Bitwise::IsEnabled(InputMode, InputModes::MonoMixToLeft))
-			ES8388Control::Write(ES8388Control::Registers::ADCControl3, ES8388Control::Values::ADCControl3_MONOMIX_01, ES8388Control::Masks::ADCControl3_MONOMIX);
-		else if (Bitwise::IsEnabled(InputMode, InputModes::MonoMixToRight))
-			ES8388Control::Write(ES8388Control::Registers::ADCControl3, ES8388Control::Values::ADCControl3_MONOMIX_10, ES8388Control::Masks::ADCControl3_MONOMIX);
-		else
-			ES8388Control::Write(ES8388Control::Registers::ADCControl3, ES8388Control::Values::ADCControl3_MONOMIX_00, ES8388Control::Masks::ADCControl3_MONOMIX);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl3, monoMix, ES8388Control::Masks::ADCControl3_MONOMIX);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl4, monoMixDataSelect, ES8388Control::Masks::ADCControl4_DATSEL);
 
 		return true;
 	}
@@ -279,30 +282,47 @@ public:
 					   Bitwise::IsEnabled(OutputMode, OutputModes::Right2),
 					   OutputResistance);
 
-		ES8388Control::Write(
-			ES8388Control::Registers::DACPower,
-			(Powered && Bitwise::IsEnabled(OutputMode, OutputModes::Right2) ? ES8388Control::Values::DACPower_ROUT2_1 : ES8388Control::Values::DACPower_ROUT2_0), ES8388Control::Masks::DACPower_ROUT2);
+		ES8388Control::Values leftDACPower = ES8388Control::Values::DACPower_PdnDACL_1;
+		ES8388Control::Values rightDACPower = ES8388Control::Values::DACPower_PdnDACR_1;
+		if (Powered)
+		{
+			if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2))
+				leftDACPower = ES8388Control::Values::DACPower_PdnDACL_0;
 
-		ES8388Control::Write(
-			ES8388Control::Registers::DACPower,
-			(Powered && Bitwise::IsEnabled(OutputMode, OutputModes::Left2) ? ES8388Control::Values::DACPower_LOUT2_1 : ES8388Control::Values::DACPower_LOUT2_0), ES8388Control::Masks::DACPower_LOUT2);
+			if (Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2))
+				leftDACPower = ES8388Control::Values::DACPower_PdnDACR_0;
+		}
 
-		ES8388Control::Write(
-			ES8388Control::Registers::DACPower,
-			(Powered && Bitwise::IsEnabled(OutputMode, OutputModes::Right1) ? ES8388Control::Values::DACPower_ROUT1_1 : ES8388Control::Values::DACPower_ROUT1_0), ES8388Control::Masks::DACPower_ROUT1);
+		ES8388Control::Write(ES8388Control::Registers::DACPower, leftDACPower, ES8388Control::Masks::DACPower_PdnDACL);
+		ES8388Control::Write(ES8388Control::Registers::DACPower, leftDACPower, ES8388Control::Masks::DACPower_PdnDACR);
 
-		ES8388Control::Write(
-			ES8388Control::Registers::DACPower,
-			(Powered && Bitwise::IsEnabled(OutputMode, OutputModes::Left1) ? ES8388Control::Values::DACPower_LOUT1_1 : ES8388Control::Values::DACPower_LOUT1_0), ES8388Control::Masks::DACPower_LOUT1);
+		ES8388Control::Values leftOut1 = ES8388Control::Values::DACPower_LOUT1_0;
+		ES8388Control::Values rightOut1 = ES8388Control::Values::DACPower_ROUT1_0;
+		ES8388Control::Values leftOut2 = ES8388Control::Values::DACPower_LOUT2_0;
+		ES8388Control::Values rightOut2 = ES8388Control::Values::DACPower_ROUT2_0;
 
-		ES8388Control::Write(
-			ES8388Control::Registers::DACPower,
-			(Powered && Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2) ? ES8388Control::Values::DACPower_PdnDACR_0 : ES8388Control::Values::DACPower_PdnDACR_1), ES8388Control::Masks::DACPower_PdnDACR);
+		if (Powered)
+		{
+			if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1))
+				leftOut1 = ES8388Control::Values::DACPower_LOUT1_1;
 
-		ES8388Control::Write(
-			ES8388Control::Registers::DACPower,
-			(Powered && Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2) ? ES8388Control::Values::DACPower_PdnDACL_0 : ES8388Control::Values::DACPower_PdnDACL_1), ES8388Control::Masks::DACPower_PdnDACL);
+			if (Bitwise::IsEnabled(OutputMode, OutputModes::Right1))
+				rightOut1 = ES8388Control::Values::DACPower_ROUT1_1;
 
+			if (Bitwise::IsEnabled(OutputMode, OutputModes::Left2))
+				leftOut2 = ES8388Control::Values::DACPower_LOUT2_1;
+
+			if (Bitwise::IsEnabled(OutputMode, OutputModes::Right2))
+				rightOut2 = ES8388Control::Values::DACPower_ROUT2_1;
+		}
+
+		ES8388Control::Write(ES8388Control::Registers::DACPower, leftOut1, ES8388Control::Masks::DACPower_LOUT1);
+		ES8388Control::Write(ES8388Control::Registers::DACPower, rightOut1, ES8388Control::Masks::DACPower_ROUT1);
+		ES8388Control::Write(ES8388Control::Registers::DACPower, leftOut2, ES8388Control::Masks::DACPower_LOUT2);
+		ES8388Control::Write(ES8388Control::Registers::DACPower, rightOut2, ES8388Control::Masks::DACPower_ROUT2);
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ????????????????????????????????????
 		ES8388Control::Write(ES8388Control::Registers::DACControl16, ES8388Control::Values::DACControl16_RMIXSEL_000, ES8388Control::Masks::DACControl16_RMIXSEL);
 		ES8388Control::Write(ES8388Control::Registers::DACControl16, ES8388Control::Values::DACControl16_LMIXSEL_000, ES8388Control::Masks::DACControl16_LMIXSEL);
 
@@ -703,10 +723,7 @@ public:
 	{
 		Log::WriteInfo(TAG, "Setting Input Mute: %i", Mute);
 
-		ES8388Control::Write(
-			ES8388Control::Registers::ADCControl7,
-			(Mute ? ES8388Control::Values::ADCControl7_ADCMute_1 : ES8388Control::Values::ADCControl7_ADCMute_0),
-			ES8388Control::Masks::ADCControl7_ADCMute);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl7, (Mute ? ES8388Control::Values::ADCControl7_ADCMute_1 : ES8388Control::Values::ADCControl7_ADCMute_0), ES8388Control::Masks::ADCControl7_ADCMute);
 
 		return true;
 	}
@@ -720,10 +737,7 @@ public:
 	{
 		Log::WriteInfo(TAG, "Setting Output Mute: %i", Mute);
 
-		ES8388Control::Write(
-			ES8388Control::Registers::DACControl3,
-			(Mute ? ES8388Control::Values::DACControl3_DACMute_1 : ES8388Control::Values::DACControl3_DACMute_0),
-			ES8388Control::Masks::DACControl3_DACMute);
+		ES8388Control::Write(ES8388Control::Registers::DACControl3, (Mute ? ES8388Control::Values::DACControl3_DACMute_1 : ES8388Control::Values::DACControl3_DACMute_0), ES8388Control::Masks::DACControl3_DACMute);
 
 		return true;
 	}
@@ -793,26 +807,26 @@ private:
 	{
 		Log::WriteInfo(TAG, "Setting ADC Enabled: %i, ChangeDLL: %i", Enabled, ChangeDLL);
 
+		ES8388Control::Values analogReferencePower = ES8388Control::Values::ChipPower_adcVref_PDN_1;
+		ES8388Control::Values dllPower = ES8388Control::Read(ES8388Control::Registers::ChipPower, ES8388Control::Masks::ChipPower_ADCDLL_PDN);
+		ES8388Control::Values resetStateMachine = ES8388Control::Values::ChipPower_adc_stm_rst_1;
+		ES8388Control::Values resetDEM = ES8388Control::Values::ChipPower_adc_DigPDN_1;
+
 		if (Enabled)
 		{
-			ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_adcVref_PDN_0, ES8388Control::Masks::ChipPower_adcVref_PDN);
+			analogReferencePower = ES8388Control::Values::ChipPower_adcVref_PDN_0;
 
 			if (ChangeDLL)
-				ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_ADCDLL_PDN_0, ES8388Control::Masks::ChipPower_ADCDLL_PDN);
+				dllPower = ES8388Control::Values::ChipPower_ADCDLL_PDN_0;
 
-			ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_adc_stm_rst_0, ES8388Control::Masks::ChipPower_adc_stm_rst);
-			ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_adc_DigPDN_0, ES8388Control::Masks::ChipPower_adc_DigPDN);
+			resetStateMachine = ES8388Control::Values::ChipPower_adc_stm_rst_0;
+			resetDEM = ES8388Control::Values::ChipPower_adc_DigPDN_0;
 		}
-		else
-		{
-			ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_adcVref_PDN_1, ES8388Control::Masks::ChipPower_adcVref_PDN);
 
-			if (ChangeDLL)
-				ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_ADCDLL_PDN_1, ES8388Control::Masks::ChipPower_ADCDLL_PDN);
-
-			ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_adc_stm_rst_1, ES8388Control::Masks::ChipPower_adc_stm_rst);
-			ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_adc_DigPDN_1, ES8388Control::Masks::ChipPower_adc_DigPDN);
-		}
+		ES8388Control::Write(ES8388Control::Registers::ChipPower, analogReferencePower, ES8388Control::Masks::ChipPower_adcVref_PDN);
+		ES8388Control::Write(ES8388Control::Registers::ChipPower, dllPower, ES8388Control::Masks::ChipPower_ADCDLL_PDN);
+		ES8388Control::Write(ES8388Control::Registers::ChipPower, resetStateMachine, ES8388Control::Masks::ChipPower_adc_stm_rst);
+		ES8388Control::Write(ES8388Control::Registers::ChipPower, resetDEM, ES8388Control::Masks::ChipPower_adc_DigPDN);
 
 		ES8388Control::Write(ES8388Control::Registers::ADCControl5, ES8388Control::Values::ADCControl5_ADCFsRatio_00010, ES8388Control::Masks::ADCControl5_ADCFsRatio);
 		ES8388Control::Write(ES8388Control::Registers::ADCControl5, ES8388Control::Values::ADCControl5_ADCFsMode_0, ES8388Control::Masks::ADCControl5_ADCFsMode);
@@ -824,26 +838,26 @@ private:
 	{
 		Log::WriteInfo(TAG, "Setting DAC Enabled: %i, ChangeDLL: %i", Enabled, ChangeDLL);
 
+		ES8388Control::Values analogReferencePower = ES8388Control::Values::ChipPower_dacVref_PDN_1;
+		ES8388Control::Values dllPower = ES8388Control::Read(ES8388Control::Registers::ChipPower, ES8388Control::Masks::ChipPower_DACDLL_PDN);
+		ES8388Control::Values resetStateMachine = ES8388Control::Values::ChipPower_dac_stm_rst_1;
+		ES8388Control::Values resetDEM = ES8388Control::Values::ChipPower_dac_DigPDN_1;
+
 		if (Enabled)
 		{
-			ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_dacVref_PDN_0, ES8388Control::Masks::ChipPower_dacVref_PDN);
+			analogReferencePower = ES8388Control::Values::ChipPower_dacVref_PDN_0;
 
 			if (ChangeDLL)
-				ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_DACDLL_PDN_0, ES8388Control::Masks::ChipPower_DACDLL_PDN);
+				dllPower = ES8388Control::Values::ChipPower_DACDLL_PDN_0;
 
-			ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_dac_stm_rst_0, ES8388Control::Masks::ChipPower_dac_stm_rst);
-			ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_dac_DigPDN_0, ES8388Control::Masks::ChipPower_dac_DigPDN);
+			resetStateMachine = ES8388Control::Values::ChipPower_dac_stm_rst_0;
+			resetDEM = ES8388Control::Values::ChipPower_dac_DigPDN_0;
 		}
-		else
-		{
-			ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_dacVref_PDN_1, ES8388Control::Masks::ChipPower_dacVref_PDN);
 
-			if (ChangeDLL)
-				ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_DACDLL_PDN_1, ES8388Control::Masks::ChipPower_DACDLL_PDN);
-
-			ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_dac_stm_rst_1, ES8388Control::Masks::ChipPower_dac_stm_rst);
-			ES8388Control::Write(ES8388Control::Registers::ChipPower, ES8388Control::Values::ChipPower_dac_DigPDN_1, ES8388Control::Masks::ChipPower_dac_DigPDN);
-		}
+		ES8388Control::Write(ES8388Control::Registers::ChipPower, analogReferencePower, ES8388Control::Masks::ChipPower_dacVref_PDN);
+		ES8388Control::Write(ES8388Control::Registers::ChipPower, dllPower, ES8388Control::Masks::ChipPower_DACDLL_PDN);
+		ES8388Control::Write(ES8388Control::Registers::ChipPower, resetStateMachine, ES8388Control::Masks::ChipPower_dac_stm_rst);
+		ES8388Control::Write(ES8388Control::Registers::ChipPower, resetDEM, ES8388Control::Masks::ChipPower_dac_DigPDN);
 
 		ES8388Control::Write(ES8388Control::Registers::DACControl1, ES8388Control::Values::DACControl1_DACLRSWAP_0, ES8388Control::Masks::DACControl1_DACLRSWAP);
 

@@ -30,12 +30,13 @@ public:
 
 	enum class InputModes
 	{
-		None = 0b00000000,
-		LeftAndRightInput1 = 0b00000001,
-		Microphone1 = 0b00000010,
-		Microphone2 = 0b00000100,
-		LeftAndRightInput2 = 0b00001000,
-		Difference = 0b00010000
+		None = (uint8)ES8388Interface::InputModes::None,
+
+		Left1 = (uint8)ES8388Interface::InputModes::Left1,
+		Right1 = (uint8)ES8388Interface::InputModes::Right1,
+
+		Left2 = (uint8)ES8388Interface::InputModes::Left2,
+		Right2 = (uint8)ES8388Interface::InputModes::Right2,
 	};
 
 	enum class OutputModes
@@ -45,6 +46,13 @@ public:
 		Right1 = (uint8)ES8388Interface::OutputModes::Right1,
 		Left2 = (uint8)ES8388Interface::OutputModes::Left2,
 		Right2 = (uint8)ES8388Interface::OutputModes::Right2,
+
+		Left1AndLeft2 = Left1 | Left2,
+		Right1AndRight2 = Right1 | Right2,
+
+		LeftAndRight1 = Left1 | Right1,
+		LeftAndRight2 = Left2 | Right2,
+
 		All = (uint8)ES8388Interface::OutputModes::All
 	};
 
