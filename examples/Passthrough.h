@@ -14,12 +14,12 @@ public:
 		ESP32A1SCodec::Configs configs;
 		configs.Version = ESP32A1SCodec::Versions::V2974;
 		configs.SampleRate = 44100;
-		configs.BitsPerSample = ES8388::BitsPerSamples::BPS32;
+		configs.BitsPerSample = ESP32A1SCodec::BitsPerSamples::BPS32;
 		configs.ChannelFormat = ESP32A1SCodec::ChannelFormats::SeparatedLeftAndRight;
 		configs.BufferCount = 3;
 		configs.BufferLegth = 300;
-		configs.InputMode = ES8388::InputModes::LeftAndRightInput1;
-		configs.OutputMode = ES8388::OutputModes::AllLineOutputs;
+		configs.InputMode = ESP32A1SCodec::InputModes::LeftAndRightInput1;
+		configs.OutputMode = ESP32A1SCodec::OutputModes::All;
 
 		CHECK_CALL(ESP32A1SCodec::Initialize(&configs));
 

@@ -16,6 +16,13 @@ public:
 		V2974
 	};
 
+	enum class BitsPerSamples
+	{
+		BPS16 = (uint8)ES8388::BitsPerSamples::BPS16,
+		BPS24 = (uint8)ES8388::BitsPerSamples::BPS24,
+		BPS32 = (uint8)ES8388::BitsPerSamples::BPS32
+	};
+
 	enum class ChannelFormats
 	{
 		SeparatedLeftAndRight = I2S_CHANNEL_FMT_RIGHT_LEFT,
@@ -25,17 +32,36 @@ public:
 		OnlyRight = I2S_CHANNEL_FMT_ONLY_RIGHT
 	};
 
+	enum class InputModes
+	{
+		None = 0b00000000,
+		LineL = 0b00000001,
+		LineR = 0b00000010,
+		Microphone1 = 0b00000100,
+		Microphone2 = 0b00001000,
+	};
+
+	enum class OutputModes
+	{
+		None = (uint8)ES8388::OutputModes::None,
+		SpeakerL = (uint8)ES8388::OutputModes::Left1,
+		SpeakerR = (uint8)ES8388::OutputModes::Right1,
+		HeadphoneL = (uint8)ES8388::OutputModes::Left2,
+		HeadphoneR = (uint8)ES8388::OutputModes::Right2,
+		All = (uint8)ES8388::OutputModes::All
+	};
+
 	struct Configs
 	{
 	public:
 		Versions Version;
 		uint32 SampleRate;
-		ES8388::BitsPerSamples BitsPerSample;
+		BitsPerSamples BitsPerSample;
 		ChannelFormats ChannelFormat;
 		uint16 BufferCount;
 		uint16 BufferLegth;
-		ES8388::InputModes InputMode;
-		ES8388::OutputModes OutputMode;
+		InputModes InputMode;
+		OutputModes OutputMode;
 	};
 
 public:
@@ -43,8 +69,8 @@ public:
 	{
 		CHECK_CALL(InitializeI2C(Configs));
 
-		m_Codec = new ES8388(Configs->InputMode, Configs->OutputMode);
-		CHECK_CALL(m_Codec->SetBitsPerSample(Configs->BitsPerSample));
+		m_Codec = new ES8388((ES8388::InputModes)Configs->InputMode, (ES8388::OutputModes)Configs->OutputMode);
+		CHECK_CALL(m_Codec->SetBitsPerSample((ES8388::BitsPerSamples)Configs->BitsPerSample));
 
 		CHECK_CALL(InitializeI2S(Configs));
 	}
@@ -178,23 +204,23 @@ private:
 		Log::WriteInfo(TAG, "Initializing I2S");
 
 		i2s_mode_t modes = I2S_MODE_MASTER;
-		if (Configs->OutputMode != ES8388::OutputModes::None)
+		if (Configs->OutputMode != OutputModes::None)
 			modes |= I2S_MODE_TX;
-		if (Configs->InputMode != ES8388::InputModes::None)
+		if (Configs->InputMode != InputModes::None)
 			modes |= I2S_MODE_RX;
 
 		i2s_bits_per_sample_t bps = I2S_BITS_PER_SAMPLE_8BIT;
 		switch (Configs->BitsPerSample)
 		{
-		case ES8388::BitsPerSamples::BPS16:
+		case BitsPerSamples::BPS16:
 			bps = I2S_BITS_PER_SAMPLE_16BIT;
 			break;
 
-		case ES8388::BitsPerSamples::BPS24:
+		case BitsPerSamples::BPS24:
 			bps = I2S_BITS_PER_SAMPLE_24BIT;
 			break;
 
-		case ES8388::BitsPerSamples::BPS32:
+		case BitsPerSamples::BPS32:
 			bps = I2S_BITS_PER_SAMPLE_32BIT;
 			break;
 		}

@@ -40,6 +40,7 @@ public:
 
 	enum class OutputModes
 	{
+		None = 0b00000000,
 		Left1 = 0b00000001,
 		Right1 = 0b00000010,
 		Left2 = 0b00000100,
@@ -104,43 +105,47 @@ public:
 		return true;
 	}
 
-	static bool Standby(void)
-	{
-		Log::WriteInfo(TAG, "Standing by");
+	// This needs to act based on the initial Configs, i.e. it shouldn't turn on/off all of the Outputs regarless of the initial Configs
+	//  static bool Standby(void)
+	//  {
+	//  	Log::WriteInfo(TAG, "Standing by");
 
-		CHECK_CALL(SetInputMute(true));
-		CHECK_CALL(SetOutputMute(true));
+	// 	CHECK_CALL(SetInputMute(true));
+	// 	CHECK_CALL(SetOutputMute(true));
 
-		CHECK_CALL(SetADCEnabled(false, false));
-		CHECK_CALL(SetDACEnabled(false, false));
+	// 	CHECK_CALL(SetADCEnabled(false, false));
+	// 	CHECK_CALL(SetDACEnabled(false, false));
 
-		CHECK_CALL(SetADCPowered(false, false, InputModes::BothDifferential));
-		CHECK_CALL(SetDACPowered(false, OutputModes::All, OutputResistances::R1K5));
+	// 	CHECK_CALL(SetADCPowered(false, false, InputModes::BothDifferential));
+	// 	CHECK_CALL(SetDACPowered(false, OutputModes::All, OutputResistances::R1K5));
 
-		return true;
-	}
+	// 	return true;
+	// }
 
-	static bool Resume(void)
-	{
-		Log::WriteInfo(TAG, "Resuming");
+	// This needs to act based on the initial Configs, i.e. it shouldn't turn on/off all of the Outputs regarless of the initial Configs
+	//  static bool Resume(void)
+	//  {
+	//  	Log::WriteInfo(TAG, "Resuming");
 
-		CHECK_CALL(SetADCPowered(true, true, InputModes::BothDifferential));
-		CHECK_CALL(SetDACPowered(true, OutputModes::All, OutputResistances::R1K5));
+	// 	CHECK_CALL(SetADCPowered(true, true, InputModes::BothDifferential));
+	// 	CHECK_CALL(SetDACPowered(true, OutputModes::All, OutputResistances::R1K5));
 
-		CHECK_CALL(SetInputMute(false));
-		CHECK_CALL(SetOutputMute(false));
+	// 	CHECK_CALL(SetInputMute(false));
+	// 	CHECK_CALL(SetOutputMute(false));
 
-		CHECK_CALL(SetADCEnabled(false));
-		CHECK_CALL(SetDACEnabled(false));
+	// 	CHECK_CALL(SetADCEnabled(false));
+	// 	CHECK_CALL(SetDACEnabled(false));
 
-		return true;
-	}
+	// 	return true;
+	// }
 
 	static bool SetADCPowered(bool Powered, bool MicrophoneBiasPowered, InputModes InputMode)
 	{
-		Log::WriteInfo(TAG, "Setting ADC Powered: %i, Microphone Bias Powered: %i, R: %i, L: %i, D: %i", Powered, (Powered && MicrophoneBiasPowered),
-					   Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2),
-					   Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2),
+		Log::WriteInfo(TAG, "Setting ADC Powered: %i, Microphone Bias Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Diffrential: %i", Powered, MicrophoneBiasPowered,
+					   Bitwise::IsEnabled(InputMode, InputModes::Left1),
+					   Bitwise::IsEnabled(InputMode, InputModes::Right1),
+					   Bitwise::IsEnabled(InputMode, InputModes::Left2),
+					   Bitwise::IsEnabled(InputMode, InputModes::Right2),
 					   Bitwise::IsEnabled(InputMode, (~(uint8)InputModes::SingleEnded1 & (uint8)InputModes::Differential1)));
 
 		ES8388Control::Write(
@@ -242,42 +247,36 @@ public:
 
 	static bool SetDACPowered(bool Powered, OutputModes OutputMode, OutputResistances OutputResistance)
 	{
-		Log::WriteInfo(TAG, "Setting DAC Powered: %i, R1: %i, L1: %i, R2: %i, L2: %i, Output Resistance: %i", Powered,
-					   Bitwise::IsEnabled(OutputMode, OutputModes::Right1),
+		Log::WriteInfo(TAG, "Setting DAC Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Output Resistance: %i", Powered,
 					   Bitwise::IsEnabled(OutputMode, OutputModes::Left1),
-					   Bitwise::IsEnabled(OutputMode, OutputModes::Right2),
+					   Bitwise::IsEnabled(OutputMode, OutputModes::Right1),
 					   Bitwise::IsEnabled(OutputMode, OutputModes::Left2),
+					   Bitwise::IsEnabled(OutputMode, OutputModes::Right2),
 					   OutputResistance);
 
-		if (Bitwise::IsEnabled(OutputMode, OutputModes::Right2))
-			ES8388Control::Write(
-				ES8388Control::Registers::DACPower,
-				(Powered ? ES8388Control::Values::DACPower_ROUT2_1 : ES8388Control::Values::DACPower_ROUT2_0), ES8388Control::Masks::DACPower_ROUT2);
+		ES8388Control::Write(
+			ES8388Control::Registers::DACPower,
+			(Powered && Bitwise::IsEnabled(OutputMode, OutputModes::Right2) ? ES8388Control::Values::DACPower_ROUT2_1 : ES8388Control::Values::DACPower_ROUT2_0), ES8388Control::Masks::DACPower_ROUT2);
 
-		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left2))
-			ES8388Control::Write(
-				ES8388Control::Registers::DACPower,
-				(Powered ? ES8388Control::Values::DACPower_LOUT2_1 : ES8388Control::Values::DACPower_LOUT2_0), ES8388Control::Masks::DACPower_LOUT2);
+		ES8388Control::Write(
+			ES8388Control::Registers::DACPower,
+			(Powered && Bitwise::IsEnabled(OutputMode, OutputModes::Left2) ? ES8388Control::Values::DACPower_LOUT2_1 : ES8388Control::Values::DACPower_LOUT2_0), ES8388Control::Masks::DACPower_LOUT2);
 
-		if (Bitwise::IsEnabled(OutputMode, OutputModes::Right1))
-			ES8388Control::Write(
-				ES8388Control::Registers::DACPower,
-				(Powered ? ES8388Control::Values::DACPower_ROUT1_1 : ES8388Control::Values::DACPower_ROUT1_0), ES8388Control::Masks::DACPower_ROUT1);
+		ES8388Control::Write(
+			ES8388Control::Registers::DACPower,
+			(Powered && Bitwise::IsEnabled(OutputMode, OutputModes::Right1) ? ES8388Control::Values::DACPower_ROUT1_1 : ES8388Control::Values::DACPower_ROUT1_0), ES8388Control::Masks::DACPower_ROUT1);
 
-		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1))
-			ES8388Control::Write(
-				ES8388Control::Registers::DACPower,
-				(Powered ? ES8388Control::Values::DACPower_LOUT1_1 : ES8388Control::Values::DACPower_LOUT1_0), ES8388Control::Masks::DACPower_LOUT1);
+		ES8388Control::Write(
+			ES8388Control::Registers::DACPower,
+			(Powered && Bitwise::IsEnabled(OutputMode, OutputModes::Left1) ? ES8388Control::Values::DACPower_LOUT1_1 : ES8388Control::Values::DACPower_LOUT1_0), ES8388Control::Masks::DACPower_LOUT1);
 
-		if (Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2))
-			ES8388Control::Write(
-				ES8388Control::Registers::DACPower,
-				(Powered ? ES8388Control::Values::DACPower_PdnDACR_0 : ES8388Control::Values::DACPower_PdnDACR_1), ES8388Control::Masks::DACPower_PdnDACR);
+		ES8388Control::Write(
+			ES8388Control::Registers::DACPower,
+			(Powered && Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2) ? ES8388Control::Values::DACPower_PdnDACR_0 : ES8388Control::Values::DACPower_PdnDACR_1), ES8388Control::Masks::DACPower_PdnDACR);
 
-		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2))
-			ES8388Control::Write(
-				ES8388Control::Registers::DACPower,
-				(Powered ? ES8388Control::Values::DACPower_PdnDACL_0 : ES8388Control::Values::DACPower_PdnDACL_1), ES8388Control::Masks::DACPower_PdnDACL);
+		ES8388Control::Write(
+			ES8388Control::Registers::DACPower,
+			(Powered && Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2) ? ES8388Control::Values::DACPower_PdnDACL_0 : ES8388Control::Values::DACPower_PdnDACL_1), ES8388Control::Masks::DACPower_PdnDACL);
 
 		ES8388Control::Write(ES8388Control::Registers::DACControl16, ES8388Control::Values::DACControl16_RMIXSEL_000, ES8388Control::Masks::DACControl16_RMIXSEL);
 		ES8388Control::Write(ES8388Control::Registers::DACControl16, ES8388Control::Values::DACControl16_LMIXSEL_000, ES8388Control::Masks::DACControl16_LMIXSEL);
@@ -591,7 +590,7 @@ public:
 	{
 		dB = Math::Clamp(dB, -96, 0);
 
-		Log::WriteInfo(TAG, "Setting DAC volume: %.1fdB", dB);
+		Log::WriteInfo(TAG, "Setting DAC Volume: %.1fdB", dB);
 
 		ES8388Control::Values value = (ES8388Control::Values)(((uint8)(dB * 2)) & (uint8)ES8388Control::Masks::DACControl4_LDACVOL);
 
@@ -613,7 +612,7 @@ public:
 	{
 		dB = Math::Clamp(dB, -96, 0);
 
-		Log::WriteInfo(TAG, "Setting Input volume: %.1fdB", dB);
+		Log::WriteInfo(TAG, "Setting Input Volume: %.1fdB", dB);
 
 		ES8388Control::Values value = (ES8388Control::Values)(((uint8)(dB * 2)) & (uint8)ES8388Control::Masks::ADCControl8_LADCVOL);
 

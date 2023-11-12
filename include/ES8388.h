@@ -30,23 +30,22 @@ public:
 
 	enum class InputModes
 	{
-		None = -1,
-		LeftAndRightInput1 = 0x00,
-		Microphone1 = 0x05,
-		Microphone2 = 0x06,
-		LeftAndRightInput2 = 0x50,
-		Difference = 0xf0
+		None = 0b00000000,
+		LeftAndRightInput1 = 0b00000001,
+		Microphone1 = 0b00000010,
+		Microphone2 = 0b00000100,
+		LeftAndRightInput2 = 0b00001000,
+		Difference = 0b00010000
 	};
 
 	enum class OutputModes
 	{
-		None = -1,
-		LeftOutput1 = 0x20,
-		LeftOutput2 = 0x08,
-		SpeakerOutput = 0x09,
-		RightOutput1 = 0x10,
-		RightOutput2 = 0x04,
-		AllLineOutputs = LeftOutput1 | LeftOutput2 | RightOutput1 | RightOutput2
+		None = (uint8)ES8388Interface::OutputModes::None,
+		Left1 = (uint8)ES8388Interface::OutputModes::Left1,
+		Right1 = (uint8)ES8388Interface::OutputModes::Right1,
+		Left2 = (uint8)ES8388Interface::OutputModes::Left2,
+		Right2 = (uint8)ES8388Interface::OutputModes::Right2,
+		All = (uint8)ES8388Interface::OutputModes::All
 	};
 
 public:
@@ -63,11 +62,10 @@ public:
 		CHECK_CALL(ES8388Interface::TurnOn(false, ES8388Interface::MiddleVoltageResistances::R50K));
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
-			// CHECK_CALL(ES8388Interface::SetADCPowered(true, false, ES8388Interface::InputModes::Differential2));
-			CHECK_CALL(ES8388Interface::SetADCPowered(true, false, ES8388Interface::InputModes::BothDifferential));
+			CHECK_CALL(ES8388Interface::SetADCPowered(true, false, (ES8388Interface::InputModes)InputMode));
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
-			CHECK_CALL(ES8388Interface::SetDACPowered(true, ES8388Interface::OutputModes::All, ES8388Interface::OutputResistances::R1K5));
+			CHECK_CALL(ES8388Interface::SetDACPowered(true, (ES8388Interface::OutputModes)OutputMode, ES8388Interface::OutputResistances::R1K5));
 
 		CHECK_CALL(SetBitsPerSample(BitsPerSamples::BPS16));
 
