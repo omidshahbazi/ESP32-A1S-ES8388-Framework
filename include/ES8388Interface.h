@@ -36,6 +36,7 @@ public:
 		R40K = (uint8)ES8388Control::Values::DACControl23_VROI_1,
 	};
 
+	// TODO: Renaming
 	enum class InputModes
 	{
 		None = 0b00000000,
@@ -321,11 +322,6 @@ public:
 		ES8388Control::Write(ES8388Control::Registers::DACPower, leftOut2, ES8388Control::Masks::DACPower_LOUT2);
 		ES8388Control::Write(ES8388Control::Registers::DACPower, rightOut2, ES8388Control::Masks::DACPower_ROUT2);
 
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ????????????????????????????????????
-		ES8388Control::Write(ES8388Control::Registers::DACControl16, ES8388Control::Values::DACControl16_RMIXSEL_000, ES8388Control::Masks::DACControl16_RMIXSEL);
-		ES8388Control::Write(ES8388Control::Registers::DACControl16, ES8388Control::Values::DACControl16_LMIXSEL_000, ES8388Control::Masks::DACControl16_LMIXSEL);
-
 		ES8388Control::Write(ES8388Control::Registers::DACControl23, (ES8388Control::Values)OutputResistance, ES8388Control::Masks::DACControl23_VROI);
 
 		return true;
@@ -554,21 +550,23 @@ public:
 	// HoldTime [0ms, 1360ms]
 	// AttackTime [0.104ms/0.0227ms, 106ms/23.2ms]
 	// DecayTime [0.410ms/0.0908ms, 420ms/93ms]
-	static bool SetAutomaticLevelControlParameters(float dBMin, float dBMax, float dBTarget, float HoldTime, float AttackTime, float DecayTime)
+	// WindowsSize [96, 496]
+	static bool SetAutomaticLevelControlParameters(float dBMin, float dBMax, float dBTarget, float HoldTime, float AttackTime, float DecayTime, uint8 WindowsSize, bool ZeroCrossTimeout, bool UseZeroCrossDetection, bool LimiterMode)
 	{
 		dBMin = Math::Clamp(dBMin, -12, 30);
-		dBMax = Math::Clamp(dBMax, -6.5, 35.5);
-		dBTarget = Math::Clamp(dBTarget, -16.5, -1.5);
+		dBMax = Math::Clamp(dBMax, -6.5F, 35.5F);
+		dBTarget = Math::Clamp(dBTarget, -16.5F, -1.5F);
 		HoldTime = Math::Clamp(HoldTime, 0, 1360);
 		AttackTime = Math::Clamp(AttackTime, 0.104, 106);
 		DecayTime = Math::Clamp(DecayTime, 0.410, 420);
+		WindowsSize = Math::Clamp(WindowsSize, 96, 496);
 
 		Log::WriteInfo(TAG, "Setting Automatic Level Control Parameters, Min: %.1fdB, Max: %.1fdB, Target: %.1fdB, Hold Time: %.1fms, Attack Time: %.1fms, Decay Time: %.1fms", dBMin, dBMax, dBTarget, HoldTime, AttackTime, DecayTime);
 
 		uint8 value = (dBMin + 12) / 6;
 		ES8388Control::Write(ES8388Control::Registers::ADCControl10, (ES8388Control::Values)value, ES8388Control::Masks::ADCControl10_MINGAIN);
 
-		value = (dBMax + 6.5) / 6;
+		value = (dBMax + 6.5F) / 6;
 		ES8388Control::Write(ES8388Control::Registers::ADCControl10, (ES8388Control::Values)(value << 3), ES8388Control::Masks::ADCControl10_MAXGAIN);
 
 		value = (dBTarget + 16.5F) / 1.5F;
@@ -582,6 +580,13 @@ public:
 
 		value = log2(DecayTime / 0.21F);
 		ES8388Control::Write(ES8388Control::Registers::ADCControl12, (ES8388Control::Values)(value << 4), ES8388Control::Masks::ADCControl12_ALCDCY);
+
+		value = WindowsSize / 16;
+		ES8388Control::Write(ES8388Control::Registers::ADCControl13, (ES8388Control::Values)value, ES8388Control::Masks::ADCControl13_WIN_SIZE);
+
+		ES8388Control::Write(ES8388Control::Registers::ADCControl13, (ZeroCrossTimeout ? ES8388Control::Values::ADCControl13_TIME_OUT_1 : ES8388Control::Values::ADCControl13_TIME_OUT_0), ES8388Control::Masks::ADCControl13_TIME_OUT);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl13, (UseZeroCrossDetection ? ES8388Control::Values::ADCControl13_ALCZC_1 : ES8388Control::Values::ADCControl13_ALCZC_0), ES8388Control::Masks::ADCControl13_ALCZC);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl13, (LimiterMode ? ES8388Control::Values::ADCControl13_ALCMODE_1 : ES8388Control::Values::ADCControl13_ALCMODE_0), ES8388Control::Masks::ADCControl13_ALCMODE);
 
 		return true;
 	}
@@ -608,25 +613,29 @@ public:
 		return (uint8)value * 3.0F;
 	}
 
-	//[-76.5dBFS, -30dBFS]
-	static bool SetMicrophoneNoiseGate(float dBFS)
+	static bool SetMicrophoneNoiseGateEnabled(bool Enabled)
 	{
-		dBFS = Math::Clamp(dBFS, -76.5, -30);
+		Log::WriteInfo(TAG, "Setting Microphone Noise Gate Enabled: %i", Enabled);
 
-		Log::WriteInfo(TAG, "Setting Microphone Noise Gate: %.1fdBFS", dBFS);
-
-		uint8 value = (dBFS + 76.5) / -1.5;
-
-		ES8388Control::Write(ES8388Control::Registers::ADCControl14, (ES8388Control::Values)(value << 3), ES8388Control::Masks::ADCControl14_NGTH);
+		ES8388Control::Write(ES8388Control::Registers::ADCControl14, (Enabled ? ES8388Control::Values::ADCControl14_NGAT_1 : ES8388Control::Values::ADCControl14_NGAT_0), ES8388Control::Masks::ADCControl14_NGAT);
 
 		return true;
 	}
 
-	static float GetMicrophoneNoiseGate(void)
+	//[-76.5dBFS, -30dBFS]
+	static bool SetMicrophoneNoiseGateParameters(float dBFS, bool MuteOnNoise)
 	{
-		ES8388Control::Values value = ES8388Control::Read(ES8388Control::Registers::DACControl17, ES8388Control::Masks::DACControl17_LI2LOVOL);
+		dBFS = Math::Clamp(dBFS, -76.5F, -30);
 
-		return (7 - ((uint8)value >> 3) * 3.0F) - 15;
+		Log::WriteInfo(TAG, "Setting Microphone Noise Gate: %.1fdBFS", dBFS);
+
+		uint8 value = (dBFS + 76.5F) / -1.5;
+
+		ES8388Control::Write(ES8388Control::Registers::ADCControl14, (ES8388Control::Values)(value << 3), ES8388Control::Masks::ADCControl14_NGTH);
+
+		ES8388Control::Write(ES8388Control::Registers::ADCControl14, (MuteOnNoise ? ES8388Control::Values::ADCControl14_NGG_01 : ES8388Control::Values::ADCControl14_NGG_00), ES8388Control::Masks::ADCControl14_NGG);
+
+		return true;
 	}
 
 	//[-15dB, 6dB]

@@ -28,6 +28,7 @@ public:
 		BPS32 = (uint8)ES8388Interface::BitsPerSamples::BPS32
 	};
 
+	// TODO: Renaming
 	enum class InputModes
 	{
 		None = (uint8)ES8388Interface::InputModes::None,
@@ -89,10 +90,19 @@ public:
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
 		{
-			CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGate(-40.5F));
 			CHECK_CALL(ES8388Interface::SetInputToMixerGain(6));
+			CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateEnabled(true));
 
-			CHECK_CALL(SetAutomaticLevelControlParameters(0, 0, -1.5F, 500, 50, 200));
+			if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1))
+			{
+				CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateParameters(-40.5F, true));
+				CHECK_CALL(SetAutomaticLevelControlParameters(0, 23.5F, -4.5F, 0, 0.416F, 0.820F, 21, false, false, false)); // Optimized for Microphone
+			}
+			else if (Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
+			{
+				CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateParameters(-60, false));
+				CHECK_CALL(SetAutomaticLevelControlParameters(-12, 35.5F, -12, 0, 6.66F, 420, 21, false, false, false)); // Optimized for Music
+			}
 
 			CHECK_CALL(SetMicrophoneGain(24));
 
@@ -136,12 +146,12 @@ public:
 	// HoldTime [0ms, 1360ms]
 	// AttackTime [0.104ms/0.0227ms, 106ms/23.2ms]
 	// DecayTime [0.410ms/0.0908ms, 420ms/93ms]
-	bool SetAutomaticLevelControlParameters(float dBMin, float dBMax, float dBTarget, float HoldTime, float AttackTime, float DecayTime)
+	bool SetAutomaticLevelControlParameters(float dBMin, float dBMax, float dBTarget, float HoldTime, float AttackTime, float DecayTime, uint8 WindowsSize, bool ZeroCrossTimeout, bool UseZeroCrossDetection, bool LimiterMode)
 	{
 		if (!Bitwise::IsEnabled(m_Modules, Modules::ADC))
 			return false;
 
-		CHECK_CALL(ES8388Interface::SetAutomaticLevelControlParameters(dBMin, dBMax, dBTarget, HoldTime, AttackTime, DecayTime));
+		CHECK_CALL(ES8388Interface::SetAutomaticLevelControlParameters(dBMin, dBMax, dBTarget, HoldTime, AttackTime, DecayTime, WindowsSize, ZeroCrossTimeout, UseZeroCrossDetection, LimiterMode));
 
 		return true;
 	}

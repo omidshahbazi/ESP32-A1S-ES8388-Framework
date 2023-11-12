@@ -34,6 +34,7 @@ public:
 		OnlyRight = I2S_CHANNEL_FMT_ONLY_RIGHT
 	};
 
+	// TODO: Renaming
 	enum class InputModes
 	{
 		None = (uint8)ES8388::InputModes::None,
