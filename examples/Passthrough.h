@@ -17,7 +17,7 @@ public:
 		configs.BitsPerSample = ESP32A1SCodec::BitsPerSamples::BPS32;
 		configs.ChannelFormat = ESP32A1SCodec::ChannelFormats::SeparatedLeftAndRight;
 		configs.BufferCount = 3;
-		configs.BufferLegth = 300;
+		configs.BufferLength = 300;
 		configs.InputMode = ESP32A1SCodec::InputModes::LeftAndRightInput1;
 		configs.OutputMode = ESP32A1SCodec::OutputModes::All;
 

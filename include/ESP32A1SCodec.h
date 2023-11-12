@@ -59,7 +59,7 @@ public:
 		BitsPerSamples BitsPerSample;
 		ChannelFormats ChannelFormat;
 		uint16 BufferCount;
-		uint16 BufferLegth;
+		uint16 BufferLength;
 		InputModes InputMode;
 		OutputModes OutputMode;
 	};
@@ -199,7 +199,7 @@ private:
 
 	static bool InitializeI2S(Configs *Configs)
 	{
-		Configs->BufferLegth = Math::Clamp(Configs->BufferLegth, 1, 1024);
+		Configs->BufferLength = Math::Clamp(Configs->BufferLength, 1, 1024);
 
 		Log::WriteInfo(TAG, "Initializing I2S");
 
@@ -233,7 +233,7 @@ private:
 		config.communication_format = I2S_COMM_FORMAT_STAND_I2S;
 		config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;
 		config.dma_buf_count = Configs->BufferCount;
-		config.dma_buf_len = Configs->BufferLegth;
+		config.dma_buf_len = Configs->BufferLength;
 		config.use_apll = true;
 		config.tx_desc_auto_clear = true;
 		config.mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT;
