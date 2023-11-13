@@ -156,7 +156,7 @@ public:
 	// 	return true;
 	// }
 
-	// Bias
+	// TODO: Bias
 	static bool SetADCPowered(bool Powered, bool MicrophoneBiasPowered, InputModes InputMode)
 	{
 		Log::WriteInfo(TAG, "Setting ADC Powered: %i, Microphone Bias Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Left1 and Right1 Diffrential: %i, Left2 and Right2 Diffrential: %i, Mono Mix to Left: %i, Mono Mix to Right: %i", Powered, MicrophoneBiasPowered,
@@ -710,6 +710,7 @@ public:
 		return (uint8)value / 2.0F;
 	}
 
+	// TODO: Separate set
 	//[-45dB, 4.5dB]
 	static bool SetOutputVolume(float dB)
 	{
