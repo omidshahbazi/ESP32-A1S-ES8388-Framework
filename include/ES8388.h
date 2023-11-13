@@ -73,7 +73,7 @@ public:
 		CHECK_CALL(ES8388Interface::TurnOn(false, ES8388Interface::MiddleVoltageResistances::R50K));
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
-			CHECK_CALL(ES8388Interface::SetADCPowered(true, false, (ES8388Interface::InputModes)InputMode));
+			CHECK_CALL(ES8388Interface::SetADCPowered(true, (ES8388Interface::InputModes)InputMode));
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
 			CHECK_CALL(ES8388Interface::SetDACPowered(true, (ES8388Interface::OutputModes)OutputMode, ES8388Interface::OutputResistances::R1K5));
@@ -244,6 +244,7 @@ public:
 	}
 
 private:
+	// TODO: change to input, output mode
 	Modules m_Modules;
 
 	static const char *TAG;

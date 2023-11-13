@@ -133,7 +133,7 @@ public:
 	// 	CHECK_CALL(SetADCEnabled(false, false));
 	// 	CHECK_CALL(SetDACEnabled(false, false));
 
-	// 	CHECK_CALL(SetADCPowered(false, false, InputModes::BothDifferential));
+	// 	CHECK_CALL(SetADCPowered(false, InputModes::BothDifferential));
 	// 	CHECK_CALL(SetDACPowered(false, OutputModes::All, OutputResistances::R1K5));
 
 	// 	return true;
@@ -144,7 +144,7 @@ public:
 	//  {
 	//  	Log::WriteInfo(TAG, "Resuming");
 
-	// 	CHECK_CALL(SetADCPowered(true, true, InputModes::BothDifferential));
+	// 	CHECK_CALL(SetADCPowered(true, InputModes::BothDifferential));
 	// 	CHECK_CALL(SetDACPowered(true, OutputModes::All, OutputResistances::R1K5));
 
 	// 	CHECK_CALL(SetInputMute(false));
@@ -157,9 +157,9 @@ public:
 	// }
 
 	// TODO: Bias
-	static bool SetADCPowered(bool Powered, bool MicrophoneBiasPowered, InputModes InputMode)
+	static bool SetADCPowered(bool Powered, InputModes InputMode)
 	{
-		Log::WriteInfo(TAG, "Setting ADC Powered: %i, Microphone Bias Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Left1 and Right1 Diffrential: %i, Left2 and Right2 Diffrential: %i, Mono Mix to Left: %i, Mono Mix to Right: %i", Powered, MicrophoneBiasPowered,
+		Log::WriteInfo(TAG, "Setting ADC Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Left1 and Right1 Diffrential: %i, Left2 and Right2 Diffrential: %i, Mono Mix to Left: %i, Mono Mix to Right: %i", Powered,
 					   Bitwise::IsEnabled(InputMode, InputModes::Left1),
 					   Bitwise::IsEnabled(InputMode, InputModes::Right1),
 					   Bitwise::IsEnabled(InputMode, InputModes::Left2),
@@ -171,14 +171,17 @@ public:
 
 		ES8388Control::Values adcPower = ES8388Control::Values::ADCPower_int1LP_1;
 		ES8388Control::Values adcFlashPower = ES8388Control::Values::ADCPower_flashLP_1;
+		ES8388Control::Values biasGeneratorPower = ES8388Control::Values::ADCPower_PdnADCBiasgen_1;
 		if (Powered)
 		{
 			adcPower = ES8388Control::Values::ADCPower_int1LP_0;
 			adcFlashPower = ES8388Control::Values::ADCPower_flashLP_0;
+			biasGeneratorPower = ES8388Control::Values::ADCPower_PdnADCBiasgen_0;
 		}
 
 		ES8388Control::Write(ES8388Control::Registers::ADCPower, adcPower, ES8388Control::Masks::ADCPower_int1LP);
 		ES8388Control::Write(ES8388Control::Registers::ADCPower, adcFlashPower, ES8388Control::Masks::ADCPower_flashLP);
+		ES8388Control::Write(ES8388Control::Registers::ADCPower, biasGeneratorPower, ES8388Control::Masks::ADCPower_PdnADCBiasgen);
 
 		ES8388Control::Write(ES8388Control::Registers::ADCControl2, ES8388Control::Values::ADCControl2_DSSEL_1, ES8388Control::Masks::ADCControl2_DSSEL);
 
@@ -187,7 +190,7 @@ public:
 		ES8388Control::Values lefInSelect = ES8388Control::Values::ADCControl2_LINSEL_00;
 		ES8388Control::Values leftDiffrentialInputSelect = ES8388Control::Values::ADCControl3_DS_0;
 
-		if (Powered && Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2))
+		if (Powered && (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2)))
 		{
 			leftADCPower = ES8388Control::Values::ADCPower_PdnADCL_0;
 			leftAnalogInputPower = ES8388Control::Values::ADCPower_PdnAINL_0;
@@ -218,7 +221,7 @@ public:
 		ES8388Control::Values rightInSelect = ES8388Control::Values::ADCControl2_RINSEL_00;
 		ES8388Control::Values rightDiffrentialInputSelect = ES8388Control::Values::ADCControl2_DSR_0;
 
-		if (Powered && Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
+		if (Powered && (Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
 		{
 			rightADCPower = ES8388Control::Values::ADCPower_PdnADCR_0;
 			rightAnalogInputPower = ES8388Control::Values::ADCPower_PdnAINR_0;
@@ -269,13 +272,12 @@ public:
 		ES8388Control::Write(ES8388Control::Registers::ADCControl3, monoMix, ES8388Control::Masks::ADCControl3_MONOMIX);
 		ES8388Control::Write(ES8388Control::Registers::ADCControl4, monoMixDataSelect, ES8388Control::Masks::ADCControl4_DATSEL);
 
-		ES8388Control::Write(
-			ES8388Control::Registers::ADCPower,
-			(Powered ? ES8388Control::Values::ADCPower_PdnADCBiasgen_0 : ES8388Control::Values::ADCPower_PdnADCBiasgen_1), ES8388Control::Masks::ADCPower_PdnADCBiasgen);
+		ES8388Control::Values micBiasGenerator = ES8388Control::Values::ADCPower_PdnMICB_1;
 
-		ES8388Control::Write(
-			ES8388Control::Registers::ADCPower,
-			(Powered && MicrophoneBiasPowered ? ES8388Control::Values::ADCPower_PdnMICB_0 : ES8388Control::Values::ADCPower_PdnMICB_1), ES8388Control::Masks::ADCPower_PdnMICB);
+		if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1))
+			micBiasGenerator = ES8388Control::Values::ADCPower_PdnMICB_0;
+
+		ES8388Control::Write(ES8388Control::Registers::ADCPower, micBiasGenerator, ES8388Control::Masks::ADCPower_PdnMICB);
 
 		return true;
 	}
@@ -792,10 +794,7 @@ private:
 		ES8388Control::Write(ES8388Control::Registers::ChipControl1, ES8388Control::Values::ChipControl1_SameFs_0, ES8388Control::Masks::ChipControl1_SameFs);
 		ES8388Control::Write(ES8388Control::Registers::ChipControl1, ES8388Control::Values::ChipControl1_DACMCLK_0, ES8388Control::Masks::ChipControl1_DACMCLK);
 		ES8388Control::Write(ES8388Control::Registers::ChipControl1, ES8388Control::Values::ChipControl1_LRCM_0, ES8388Control::Masks::ChipControl1_LRCM);
-		ES8388Control::Write(
-			ES8388Control::Registers::ChipControl1,
-			(ResetControlPort ? ES8388Control::Values::ChipControl1_SCPReset_1 : ES8388Control::Values::ChipControl1_SCPReset_0),
-			ES8388Control::Masks::ChipControl1_SCPReset);
+		ES8388Control::Write(ES8388Control::Registers::ChipControl1, (ResetControlPort ? ES8388Control::Values::ChipControl1_SCPReset_1 : ES8388Control::Values::ChipControl1_SCPReset_0), ES8388Control::Masks::ChipControl1_SCPReset);
 
 		if (PoweredOn)
 		{

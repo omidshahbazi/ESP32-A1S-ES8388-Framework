@@ -6,6 +6,7 @@
 #include <functional>
 #include <Arduino.h>
 
+// TODO: malfunction
 class PushButtonArray
 {
 public:
