@@ -530,8 +530,11 @@ public:
 		return (BitsPerSamples)0;
 	}
 
-	static bool SetAutomaticLevelControlEnabled(bool Enabled, InputModes InputMode)
+	static bool SetAutomaticLevelControlEnabled(InputModes InputMode, bool Enabled)
 	{
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
+			return false;
+
 		Log::WriteInfo(TAG, "Setting ALC Enabled: %i, Right: %i, Left: %i", Enabled,
 					   Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2),
 					   Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2));
@@ -558,8 +561,11 @@ public:
 	// AttackTime [0.104ms/0.0227ms, 106ms/23.2ms]
 	// DecayTime [0.410ms/0.0908ms, 420ms/93ms]
 	// WindowsSize [96, 496]
-	static bool SetAutomaticLevelControlParameters(float dBMin, float dBMax, float dBTarget, float HoldTime, float AttackTime, float DecayTime, uint8 WindowsSize, bool ZeroCrossTimeout, bool UseZeroCrossDetection, bool LimiterMode)
+	static bool SetAutomaticLevelControlParameters(InputModes InputMode, float dBMin, float dBMax, float dBTarget, float HoldTime, float AttackTime, float DecayTime, uint8 WindowsSize, bool ZeroCrossTimeout, bool UseZeroCrossDetection, bool LimiterMode)
 	{
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
+			return false;
+
 		dBMin = Math::Clamp(dBMin, -12, 30);
 		dBMax = Math::Clamp(dBMax, -6.5F, 35.5F);
 		dBTarget = Math::Clamp(dBTarget, -16.5F, -1.5F);
@@ -658,7 +664,7 @@ public:
 		ES8388Control::Values value = (ES8388Control::Values)0;
 
 		if (Bitwise::IsEnabled(InputMode, InputModes::Left1))
-			value = ES8388Control::Read(ES8388Control::Registers::ADCControl1, ES8388Control::Masks::ADCControl1_MicAmpR) >> 4;
+			value = (ES8388Control::Values)((uint8)ES8388Control::Read(ES8388Control::Registers::ADCControl1, ES8388Control::Masks::ADCControl1_MicAmpR) >> 4);
 
 		if (Bitwise::IsEnabled(InputMode, InputModes::Right1))
 			value = ES8388Control::Read(ES8388Control::Registers::ADCControl1, ES8388Control::Masks::ADCControl1_MicAmpR);
@@ -700,7 +706,7 @@ public:
 		if (Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
 			value = ES8388Control::Read(ES8388Control::Registers::DACControl20, ES8388Control::Masks::DACControl20_RI2ROVOL);
 
-		return ((7 - ((uint8)value >> 3)) * 3F) - 15;
+		return ((7 - ((uint8)value >> 3)) * 3) - 15;
 	}
 
 	//[-96dB, 0dB]
@@ -752,7 +758,7 @@ public:
 		return true;
 	}
 
-	static bool GetInputMute(void)
+	static bool GetInputMute(InputModes InputMode)
 	{
 		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
 			return false;
@@ -847,8 +853,11 @@ public:
 		return ((uint8)value * 1.5F) - 45;
 	}
 
-	static bool SetOutputMute(bool Mute)
+	static bool SetOutputMute(OutputModes OutputMode, bool Mute)
 	{
+		if (!(Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2)))
+			return 0;
+
 		Log::WriteInfo(TAG, "Setting Output Mute: %i", Mute);
 
 		ES8388Control::Write(ES8388Control::Registers::DACControl3, (Mute ? ES8388Control::Values::DACControl3_DACMute_1 : ES8388Control::Values::DACControl3_DACMute_0), ES8388Control::Masks::DACControl3_DACMute);
@@ -856,8 +865,11 @@ public:
 		return true;
 	}
 
-	static bool GetOutputMute(void)
+	static bool GetOutputMute(OutputModes OutputMode)
 	{
+		if (!(Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2)))
+			return 0;
+
 		return (ES8388Control::Read(ES8388Control::Registers::DACControl3, ES8388Control::Masks::DACControl3_DACMute) == ES8388Control::Values::DACControl3_DACMute_1);
 	}
 

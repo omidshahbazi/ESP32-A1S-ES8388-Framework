@@ -62,10 +62,10 @@ public:
 		bool needsDAC = (m_OutputMode != OutputModes::None);
 
 		if (needsADC)
-			CHECK_CALL(ES8388Interface::SetADCPowered(true, (ES8388Interface::InputModes)InputMode));
+			CHECK_CALL(ES8388Interface::SetADCPowered(true, (ES8388Interface::InputModes)m_InputMode));
 
 		if (needsADC)
-			CHECK_CALL(ES8388Interface::SetDACPowered(true, (ES8388Interface::OutputModes)OutputMode, ES8388Interface::OutputResistances::R1K5));
+			CHECK_CALL(ES8388Interface::SetDACPowered(true, (ES8388Interface::OutputModes)m_OutputMode, ES8388Interface::OutputResistances::R1K5));
 
 		CHECK_CALL(SetBitsPerSample(BitsPerSamples::BPS16));
 
@@ -77,21 +77,21 @@ public:
 
 		if (needsADC)
 		{
-			CHECK_CALL(ES8388Interface::SetInputToMixerGain(6));
+			CHECK_CALL(ES8388Interface::SetInputToMixerGain((ES8388Interface::InputModes)m_InputMode, 6));
 
-			// CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateEnabled(true));
-			// CHECK_CALL(ES8388Interface::SetAutomaticLevelControlEnabled(true, (ES8388Interface::InputModes)InputMode));
+			CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateEnabled((ES8388Interface::InputModes)m_InputMode, true));
+			CHECK_CALL(ES8388Interface::SetAutomaticLevelControlEnabled((ES8388Interface::InputModes)m_InputMode, true));
 
-			// if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1))
-			// {
-			// 	CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateParameters(-40.5F, true));
-			// 	CHECK_CALL(SetAutomaticLevelControlParameters(0, 23.5F, -4.5F, 0, 0.416F, 0.820F, 21, false, false, false)); // Optimized for Microphone
-			// }
-			// else if (Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
-			// {
-			// 	CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateParameters(-60, false));
-			// 	CHECK_CALL(SetAutomaticLevelControlParameters(-12, 35.5F, -12, 0, 6.66F, 420, 21, false, false, false)); // Optimized for Music
-			// }
+			if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1))
+			{
+				CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateParameters((ES8388Interface::InputModes)m_InputMode, -40.5F, true));
+				CHECK_CALL(SetAutomaticLevelControlParameters(0, 23.5F, -4.5F, 0, 0.416F, 0.820F, 21, false, false, false)); // Optimized for Microphone
+			}
+			else if (Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
+			{
+				CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateParameters((ES8388Interface::InputModes)m_InputMode, -60, false));
+				CHECK_CALL(SetAutomaticLevelControlParameters(-12, 35.5F, -12, 0, 6.66F, 420, 21, false, false, false)); // Optimized for Music
+			}
 
 			CHECK_CALL(SetMicrophoneGain(24));
 
@@ -100,7 +100,7 @@ public:
 
 		if (needsDAC)
 		{
-			CHECK_CALL(ES8388Interface::SetDigitalVolume(0));
+			CHECK_CALL(ES8388Interface::SetDigitalVolume((ES8388Interface::OutputModes)m_OutputMode, 0));
 			CHECK_CALL(SetOutputVolume(4.5F));
 		}
 
@@ -140,7 +140,7 @@ public:
 		if (m_InputMode == InputModes::None)
 			return false;
 
-		CHECK_CALL(ES8388Interface::SetAutomaticLevelControlParameters(dBMin, dBMax, dBTarget, HoldTime, AttackTime, DecayTime, WindowsSize, ZeroCrossTimeout, UseZeroCrossDetection, LimiterMode));
+		CHECK_CALL(ES8388Interface::SetAutomaticLevelControlParameters((ES8388Interface::InputModes)m_InputMode, dBMin, dBMax, dBTarget, HoldTime, AttackTime, DecayTime, WindowsSize, ZeroCrossTimeout, UseZeroCrossDetection, LimiterMode));
 
 		return true;
 	}
@@ -161,7 +161,7 @@ public:
 		if (m_InputMode == InputModes::None)
 			return -1;
 
-		return ES8388Interface::GetMicrophoneGain();
+		return ES8388Interface::GetMicrophoneGain((ES8388Interface::InputModes)m_InputMode);
 	}
 
 	//[-96dB, 0dB]
@@ -170,7 +170,7 @@ public:
 		if (m_InputMode == InputModes::None)
 			return false;
 
-		CHECK_CALL(ES8388Interface::SetInputVolume(dB));
+		CHECK_CALL(ES8388Interface::SetInputVolume((ES8388Interface::InputModes)m_InputMode, dB));
 
 		return true;
 	}
@@ -180,7 +180,7 @@ public:
 		if (m_InputMode == InputModes::None)
 			return -1;
 
-		return ES8388Interface::GetInputVolume();
+		return ES8388Interface::GetInputVolume((ES8388Interface::InputModes)m_InputMode);
 	}
 
 	//[-45dB, 4.5dB]
@@ -189,7 +189,7 @@ public:
 		if (m_InputMode == InputModes::None)
 			return false;
 
-		CHECK_CALL(ES8388Interface::SetOutputVolume(dB));
+		CHECK_CALL(ES8388Interface::SetOutputVolume((ES8388Interface::OutputModes)m_OutputMode, dB));
 
 		return true;
 	}
@@ -199,16 +199,16 @@ public:
 		if (m_OutputMode == OutputModes::None)
 			return -1;
 
-		return ES8388Interface::GetOutputVolume();
+		return ES8388Interface::GetOutputVolume((ES8388Interface::OutputModes)m_OutputMode);
 	}
 
 	bool SetMute(bool Mute)
 	{
 		if (m_InputMode != InputModes::None)
-			CHECK_CALL(ES8388Interface::SetInputMute(Mute));
+			CHECK_CALL(ES8388Interface::SetInputMute((ES8388Interface::InputModes)m_InputMode, Mute));
 
 		if (m_OutputMode != OutputModes::None)
-			CHECK_CALL(ES8388Interface::SetOutputMute(Mute));
+			CHECK_CALL(ES8388Interface::SetOutputMute((ES8388Interface::OutputModes)m_OutputMode, Mute));
 
 		return true;
 	}
@@ -216,10 +216,10 @@ public:
 	bool GetMute(void)
 	{
 		if (m_InputMode != InputModes::None)
-			return ES8388Interface::GetInputMute();
+			return ES8388Interface::GetInputMute((ES8388Interface::InputModes)m_InputMode);
 
 		if (m_OutputMode != OutputModes::None)
-			return ES8388Interface::GetOutputMute();
+			return ES8388Interface::GetOutputMute((ES8388Interface::OutputModes)m_OutputMode);
 
 		return false;
 	}
