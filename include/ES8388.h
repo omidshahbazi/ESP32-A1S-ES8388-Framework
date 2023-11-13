@@ -61,8 +61,6 @@ public:
 	ES8388(InputModes InputMode, OutputModes OutputMode)
 		: m_Modules((Modules)0)
 	{
-		InputMode = InputModes::Left1 | InputModes::Right1;
-
 		Log::WriteInfo(TAG, "Intializing");
 
 		if (InputMode != InputModes::None)
