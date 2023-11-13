@@ -13,14 +13,13 @@
 class ES8388
 {
 public:
-	enum class BitsPerSamples
+	enum class MonoMixModes
 	{
-		BPS16 = (uint8)ES8388Interface::BitsPerSamples::BPS16,
-		BPS24 = (uint8)ES8388Interface::BitsPerSamples::BPS24,
-		BPS32 = (uint8)ES8388Interface::BitsPerSamples::BPS32
+		None = (uint8)ES8388Interface::MonoMixModes::None,
+		MonoMixToLeft = (uint8)ES8388Interface::MonoMixModes::MonoMixToLeft,
+		MonoMixToRight = (uint8)ES8388Interface::MonoMixModes::MonoMixToRight
 	};
 
-	// TODO: Renaming
 	enum class InputModes
 	{
 		None = (uint8)ES8388Interface::InputModes::None,
@@ -30,27 +29,38 @@ public:
 
 		Left2 = (uint8)ES8388Interface::InputModes::Left2,
 		Right2 = (uint8)ES8388Interface::InputModes::Right2,
+
+		Left1AndRight1Differential = (uint8)ES8388Interface::InputModes::Left1AndRight1Differential,
+		Left2AndRight2Differential = (uint8)ES8388Interface::InputModes::Left2AndRight2Differential
 	};
 
 	enum class OutputModes
 	{
 		None = (uint8)ES8388Interface::OutputModes::None,
+
 		Left1 = (uint8)ES8388Interface::OutputModes::Left1,
 		Right1 = (uint8)ES8388Interface::OutputModes::Right1,
 		Left2 = (uint8)ES8388Interface::OutputModes::Left2,
 		Right2 = (uint8)ES8388Interface::OutputModes::Right2,
 
+		Left1AndRight1 = Left1 | Right1,
+		Left2AndRight2 = Left2 | Right2,
+
 		Left1AndLeft2 = Left1 | Left2,
 		Right1AndRight2 = Right1 | Right2,
 
-		LeftAndRight1 = Left1 | Right1,
-		LeftAndRight2 = Left2 | Right2,
+		All = Left1AndRight1 | Left2AndRight2
+	};
 
-		All = (uint8)ES8388Interface::OutputModes::All
+	enum class BitsPerSamples
+	{
+		BPS16 = (uint8)ES8388Interface::BitsPerSamples::BPS16,
+		BPS24 = (uint8)ES8388Interface::BitsPerSamples::BPS24,
+		BPS32 = (uint8)ES8388Interface::BitsPerSamples::BPS32
 	};
 
 public:
-	ES8388(InputModes InputMode, OutputModes OutputMode)
+	ES8388(InputModes InputMode, MonoMixModes MonoMixMode, OutputModes OutputMode)
 		: m_InputMode(InputMode),
 		  m_OutputMode(OutputMode)
 	{
@@ -62,7 +72,7 @@ public:
 		bool needsDAC = (m_OutputMode != OutputModes::None);
 
 		if (needsADC)
-			CHECK_CALL(ES8388Interface::SetADCPowered(true, (ES8388Interface::InputModes)m_InputMode));
+			CHECK_CALL(ES8388Interface::SetADCPowered(true, (ES8388Interface::InputModes)m_InputMode, (ES8388Interface::MonoMixModes)MonoMixMode));
 
 		if (needsADC)
 			CHECK_CALL(ES8388Interface::SetDACPowered(true, (ES8388Interface::OutputModes)m_OutputMode, ES8388Interface::OutputResistances::R1K5));
@@ -79,21 +89,21 @@ public:
 		{
 			CHECK_CALL(ES8388Interface::SetInputToMixerGain((ES8388Interface::InputModes)m_InputMode, 6));
 
-			CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateEnabled((ES8388Interface::InputModes)m_InputMode, true));
+			CHECK_CALL(ES8388Interface::SetNoiseGateEnabled((ES8388Interface::InputModes)m_InputMode, true));
 			CHECK_CALL(ES8388Interface::SetAutomaticLevelControlEnabled((ES8388Interface::InputModes)m_InputMode, true));
 
 			if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1))
 			{
-				CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateParameters((ES8388Interface::InputModes)m_InputMode, -40.5F, true));
+				CHECK_CALL(ES8388Interface::SetNoiseGateParameters((ES8388Interface::InputModes)m_InputMode, -40.5F, true));
 				CHECK_CALL(SetAutomaticLevelControlParameters(0, 23.5F, -4.5F, 0, 0.416F, 0.820F, 21, false, false, false)); // Optimized for Microphone
+
+				CHECK_CALL(SetMicrophoneGain(24));
 			}
 			else if (Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
 			{
-				CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateParameters((ES8388Interface::InputModes)m_InputMode, -60, false));
+				CHECK_CALL(ES8388Interface::SetNoiseGateParameters((ES8388Interface::InputModes)m_InputMode, -60, false));
 				CHECK_CALL(SetAutomaticLevelControlParameters(-12, 35.5F, -12, 0, 6.66F, 420, 21, false, false, false)); // Optimized for Music
 			}
-
-			CHECK_CALL(SetMicrophoneGain(24));
 
 			CHECK_CALL(SetInputVolume(0));
 		}

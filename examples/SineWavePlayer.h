@@ -21,6 +21,7 @@ public:
 		configs.BufferLength = 300;
 		configs.InputMode = ESP32A1SCodec::InputModes::None;
 		configs.OutputMode = ESP32A1SCodec::OutputModes::All;
+		configs.MonoMixMode = ESP32A1SCodec::MonoMixModes::None;
 
 		CHECK_CALL(ESP32A1SCodec::Initialize(&configs));
 

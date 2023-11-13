@@ -17,9 +17,7 @@ private:
 		Left2 = 0b00000100,
 		Right2 = 0b00001000,
 
-		Differential = 0b00010000,
-
-		MonoMix = 0b00100000
+		Differential = 0b00010000
 	};
 
 public:
@@ -37,7 +35,13 @@ public:
 		R40K = (uint8)ES8388Control::Values::DACControl23_VROI_1,
 	};
 
-	// TODO: Renaming
+	enum class MonoMixModes
+	{
+		None = 0b00000000,
+		MonoMixToLeft = 0b00000001,
+		MonoMixToRight = 0b00000010
+	};
+
 	enum class InputModes
 	{
 		None = 0b00000000,
@@ -49,11 +53,6 @@ public:
 
 		Left1AndRight1Differential = (uint8)InputModeBits::Differential | Left1 | Right1,
 		Left2AndRight2Differential = (uint8)InputModeBits::Differential | Left2 | Right2,
-
-		BothDifferential = Left1AndRight1Differential | Left2AndRight2Differential,
-
-		MonoMixToLeft = (uint8)InputModeBits::MonoMix,
-		MonoMixToRight = (uint8)InputModeBits::MonoMix
 	};
 
 	enum class OutputModes
@@ -64,9 +63,7 @@ public:
 		Right1 = 0b00000010,
 
 		Left2 = 0b00000100,
-		Right2 = 0b00001000,
-
-		All = Left1 | Right1 | Left2 | Right2
+		Right2 = 0b00001000
 	};
 
 	enum class Formats
@@ -157,7 +154,7 @@ public:
 	// 	return true;
 	// }
 
-	static bool SetADCPowered(bool Powered, InputModes InputMode)
+	static bool SetADCPowered(bool Powered, InputModes InputMode, MonoMixModes MonoMixMode)
 	{
 		Log::WriteInfo(TAG, "Setting ADC Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Left1 and Right1 Diffrential: %i, Left2 and Right2 Diffrential: %i, Mono Mix to Left: %i, Mono Mix to Right: %i", Powered,
 					   Bitwise::IsEnabled(InputMode, InputModes::Left1),
@@ -166,8 +163,8 @@ public:
 					   Bitwise::IsEnabled(InputMode, InputModes::Right2),
 					   Bitwise::IsEnabled(InputMode, InputModes::Left1AndRight1Differential),
 					   Bitwise::IsEnabled(InputMode, InputModes::Left2AndRight2Differential),
-					   Bitwise::IsEnabled(InputMode, InputModes::MonoMixToLeft),
-					   Bitwise::IsEnabled(InputMode, InputModes::MonoMixToRight));
+					   Bitwise::IsEnabled(MonoMixMode, MonoMixModes::MonoMixToLeft),
+					   Bitwise::IsEnabled(MonoMixMode, MonoMixModes::MonoMixToRight));
 
 		ES8388Control::Values adcPower = ES8388Control::Values::ADCPower_int1LP_1;
 		ES8388Control::Values adcFlashPower = ES8388Control::Values::ADCPower_flashLP_1;
@@ -247,17 +244,24 @@ public:
 		ES8388Control::Write(ES8388Control::Registers::ADCControl2, rightInSelect, ES8388Control::Masks::ADCControl2_RINSEL);
 		ES8388Control::Write(ES8388Control::Registers::ADCControl2, rightDiffrentialInputSelect, ES8388Control::Masks::ADCControl2_DSR);
 
+		ES8388Control::Values micBiasGenerator = ES8388Control::Values::ADCPower_PdnMICB_1;
+
+		if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1))
+			micBiasGenerator = ES8388Control::Values::ADCPower_PdnMICB_0;
+
+		ES8388Control::Write(ES8388Control::Registers::ADCPower, micBiasGenerator, ES8388Control::Masks::ADCPower_PdnMICB);
+
 		ES8388Control::Values monoMix = ES8388Control::Values::ADCControl3_MONOMIX_00;
 		ES8388Control::Values monoMixDataSelect = ES8388Control::Values::ADCControl4_DATSEL_00;
 
 		if (Powered)
 		{
-			if (Bitwise::IsEnabled(InputMode, InputModes::MonoMixToLeft))
+			if (Bitwise::IsEnabled(MonoMixMode, MonoMixModes::MonoMixToLeft))
 			{
 				monoMix = ES8388Control::Values::ADCControl3_MONOMIX_01;
 				monoMixDataSelect = ES8388Control::Values::ADCControl4_DATSEL_01;
 			}
-			else if (Bitwise::IsEnabled(InputMode, InputModes::MonoMixToRight))
+			else if (Bitwise::IsEnabled(MonoMixMode, MonoMixModes::MonoMixToRight))
 			{
 				monoMix = ES8388Control::Values::ADCControl3_MONOMIX_10;
 				monoMixDataSelect = ES8388Control::Values::ADCControl4_DATSEL_10;
@@ -271,13 +275,6 @@ public:
 
 		ES8388Control::Write(ES8388Control::Registers::ADCControl3, monoMix, ES8388Control::Masks::ADCControl3_MONOMIX);
 		ES8388Control::Write(ES8388Control::Registers::ADCControl4, monoMixDataSelect, ES8388Control::Masks::ADCControl4_DATSEL);
-
-		ES8388Control::Values micBiasGenerator = ES8388Control::Values::ADCPower_PdnMICB_1;
-
-		if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1))
-			micBiasGenerator = ES8388Control::Values::ADCPower_PdnMICB_0;
-
-		ES8388Control::Write(ES8388Control::Registers::ADCPower, micBiasGenerator, ES8388Control::Masks::ADCPower_PdnMICB);
 
 		return true;
 	}
@@ -605,12 +602,12 @@ public:
 		return true;
 	}
 
-	static bool SetMicrophoneNoiseGateEnabled(InputModes InputMode, bool Enabled)
+	static bool SetNoiseGateEnabled(InputModes InputMode, bool Enabled)
 	{
-		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1)))
-			return false;
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
+			return 0;
 
-		Log::WriteInfo(TAG, "Setting Microphone Noise Gate Enabled: %i", Enabled);
+		Log::WriteInfo(TAG, "Setting Noise Gate Enabled: %i", Enabled);
 
 		ES8388Control::Write(ES8388Control::Registers::ADCControl14, (Enabled ? ES8388Control::Values::ADCControl14_NGAT_1 : ES8388Control::Values::ADCControl14_NGAT_0), ES8388Control::Masks::ADCControl14_NGAT);
 
@@ -618,14 +615,14 @@ public:
 	}
 
 	//[-76.5dBFS, -30dBFS]
-	static bool SetMicrophoneNoiseGateParameters(InputModes InputMode, float dBFS, bool MuteOnNoise)
+	static bool SetNoiseGateParameters(InputModes InputMode, float dBFS, bool MuteOnNoise)
 	{
-		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1)))
-			return false;
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
+			return 0;
 
 		dBFS = Math::Clamp(dBFS, -76.5F, -30);
 
-		Log::WriteInfo(TAG, "Setting Microphone Noise Gate: %.1fdBFS", dBFS);
+		Log::WriteInfo(TAG, "Setting Noise Gate: %.1fdBFS, Mute On Noise: %i", dBFS, MuteOnNoise);
 
 		uint8 value = (dBFS + 76.5F) / -1.5;
 

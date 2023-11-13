@@ -36,35 +36,44 @@ public:
 		OnlyRight = I2S_CHANNEL_FMT_ONLY_RIGHT
 	};
 
-	// TODO: Renaming
+	enum class MonoMixModes
+	{
+		None = (uint8)ES8388::MonoMixModes::None,
+		MonoMixToLeft = (uint8)ES8388::MonoMixModes::MonoMixToLeft,
+		MonoMixToRight = (uint8)ES8388::MonoMixModes::MonoMixToRight
+	};
+
 	enum class InputModes
 	{
 		None = (uint8)ES8388::InputModes::None,
 
-		Microphone1 = (uint8)ES8388::InputModes::Left1,
-		Microphone2 = (uint8)ES8388::InputModes::Right1,
+		Microphone1 = (uint8)ES8388::InputModes::Left1,	 // MIC1P
+		Microphone2 = (uint8)ES8388::InputModes::Right1, // MIC1N
 
-		LineL = (uint8)ES8388::InputModes::Left2,
-		LineR = (uint8)ES8388::InputModes::Right2,
+		LineL = (uint8)ES8388::InputModes::Left2,  // LINEINL, MIC2P
+		LineR = (uint8)ES8388::InputModes::Right2, // LINEINR, MIC2N
+
+		Microphone1AndMicrophone2Differential = (uint8)ES8388::InputModes::Left1AndRight1Differential,
+		LineLAndLineRDifferential = (uint8)ES8388::InputModes::Left2AndRight2Differential
 	};
 
 	enum class OutputModes
 	{
 		None = (uint8)ES8388::OutputModes::None,
 
-		SpeakerL = (uint8)ES8388::OutputModes::Left1,
-		SpeakerR = (uint8)ES8388::OutputModes::Right1,
+		SpeakerL = (uint8)ES8388::OutputModes::Left1,  // SPOLN
+		SpeakerR = (uint8)ES8388::OutputModes::Right1, // SPORN
 
-		HeadphoneL = (uint8)ES8388::OutputModes::Left2,
-		HeadphoneR = (uint8)ES8388::OutputModes::Right2,
+		HeadphoneL = (uint8)ES8388::OutputModes::Left2,	 // HPOUTL
+		HeadphoneR = (uint8)ES8388::OutputModes::Right2, // HPOUTR
 
 		SpeakerLAndHeadphoneL = (uint8)ES8388::OutputModes::Left1AndLeft2,
 		SpeakerRAndHeadphoneR = (uint8)ES8388::OutputModes::Right1AndRight2,
 
-		SpeakerLR = (uint8)ES8388::OutputModes::LeftAndRight1,
-		HeadphoneLR = (uint8)ES8388::OutputModes::LeftAndRight2,
+		SpeakerLR = (uint8)ES8388::OutputModes::Left1AndRight1,
+		HeadphoneLR = (uint8)ES8388::OutputModes::Left2AndRight2,
 
-		All = (uint8)ES8388::OutputModes::All
+		All = SpeakerLR | HeadphoneLR
 	};
 
 	struct Configs
@@ -77,6 +86,7 @@ public:
 		uint16 BufferCount;
 		uint16 BufferLength;
 		InputModes InputMode;
+		MonoMixModes MonoMixMode;
 		OutputModes OutputMode;
 	};
 
@@ -85,7 +95,7 @@ public:
 	{
 		CHECK_CALL(InitializeI2C(Configs));
 
-		m_Codec = new ES8388((ES8388::InputModes)Configs->InputMode, (ES8388::OutputModes)Configs->OutputMode);
+		m_Codec = new ES8388((ES8388::InputModes)Configs->InputMode, (ES8388::MonoMixModes)Configs->MonoMixMode, (ES8388::OutputModes)Configs->OutputMode);
 		CHECK_CALL(m_Codec->SetBitsPerSample((ES8388::BitsPerSamples)Configs->BitsPerSample));
 
 		CHECK_CALL(InitializeI2S(Configs));
