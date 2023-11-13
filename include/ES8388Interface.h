@@ -269,6 +269,14 @@ public:
 		ES8388Control::Write(ES8388Control::Registers::ADCControl3, monoMix, ES8388Control::Masks::ADCControl3_MONOMIX);
 		ES8388Control::Write(ES8388Control::Registers::ADCControl4, monoMixDataSelect, ES8388Control::Masks::ADCControl4_DATSEL);
 
+		ES8388Control::Write(
+			ES8388Control::Registers::ADCPower,
+			(Powered ? ES8388Control::Values::ADCPower_PdnADCBiasgen_0 : ES8388Control::Values::ADCPower_PdnADCBiasgen_1), ES8388Control::Masks::ADCPower_PdnADCBiasgen);
+
+		ES8388Control::Write(
+			ES8388Control::Registers::ADCPower,
+			(Powered && MicrophoneBiasPowered ? ES8388Control::Values::ADCPower_PdnMICB_0 : ES8388Control::Values::ADCPower_PdnMICB_1), ES8388Control::Masks::ADCPower_PdnMICB);
+
 		return true;
 	}
 
