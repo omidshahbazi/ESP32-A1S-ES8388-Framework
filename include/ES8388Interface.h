@@ -159,8 +159,6 @@ public:
 	// Bias
 	static bool SetADCPowered(bool Powered, bool MicrophoneBiasPowered, InputModes InputMode)
 	{
-		InputMode = InputModes::Left1 | InputModes::Right1;
-
 		Log::WriteInfo(TAG, "Setting ADC Powered: %i, Microphone Bias Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Left1 and Right1 Diffrential: %i, Left2 and Right2 Diffrential: %i, Mono Mix to Left: %i, Mono Mix to Right: %i", Powered, MicrophoneBiasPowered,
 					   Bitwise::IsEnabled(InputMode, InputModes::Left1),
 					   Bitwise::IsEnabled(InputMode, InputModes::Right1),

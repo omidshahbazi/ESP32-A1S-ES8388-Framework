@@ -61,6 +61,8 @@ public:
 	ES8388(InputModes InputMode, OutputModes OutputMode)
 		: m_Modules((Modules)0)
 	{
+		InputMode = InputModes::Left1 | InputModes::Right1;
+
 		Log::WriteInfo(TAG, "Intializing");
 
 		if (InputMode != InputModes::None)
@@ -71,11 +73,7 @@ public:
 		CHECK_CALL(ES8388Interface::TurnOn(false, ES8388Interface::MiddleVoltageResistances::R50K));
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
-		{
 			CHECK_CALL(ES8388Interface::SetADCPowered(true, false, (ES8388Interface::InputModes)InputMode));
-
-			CHECK_CALL(ES8388Interface::SetAutomaticLevelControlEnabled(true, (ES8388Interface::InputModes)InputMode));
-		}
 
 		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
 			CHECK_CALL(ES8388Interface::SetDACPowered(true, (ES8388Interface::OutputModes)OutputMode, ES8388Interface::OutputResistances::R1K5));
@@ -91,18 +89,20 @@ public:
 		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
 		{
 			CHECK_CALL(ES8388Interface::SetInputToMixerGain(6));
-			CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateEnabled(true));
 
-			if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1))
-			{
-				CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateParameters(-40.5F, true));
-				CHECK_CALL(SetAutomaticLevelControlParameters(0, 23.5F, -4.5F, 0, 0.416F, 0.820F, 21, false, false, false)); // Optimized for Microphone
-			}
-			else if (Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
-			{
-				CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateParameters(-60, false));
-				CHECK_CALL(SetAutomaticLevelControlParameters(-12, 35.5F, -12, 0, 6.66F, 420, 21, false, false, false)); // Optimized for Music
-			}
+			// CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateEnabled(true));
+			// CHECK_CALL(ES8388Interface::SetAutomaticLevelControlEnabled(true, (ES8388Interface::InputModes)InputMode));
+
+			// if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1))
+			// {
+			// 	CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateParameters(-40.5F, true));
+			// 	CHECK_CALL(SetAutomaticLevelControlParameters(0, 23.5F, -4.5F, 0, 0.416F, 0.820F, 21, false, false, false)); // Optimized for Microphone
+			// }
+			// else if (Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
+			// {
+			// 	CHECK_CALL(ES8388Interface::SetMicrophoneNoiseGateParameters(-60, false));
+			// 	CHECK_CALL(SetAutomaticLevelControlParameters(-12, 35.5F, -12, 0, 6.66F, 420, 21, false, false, false)); // Optimized for Music
+			// }
 
 			CHECK_CALL(SetMicrophoneGain(24));
 
