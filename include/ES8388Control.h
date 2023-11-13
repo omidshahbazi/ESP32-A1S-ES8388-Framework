@@ -4,8 +4,7 @@
 
 #include "I2CUtils.h"
 
-// More info:
-// https://dl.radxa.com/rock2/docs/hw/ds/ES8388%20user%20Guide.pdf
+// ES8388 DS.pdf
 // https://docs.google.com/spreadsheets/d/1_UdXtrtpj_dzi36CSwv5tBphtGsBrY2Npdi79h1dYUk/edit#gid=0
 class ES8388Control
 {

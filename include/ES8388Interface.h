@@ -5,6 +5,7 @@
 #include "ES8388Control.h"
 #include "Math.h"
 
+// https://dl.radxa.com/rock2/docs/hw/ds/ES8388%20user%20Guide.pdf
 class ES8388Interface
 {
 private:
@@ -803,7 +804,6 @@ public:
 		return (uint8)value / 2.0F;
 	}
 
-	// TODO: Separate set
 	//[-45dB, 4.5dB]
 	static bool SetOutputVolume(OutputModes OutputMode, float dB)
 	{

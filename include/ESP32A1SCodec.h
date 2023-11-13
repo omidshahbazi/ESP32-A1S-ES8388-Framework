@@ -7,6 +7,8 @@
 #include <driver/i2s.h>
 #include <driver/i2c.h>
 
+// ESP32-A1S Product Specification.pdf
+// esp32-a1s_v2.3_specification.pdf
 class ESP32A1SCodec
 {
 public:
