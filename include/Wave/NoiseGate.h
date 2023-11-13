@@ -28,10 +28,10 @@ public:
 	// 0 = -70dB, 1 = -10dB
 	void SetThreshold(float val)
 	{
-		float dB = -70.0f + 60.0f * val;
+		float dB = -70 + 60 * val;
 
-		m_UpperThreshold = powf(10, dB / 20.0f);
-		m_LowerThreshold = m_UpperThreshold / 2.0f;
+		m_UpperThreshold = powf(10, dB / 20);
+		m_LowerThreshold = m_UpperThreshold / 2;
 	}
 
 	double Process(double Value) override

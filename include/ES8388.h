@@ -12,14 +12,6 @@
 
 class ES8388
 {
-private:
-	enum class Modules
-	{
-		ADC = 0x1,
-		DAC = 0x2,
-		Both = ADC | DAC
-	};
-
 public:
 	enum class BitsPerSamples
 	{
@@ -59,32 +51,31 @@ public:
 
 public:
 	ES8388(InputModes InputMode, OutputModes OutputMode)
-		: m_Modules((Modules)0)
+		: m_InputMode(InputMode),
+		  m_OutputMode(OutputMode)
 	{
 		Log::WriteInfo(TAG, "Intializing");
 
-		if (InputMode != InputModes::None)
-			m_Modules |= Modules::ADC;
-		if (OutputMode != OutputModes::None)
-			m_Modules |= Modules::DAC;
-
 		CHECK_CALL(ES8388Interface::TurnOn(false, ES8388Interface::MiddleVoltageResistances::R50K));
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
+		bool needsADC = (m_InputMode != InputModes::None);
+		bool needsDAC = (m_OutputMode != OutputModes::None);
+
+		if (needsADC)
 			CHECK_CALL(ES8388Interface::SetADCPowered(true, (ES8388Interface::InputModes)InputMode));
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
+		if (needsADC)
 			CHECK_CALL(ES8388Interface::SetDACPowered(true, (ES8388Interface::OutputModes)OutputMode, ES8388Interface::OutputResistances::R1K5));
 
 		CHECK_CALL(SetBitsPerSample(BitsPerSamples::BPS16));
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
+		if (needsADC)
 			CHECK_CALL(ES8388Interface::SetADCFormat(ES8388Interface::Formats::I2S));
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
+		if (needsDAC)
 			CHECK_CALL(ES8388Interface::SetDACFormat(ES8388Interface::Formats::I2S));
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
+		if (needsADC)
 		{
 			CHECK_CALL(ES8388Interface::SetInputToMixerGain(6));
 
@@ -107,7 +98,7 @@ public:
 			CHECK_CALL(SetInputVolume(0));
 		}
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
+		if (needsDAC)
 		{
 			CHECK_CALL(ES8388Interface::SetDigitalVolume(0));
 			CHECK_CALL(SetOutputVolume(4.5F));
@@ -118,10 +109,10 @@ public:
 
 	bool SetBitsPerSample(BitsPerSamples BitsPerSample)
 	{
-		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
+		if (m_InputMode != InputModes::None)
 			CHECK_CALL(ES8388Interface::SetADCBitsPerSample((ES8388Interface::BitsPerSamples)BitsPerSample));
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
+		if (m_OutputMode != OutputModes::None)
 			CHECK_CALL(ES8388Interface::SetDACBitsPerSample((ES8388Interface::BitsPerSamples)BitsPerSample));
 
 		return true;
@@ -129,10 +120,10 @@ public:
 
 	BitsPerSamples GetBitsPerSample(void)
 	{
-		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
+		if (m_InputMode != InputModes::None)
 			return (BitsPerSamples)ES8388Interface::GetADCBitsPerSample();
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
+		if (m_OutputMode != OutputModes::None)
 			return (BitsPerSamples)ES8388Interface::GetDACBitsPerSample();
 
 		return BitsPerSamples::BPS16;
@@ -146,7 +137,7 @@ public:
 	// DecayTime [0.410ms/0.0908ms, 420ms/93ms]
 	bool SetAutomaticLevelControlParameters(float dBMin, float dBMax, float dBTarget, float HoldTime, float AttackTime, float DecayTime, uint8 WindowsSize, bool ZeroCrossTimeout, bool UseZeroCrossDetection, bool LimiterMode)
 	{
-		if (!Bitwise::IsEnabled(m_Modules, Modules::ADC))
+		if (m_InputMode == InputModes::None)
 			return false;
 
 		CHECK_CALL(ES8388Interface::SetAutomaticLevelControlParameters(dBMin, dBMax, dBTarget, HoldTime, AttackTime, DecayTime, WindowsSize, ZeroCrossTimeout, UseZeroCrossDetection, LimiterMode));
@@ -157,26 +148,26 @@ public:
 	//[0dB, 24dB]
 	bool SetMicrophoneGain(float dB)
 	{
-		if (!Bitwise::IsEnabled(m_Modules, Modules::ADC))
+		if (m_InputMode == InputModes::None)
 			return false;
 
-		CHECK_CALL(ES8388Interface::SetMicrophoneGain(dB));
+		CHECK_CALL(ES8388Interface::SetMicrophoneGain((ES8388Interface::InputModes)m_InputMode, dB));
 
 		return true;
 	}
 
 	float GetMicrophoneGain(void)
 	{
-		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
-			return ES8388Interface::GetMicrophoneGain();
+		if (m_InputMode == InputModes::None)
+			return -1;
 
-		return -1;
+		return ES8388Interface::GetMicrophoneGain();
 	}
 
 	//[-96dB, 0dB]
 	bool SetInputVolume(float dB)
 	{
-		if (!Bitwise::IsEnabled(m_Modules, Modules::ADC))
+		if (m_InputMode == InputModes::None)
 			return false;
 
 		CHECK_CALL(ES8388Interface::SetInputVolume(dB));
@@ -186,16 +177,16 @@ public:
 
 	float GetInputVolume(void)
 	{
-		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
-			return ES8388Interface::GetInputVolume();
+		if (m_InputMode == InputModes::None)
+			return -1;
 
-		return -1;
+		return ES8388Interface::GetInputVolume();
 	}
 
 	//[-45dB, 4.5dB]
 	bool SetOutputVolume(float dB)
 	{
-		if (!Bitwise::IsEnabled(m_Modules, Modules::DAC))
+		if (m_InputMode == InputModes::None)
 			return false;
 
 		CHECK_CALL(ES8388Interface::SetOutputVolume(dB));
@@ -205,18 +196,18 @@ public:
 
 	float GetOutputVolume(void)
 	{
-		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
-			return ES8388Interface::GetOutputVolume();
+		if (m_OutputMode == OutputModes::None)
+			return -1;
 
-		return -1;
+		return ES8388Interface::GetOutputVolume();
 	}
 
 	bool SetMute(bool Mute)
 	{
-		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
+		if (m_InputMode != InputModes::None)
 			CHECK_CALL(ES8388Interface::SetInputMute(Mute));
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
+		if (m_OutputMode != OutputModes::None)
 			CHECK_CALL(ES8388Interface::SetOutputMute(Mute));
 
 		return true;
@@ -224,10 +215,10 @@ public:
 
 	bool GetMute(void)
 	{
-		if (Bitwise::IsEnabled(m_Modules, Modules::ADC))
+		if (m_InputMode != InputModes::None)
 			return ES8388Interface::GetInputMute();
 
-		if (Bitwise::IsEnabled(m_Modules, Modules::DAC))
+		if (m_OutputMode != OutputModes::None)
 			return ES8388Interface::GetOutputMute();
 
 		return false;
@@ -238,12 +229,28 @@ public:
 	//(1Vrms/2.83Vpp, 0.5Vrms/1.41Vpp, 0.25Vrms/707mVpp, 0.125Vrms/354mVpp, 0.625Vrms/177mVpp)
 	bool OptimizeConversion(uint8 Range = 2)
 	{
-		return ES8388Interface::OptimizeConversion(Range);
+		if (m_InputMode == InputModes::None)
+			return false;
+
+		if (m_OutputMode == OutputModes::None)
+			return false;
+
+		static float INPUT_GAIN[] = {0, 6, 12, 18, 24};
+		static float OUTPUT_VOLUME[] = {0, -6, -12, -18, -24};
+
+		Range = Math::Clamp(Range, 0, 4);
+
+		Log::WriteInfo(TAG, "Optimizing Conversion: %i, Input Gain: %.1ffdB, Output Volume: %.1ffdB", Range, INPUT_GAIN[Range], OUTPUT_VOLUME[Range]);
+
+		CHECK_CALL(SetMicrophoneGain(INPUT_GAIN[Range]));
+		CHECK_CALL(SetOutputVolume(OUTPUT_VOLUME[Range]));
+
+		return true;
 	}
 
 private:
-	// TODO: change to input, output mode
-	Modules m_Modules;
+	InputModes m_InputMode;
+	OutputModes m_OutputMode;
 
 	static const char *TAG;
 };

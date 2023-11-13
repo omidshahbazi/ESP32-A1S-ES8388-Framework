@@ -10,7 +10,7 @@ class ToneControl : public Wave
 {
 public:
 	ToneControl(void)
-		: m_Tone(0.5F)
+		: m_Tone(1)
 	{
 		m_LowPassFilter.SetCutoffFrequencye(408.0895981378369);	 // Emulate big muff R39k and C10nF
 		m_HighPassFilter.SetCutoffFrequencye(1476.390939459707); // Emulate big muff R22k and C4.9nF
@@ -32,7 +32,7 @@ public:
 	}
 
 private:
-	float m_Tone = 1.0f;
+	float m_Tone;
 
 	LowPassFilter m_LowPassFilter;
 	HighPassFilter m_HighPassFilter;

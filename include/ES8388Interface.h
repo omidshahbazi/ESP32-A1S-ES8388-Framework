@@ -598,30 +598,11 @@ public:
 		return true;
 	}
 
-	//[0dB, 24dB]
-	static bool SetMicrophoneGain(float dB)
+	static bool SetMicrophoneNoiseGateEnabled(InputModes InputMode, bool Enabled)
 	{
-		dB = Math::Clamp(dB, 0, 24);
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1)))
+			return false;
 
-		Log::WriteInfo(TAG, "Setting Microphone Gain: %.1fdB", dB);
-
-		uint8 value = (uint8)(dB / 3);
-
-		ES8388Control::Write(ES8388Control::Registers::ADCControl1, (ES8388Control::Values)(value & (uint8)ES8388Control::Masks::ADCControl1_MicAmpR), ES8388Control::Masks::ADCControl1_MicAmpR);
-		ES8388Control::Write(ES8388Control::Registers::ADCControl1, (ES8388Control::Values)((value << 4) & (uint8)ES8388Control::Masks::ADCControl1_MicAmpL), ES8388Control::Masks::ADCControl1_MicAmpL);
-
-		return true;
-	}
-
-	static float GetMicrophoneGain(void)
-	{
-		ES8388Control::Values value = ES8388Control::Read(ES8388Control::Registers::ADCControl1, ES8388Control::Masks::ADCControl1_MicAmpR);
-
-		return (uint8)value * 3.0F;
-	}
-
-	static bool SetMicrophoneNoiseGateEnabled(bool Enabled)
-	{
 		Log::WriteInfo(TAG, "Setting Microphone Noise Gate Enabled: %i", Enabled);
 
 		ES8388Control::Write(ES8388Control::Registers::ADCControl14, (Enabled ? ES8388Control::Values::ADCControl14_NGAT_1 : ES8388Control::Values::ADCControl14_NGAT_0), ES8388Control::Masks::ADCControl14_NGAT);
@@ -630,8 +611,11 @@ public:
 	}
 
 	//[-76.5dBFS, -30dBFS]
-	static bool SetMicrophoneNoiseGateParameters(float dBFS, bool MuteOnNoise)
+	static bool SetMicrophoneNoiseGateParameters(InputModes InputMode, float dBFS, bool MuteOnNoise)
 	{
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1)))
+			return false;
+
 		dBFS = Math::Clamp(dBFS, -76.5F, -30);
 
 		Log::WriteInfo(TAG, "Setting Microphone Noise Gate: %.1fdBFS", dBFS);
@@ -645,99 +629,122 @@ public:
 		return true;
 	}
 
-	//[-15dB, 6dB]
-	static bool SetInputToMixerGain(float dB)
+	//[0dB, 24dB]
+	static bool SetMicrophoneGain(InputModes InputMode, float dB)
 	{
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1)))
+			return false;
+
+		dB = Math::Clamp(dB, 0, 24);
+
+		Log::WriteInfo(TAG, "Setting Microphone Gain: %.1fdB", dB);
+
+		uint8 value = (uint8)(dB / 3);
+
+		if (Bitwise::IsEnabled(InputMode, InputModes::Left1))
+			ES8388Control::Write(ES8388Control::Registers::ADCControl1, (ES8388Control::Values)((value << 4) & (uint8)ES8388Control::Masks::ADCControl1_MicAmpL), ES8388Control::Masks::ADCControl1_MicAmpL);
+
+		if (Bitwise::IsEnabled(InputMode, InputModes::Right1))
+			ES8388Control::Write(ES8388Control::Registers::ADCControl1, (ES8388Control::Values)(value & (uint8)ES8388Control::Masks::ADCControl1_MicAmpR), ES8388Control::Masks::ADCControl1_MicAmpR);
+
+		return true;
+	}
+
+	static float GetMicrophoneGain(InputModes InputMode)
+	{
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1)))
+			return 0;
+
+		ES8388Control::Values value = (ES8388Control::Values)0;
+
+		if (Bitwise::IsEnabled(InputMode, InputModes::Left1))
+			value = ES8388Control::Read(ES8388Control::Registers::ADCControl1, ES8388Control::Masks::ADCControl1_MicAmpR) >> 4;
+
+		if (Bitwise::IsEnabled(InputMode, InputModes::Right1))
+			value = ES8388Control::Read(ES8388Control::Registers::ADCControl1, ES8388Control::Masks::ADCControl1_MicAmpR);
+
+		return (uint8)value * 3;
+	}
+
+	//[-15dB, 6dB]
+	static bool SetInputToMixerGain(InputModes InputMode, float dB)
+	{
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
+			return false;
+
 		dB = Math::Clamp(dB, -15, 6);
 
 		Log::WriteInfo(TAG, "Setting Input to Mixer Gain: %.1fdB", dB);
 
-		uint8 value = 7 - (uint8)((dB + 15) / 3.0F);
+		uint8 value = 7 - (uint8)((dB + 15) / 3);
 
-		ES8388Control::Write(ES8388Control::Registers::DACControl17, (ES8388Control::Values)(value << 3), ES8388Control::Masks::DACControl17_LI2LOVOL);
-		ES8388Control::Write(ES8388Control::Registers::DACControl20, (ES8388Control::Values)(value << 3), ES8388Control::Masks::DACControl20_RI2ROVOL);
+		if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2))
+			ES8388Control::Write(ES8388Control::Registers::DACControl17, (ES8388Control::Values)(value << 3), ES8388Control::Masks::DACControl17_LI2LOVOL);
 
-		return true;
-	}
-
-	static float GetInputToMixerGain(void)
-	{
-		ES8388Control::Values value = ES8388Control::Read(ES8388Control::Registers::DACControl17, ES8388Control::Masks::DACControl17_LI2LOVOL);
-
-		return ((7 - ((uint8)value >> 3)) * 3.0F) - 15;
-	}
-
-	//[-96dB, 0dB]
-	static bool SetDigitalVolume(float dB)
-	{
-		dB = Math::Clamp(dB, -96, 0);
-
-		Log::WriteInfo(TAG, "Setting DAC Volume: %.1fdB", dB);
-
-		ES8388Control::Values value = (ES8388Control::Values)(((uint8)(dB * 2)) & (uint8)ES8388Control::Masks::DACControl4_LDACVOL);
-
-		ES8388Control::Write(ES8388Control::Registers::DACControl4, value, ES8388Control::Masks::DACControl4_LDACVOL);
-		ES8388Control::Write(ES8388Control::Registers::DACControl5, value, ES8388Control::Masks::DACControl5_RDACVOL);
+		if (Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
+			ES8388Control::Write(ES8388Control::Registers::DACControl20, (ES8388Control::Values)(value << 3), ES8388Control::Masks::DACControl20_RI2ROVOL);
 
 		return true;
 	}
 
-	static float GetDigitalVolume(void)
+	static float GetInputToMixerGain(InputModes InputMode)
 	{
-		ES8388Control::Values value = ES8388Control::Read(ES8388Control::Registers::DACControl4, ES8388Control::Masks::DACControl4_LDACVOL);
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
+			return 0;
 
-		return (uint8)value / 2.0F;
+		ES8388Control::Values value = (ES8388Control::Values)0;
+
+		if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2))
+			value = ES8388Control::Read(ES8388Control::Registers::DACControl17, ES8388Control::Masks::DACControl17_LI2LOVOL);
+
+		if (Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
+			value = ES8388Control::Read(ES8388Control::Registers::DACControl20, ES8388Control::Masks::DACControl20_RI2ROVOL);
+
+		return ((7 - ((uint8)value >> 3)) * 3F) - 15;
 	}
 
 	//[-96dB, 0dB]
-	static bool SetInputVolume(float dB)
+	static bool SetInputVolume(InputModes InputMode, float dB)
 	{
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
+			return false;
+
 		dB = Math::Clamp(dB, -96, 0);
 
 		Log::WriteInfo(TAG, "Setting Input Volume: %.1fdB", dB);
 
 		ES8388Control::Values value = (ES8388Control::Values)(((uint8)(dB * 2)) & (uint8)ES8388Control::Masks::ADCControl8_LADCVOL);
 
-		ES8388Control::Write(ES8388Control::Registers::ADCControl8, value, ES8388Control::Masks::ADCControl8_LADCVOL);
-		ES8388Control::Write(ES8388Control::Registers::ADCControl9, value, ES8388Control::Masks::ADCControl9_RADCVOL);
+		if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2))
+			ES8388Control::Write(ES8388Control::Registers::ADCControl8, value, ES8388Control::Masks::ADCControl8_LADCVOL);
+
+		if (Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
+			ES8388Control::Write(ES8388Control::Registers::ADCControl9, value, ES8388Control::Masks::ADCControl9_RADCVOL);
 
 		return true;
 	}
 
-	static float GetInputVolume(void)
+	static float GetInputVolume(InputModes InputMode)
 	{
-		ES8388Control::Values value = ES8388Control::Read(ES8388Control::Registers::ADCControl8, ES8388Control::Masks::ADCControl8_LADCVOL);
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
+			return 0;
+
+		ES8388Control::Values value = (ES8388Control::Values)0;
+
+		if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2))
+			value = ES8388Control::Read(ES8388Control::Registers::ADCControl8, ES8388Control::Masks::ADCControl8_LADCVOL);
+
+		if (Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
+			value = ES8388Control::Read(ES8388Control::Registers::ADCControl9, ES8388Control::Masks::ADCControl9_RADCVOL);
 
 		return (uint8)value / 2.0F;
 	}
 
-	// TODO: Separate set
-	//[-45dB, 4.5dB]
-	static bool SetOutputVolume(float dB)
+	static bool SetInputMute(InputModes InputMode, bool Mute)
 	{
-		dB = Math::Clamp(dB, -45, 4.5F);
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
+			return false;
 
-		Log::WriteInfo(TAG, "Setting Output Volume: %.1fdB", dB);
-
-		ES8388Control::Values value = (ES8388Control::Values)((uint8)((dB + 45) / 1.5F) & (uint8)ES8388Control::Masks::DACControl24_LOUT1VOL);
-
-		ES8388Control::Write(ES8388Control::Registers::DACControl24, (ES8388Control::Values)value, ES8388Control::Masks::DACControl24_LOUT1VOL);
-		ES8388Control::Write(ES8388Control::Registers::DACControl25, (ES8388Control::Values)value, ES8388Control::Masks::DACControl25_ROUT1VOL);
-		ES8388Control::Write(ES8388Control::Registers::DACControl26, (ES8388Control::Values)value, ES8388Control::Masks::DACControl26_LOUT2VOL);
-		ES8388Control::Write(ES8388Control::Registers::DACControl27, (ES8388Control::Values)value, ES8388Control::Masks::DACControl27_ROUT2VOL);
-
-		return true;
-	}
-
-	static float GetOutputVolume(void)
-	{
-		ES8388Control::Values value = ES8388Control::Read(ES8388Control::Registers::DACControl24, ES8388Control::Masks::DACControl24_LOUT1VOL);
-
-		return ((uint8)value * 1.5F) - 45;
-	}
-
-	static bool SetInputMute(bool Mute)
-	{
 		Log::WriteInfo(TAG, "Setting Input Mute: %i", Mute);
 
 		ES8388Control::Write(ES8388Control::Registers::ADCControl7, (Mute ? ES8388Control::Values::ADCControl7_ADCMute_1 : ES8388Control::Values::ADCControl7_ADCMute_0), ES8388Control::Masks::ADCControl7_ADCMute);
@@ -747,7 +754,97 @@ public:
 
 	static bool GetInputMute(void)
 	{
+		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
+			return false;
+
 		return (ES8388Control::Read(ES8388Control::Registers::ADCControl7, ES8388Control::Masks::ADCControl7_ADCMute) == ES8388Control::Values::ADCControl7_ADCMute_1);
+	}
+
+	//[-96dB, 0dB]
+	static bool SetDigitalVolume(OutputModes OutputMode, float dB)
+	{
+		if (!(Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2)))
+			return false;
+
+		dB = Math::Clamp(dB, -96, 0);
+
+		Log::WriteInfo(TAG, "Setting Digital Volume: %.1fdB", dB);
+
+		ES8388Control::Values value = (ES8388Control::Values)(((uint8)(dB * 2)) & (uint8)ES8388Control::Masks::DACControl4_LDACVOL);
+
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2))
+			ES8388Control::Write(ES8388Control::Registers::DACControl4, value, ES8388Control::Masks::DACControl4_LDACVOL);
+
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2))
+			ES8388Control::Write(ES8388Control::Registers::DACControl5, value, ES8388Control::Masks::DACControl5_RDACVOL);
+
+		return true;
+	}
+
+	static float GetDigitalVolume(OutputModes OutputMode)
+	{
+		if (!(Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2)))
+			return 0;
+
+		ES8388Control::Values value = (ES8388Control::Values)0;
+
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2))
+			value = ES8388Control::Read(ES8388Control::Registers::DACControl4, ES8388Control::Masks::DACControl4_LDACVOL);
+
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2))
+			value = ES8388Control::Read(ES8388Control::Registers::DACControl5, ES8388Control::Masks::DACControl5_RDACVOL);
+
+		return (uint8)value / 2.0F;
+	}
+
+	// TODO: Separate set
+	//[-45dB, 4.5dB]
+	static bool SetOutputVolume(OutputModes OutputMode, float dB)
+	{
+		if (!(Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2)))
+			return 0;
+
+		dB = Math::Clamp(dB, -45, 4.5F);
+
+		Log::WriteInfo(TAG, "Setting Output Volume: %.1fdB", dB);
+
+		ES8388Control::Values value = (ES8388Control::Values)((uint8)((dB + 45) / 1.5F) & (uint8)ES8388Control::Masks::DACControl24_LOUT1VOL);
+
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1))
+			ES8388Control::Write(ES8388Control::Registers::DACControl24, (ES8388Control::Values)value, ES8388Control::Masks::DACControl24_LOUT1VOL);
+
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Right1))
+			ES8388Control::Write(ES8388Control::Registers::DACControl25, (ES8388Control::Values)value, ES8388Control::Masks::DACControl25_ROUT1VOL);
+
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left2))
+			ES8388Control::Write(ES8388Control::Registers::DACControl26, (ES8388Control::Values)value, ES8388Control::Masks::DACControl26_LOUT2VOL);
+
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Right2))
+			ES8388Control::Write(ES8388Control::Registers::DACControl27, (ES8388Control::Values)value, ES8388Control::Masks::DACControl27_ROUT2VOL);
+
+		return true;
+	}
+
+	static float GetOutputVolume(OutputModes OutputMode)
+	{
+		if (!(Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2)))
+			return 0;
+
+		ES8388Control::Values value = (ES8388Control::Values)0;
+
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1))
+			value = ES8388Control::Read(ES8388Control::Registers::DACControl24, ES8388Control::Masks::DACControl24_LOUT1VOL);
+
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1))
+			value = ES8388Control::Read(ES8388Control::Registers::DACControl25, ES8388Control::Masks::DACControl25_ROUT1VOL);
+
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1))
+			value = ES8388Control::Read(ES8388Control::Registers::DACControl26, ES8388Control::Masks::DACControl26_LOUT2VOL);
+
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1))
+			value = ES8388Control::Read(ES8388Control::Registers::DACControl27, ES8388Control::Masks::DACControl27_ROUT2VOL);
+
+		return ((uint8)value * 1.5F) - 45;
 	}
 
 	static bool SetOutputMute(bool Mute)
@@ -762,24 +859,6 @@ public:
 	static bool GetOutputMute(void)
 	{
 		return (ES8388Control::Read(ES8388Control::Registers::DACControl3, ES8388Control::Masks::DACControl3_DACMute) == ES8388Control::Values::DACControl3_DACMute_1);
-	}
-
-	// Optimize the analog to digital conversion range
-	//[0, 4]
-	//(1Vrms/2.83Vpp, 0.5Vrms/1.41Vpp, 0.25Vrms/707mVpp, 0.125Vrms/354mVpp, 0.625Vrms/177mVpp)
-	static bool OptimizeConversion(uint8 Range = 2)
-	{
-		static float INPUT_GAIN[] = {0, 6, 12, 18, 24};
-		static float OUTPUT_VOLUME[] = {0, -6, -12, -18, -24};
-
-		Range = Math::Clamp(Range, 0, 4);
-
-		Log::WriteInfo(TAG, "Optimizing Conversion: %i, Input Gain: %.1ffdB, Output Volume: %.1ffdB", Range, INPUT_GAIN[Range], OUTPUT_VOLUME[Range]);
-
-		CHECK_CALL(SetMicrophoneGain(INPUT_GAIN[Range]));
-		CHECK_CALL(SetOutputVolume(OUTPUT_VOLUME[Range]));
-
-		return true;
 	}
 
 private:

@@ -15,14 +15,14 @@ public:
 		{
 			float x = ((float)i - 127.5f) / 127.5f;
 
-			m_TransferFunctionTable[i] = 2.0f / (1 + expf(-6.0f * x)) - 1.0f;
+			m_TransferFunctionTable[i] = 2 / (1 + expf(-6 * x)) - 1;
 		}
 	}
 
 	double Process(double Value) override
 	{
-		float val = (Value + 1.0f) * 127.5f;
-		val = Math::Clamp(val, 0.0f, 255.0f);
+		float val = (Value + 1) * 127.5f;
+		val = Math::Clamp(val, 0, 255);
 
 		return LookupLinear(m_TransferFunctionTable, val);
 	}
