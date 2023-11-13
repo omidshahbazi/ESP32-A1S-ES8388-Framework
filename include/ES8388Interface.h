@@ -51,8 +51,11 @@ public:
 		Left2 = (uint8)InputModeBits::Left2,
 		Right2 = (uint8)InputModeBits::Right2,
 
-		Left1AndRight1Differential = (uint8)InputModeBits::Differential | Left1 | Right1,
-		Left2AndRight2Differential = (uint8)InputModeBits::Differential | Left2 | Right2,
+		Left1AndRight1 = Left1 | Right1,
+		Left2AndRight2 = Left2 | Right2,
+
+		Left1AndRight1Differential = (uint8)InputModeBits::Differential | Left1AndRight1,
+		Left2AndRight2Differential = (uint8)InputModeBits::Differential | Left2AndRight2,
 	};
 
 	enum class OutputModes

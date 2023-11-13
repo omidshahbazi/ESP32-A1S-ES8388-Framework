@@ -30,6 +30,9 @@ public:
 		Left2 = (uint8)ES8388Interface::InputModes::Left2,
 		Right2 = (uint8)ES8388Interface::InputModes::Right2,
 
+		Left1AndRight1 = (uint8)ES8388Interface::InputModes::Left1AndRight1,
+		Left2AndRight2 = (uint8)ES8388Interface::InputModes::Left2AndRight2,
+
 		Left1AndRight1Differential = (uint8)ES8388Interface::InputModes::Left1AndRight1Differential,
 		Left2AndRight2Differential = (uint8)ES8388Interface::InputModes::Left2AndRight2Differential
 	};

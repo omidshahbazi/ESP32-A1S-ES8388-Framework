@@ -18,7 +18,7 @@ public:
 		configs.ChannelFormat = ESP32A1SCodec::ChannelFormats::LeftAndRight;
 		configs.BufferCount = 3;
 		configs.BufferLength = 300;
-		configs.InputMode = ESP32A1SCodec::InputModes::BothLine;
+		configs.InputMode = ESP32A1SCodec::InputModes::Microphone1AndMicrophone2;
 		configs.OutputMode = ESP32A1SCodec::OutputModes::All;
 		configs.MonoMixMode = ESP32A1SCodec::MonoMixModes::None;
 

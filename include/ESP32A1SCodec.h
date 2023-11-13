@@ -53,6 +53,9 @@ public:
 		LineL = (uint8)ES8388::InputModes::Left2,  // LINEINL, MIC2P
 		LineR = (uint8)ES8388::InputModes::Right2, // LINEINR, MIC2N
 
+		Microphone1AndMicrophone2 = (uint8)ES8388::InputModes::Left1AndRight1,
+		LineLAndLineR = (uint8)ES8388::InputModes::Left2AndRight2,
+
 		Microphone1AndMicrophone2Differential = (uint8)ES8388::InputModes::Left1AndRight1Differential,
 		LineLAndLineRDifferential = (uint8)ES8388::InputModes::Left2AndRight2Differential
 	};
@@ -70,10 +73,10 @@ public:
 		SpeakerLAndHeadphoneL = (uint8)ES8388::OutputModes::Left1AndLeft2,
 		SpeakerRAndHeadphoneR = (uint8)ES8388::OutputModes::Right1AndRight2,
 
-		SpeakerLR = (uint8)ES8388::OutputModes::Left1AndRight1,
-		HeadphoneLR = (uint8)ES8388::OutputModes::Left2AndRight2,
+		SpeakerLAndSpeakerR = (uint8)ES8388::OutputModes::Left1AndRight1,
+		HeadphoneLAndHeadphoneR = (uint8)ES8388::OutputModes::Left2AndRight2,
 
-		All = SpeakerLR | HeadphoneLR
+		All = SpeakerLAndSpeakerR | HeadphoneLAndHeadphoneR
 	};
 
 	struct Configs
