@@ -30,7 +30,7 @@ public:
 		  m_Bindings(nullptr),
 		  m_BindingCount(ButtonCount)
 	{
-		uint16 diff = 1024 / (m_BindingCount + 1);
+		float diff = 1024.0F / (m_BindingCount + 1);
 
 		m_Bindings = Memory::Allocate<BindingInfo>(m_BindingCount);
 		for (uint8 i = 0; i < m_BindingCount; ++i)
@@ -42,6 +42,8 @@ public:
 		}
 
 		pinMode((uint8)m_Pin, INPUT);
+
+		analogReadResolution(10);
 	}
 
 	void Bind(uint8 Index, EventHandler &&OnDown, EventHandler &&OnHold, EventHandler &&OnUp)
@@ -61,6 +63,7 @@ public:
 	{
 		int32 value = analogRead((uint8)m_Pin);
 
+		bool aButtonBacksUp = false;
 		for (uint8 i = 0; i < m_BindingCount; ++i)
 		{
 			BindingInfo &info = m_Bindings[i];
@@ -75,7 +78,12 @@ public:
 
 			if (info.OnUp != nullptr)
 				info.OnUp();
+
+			aButtonBacksUp = true;
 		}
+
+		if (aButtonBacksUp)
+			return;
 
 		for (uint8 i = 0; i < m_BindingCount; ++i)
 		{
