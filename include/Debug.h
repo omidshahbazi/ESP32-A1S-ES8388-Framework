@@ -14,6 +14,6 @@
 		esp_restart();                                   \
 	} while (false)
 
-#define CHECK_CALL(Expression) ASSERT(Expression, "CHECK_CALL", "Call Failed: %s", #Expression);
+#define CHECK_CALL(Expression) ASSERT(Expression, "CHECK_CALL", "Call Failed: %s", #Expression)
 
 #endif

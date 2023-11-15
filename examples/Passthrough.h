@@ -21,6 +21,8 @@ public:
 		configs.InputMode = ESP32A1SCodec::InputModes::Microphone1AndMicrophone2;
 		configs.OutputMode = ESP32A1SCodec::OutputModes::All;
 		configs.MonoMixMode = ESP32A1SCodec::MonoMixModes::None;
+		configs.EnableNoiseGate = false;
+		configs.EnableAutomaticLevelControl = false;
 
 		CHECK_CALL(ESP32A1SCodec::Initialize(&configs));
 

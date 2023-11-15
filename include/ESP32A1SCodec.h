@@ -53,30 +53,30 @@ public:
 		LineL = (uint8)ES8388::InputModes::Left2,  // LINEINL, MIC2P
 		LineR = (uint8)ES8388::InputModes::Right2, // LINEINR, MIC2N
 
-		Microphone1AndMicrophone2 = (uint8)ES8388::InputModes::Left1AndRight1,
-		LineLAndLineR = (uint8)ES8388::InputModes::Left2AndRight2,
+		Microphone1AndMicrophone2 = (uint8)ES8388::InputModes::Left1AndRight1, // MIC1P and MIC1N
+		LineLAndLineR = (uint8)ES8388::InputModes::Left2AndRight2,			   //(LINEINL, MIC2P) and (LINEINR, MIC2N)
 
-		Microphone1AndMicrophone2Differential = (uint8)ES8388::InputModes::Left1AndRight1Differential,
-		LineLAndLineRDifferential = (uint8)ES8388::InputModes::Left2AndRight2Differential
+		Microphone1AndMicrophone2Differential = (uint8)ES8388::InputModes::Left1AndRight1Differential, // MIC1P - MIC1N
+		LineLAndLineRDifferential = (uint8)ES8388::InputModes::Left2AndRight2Differential			   // (LINEINL, MIC2P) - (LINEINR, MIC2N)
 	};
 
 	enum class OutputModes
 	{
 		None = (uint8)ES8388::OutputModes::None,
 
-		SpeakerL = (uint8)ES8388::OutputModes::Left1,  // SPOLN
-		SpeakerR = (uint8)ES8388::OutputModes::Right1, // SPORN
+		SpeakerL = (uint8)ES8388::OutputModes::Left1,  // SPOLP, SPOLN
+		SpeakerR = (uint8)ES8388::OutputModes::Right1, // SPORP, SPORN
 
 		HeadphoneL = (uint8)ES8388::OutputModes::Left2,	 // HPOUTL
 		HeadphoneR = (uint8)ES8388::OutputModes::Right2, // HPOUTR
 
-		SpeakerLAndHeadphoneL = (uint8)ES8388::OutputModes::Left1AndLeft2,
-		SpeakerRAndHeadphoneR = (uint8)ES8388::OutputModes::Right1AndRight2,
+		SpeakerLAndSpeakerR = (uint8)ES8388::OutputModes::Left1AndRight1,	  // (SPOLP, SPOLN) and (SPORP, SPORN)
+		HeadphoneLAndHeadphoneR = (uint8)ES8388::OutputModes::Left2AndRight2, // HPOUTL and HPOUTR
 
-		SpeakerLAndSpeakerR = (uint8)ES8388::OutputModes::Left1AndRight1,
-		HeadphoneLAndHeadphoneR = (uint8)ES8388::OutputModes::Left2AndRight2,
+		SpeakerLAndHeadphoneL = (uint8)ES8388::OutputModes::Left1AndLeft2,	 // (SPOLP, SPOLN) and HPOUTL
+		SpeakerRAndHeadphoneR = (uint8)ES8388::OutputModes::Right1AndRight2, //(SPORP, SPORN) and HPOUTR
 
-		All = SpeakerLAndSpeakerR | HeadphoneLAndHeadphoneR
+		All = SpeakerLAndSpeakerR | HeadphoneLAndHeadphoneR // (SPOLP, SPOLN), (SPORP, SPORN), HPOUTL and HPOUTR
 	};
 
 	struct Configs
@@ -91,6 +91,8 @@ public:
 		InputModes InputMode;
 		MonoMixModes MonoMixMode;
 		OutputModes OutputMode;
+		bool EnableNoiseGate;
+		bool EnableAutomaticLevelControl;
 	};
 
 public:
@@ -98,7 +100,10 @@ public:
 	{
 		CHECK_CALL(InitializeI2C(Configs));
 
-		m_Codec = new ES8388((ES8388::InputModes)Configs->InputMode, (ES8388::MonoMixModes)Configs->MonoMixMode, (ES8388::OutputModes)Configs->OutputMode);
+		m_Codec = Memory::Allocate<ES8388>();
+
+		new (m_Codec) ES8388((ES8388::InputModes)Configs->InputMode, (ES8388::MonoMixModes)Configs->MonoMixMode, (ES8388::OutputModes)Configs->OutputMode, Configs->EnableNoiseGate, Configs->EnableAutomaticLevelControl);
+
 		CHECK_CALL(m_Codec->SetBitsPerSample((ES8388::BitsPerSamples)Configs->BitsPerSample));
 
 		CHECK_CALL(InitializeI2S(Configs));
