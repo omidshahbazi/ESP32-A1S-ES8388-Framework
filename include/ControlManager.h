@@ -2,7 +2,7 @@
 #ifndef CONTROL_MANAGER_H
 #define CONTROL_MANAGER_H
 
-#include "IControl.h"
+#include "Control.h"
 #include "Memory.h"
 #include "Task.h"
 #include <vector>
@@ -15,7 +15,7 @@ public:
 		Task::Create(
 			[&]()
 			{
-				UpdateTask();
+				ProcessTask();
 			},
 			0, 1);
 	}
@@ -32,19 +32,19 @@ public:
 	}
 
 private:
-	void UpdateTask(void)
+	void ProcessTask(void)
 	{
 		while (true)
 		{
 			Task::Delay(1);
 
-			for (IControl *control : m_Controls)
-				control->Update();
+			for (Control *control : m_Controls)
+				control->Process();
 		}
 	}
 
 private:
-	std::vector<IControl *> m_Controls;
+	std::vector<Control *> m_Controls;
 };
 
 #endif

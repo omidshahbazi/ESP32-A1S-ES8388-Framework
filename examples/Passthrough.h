@@ -15,7 +15,6 @@ public:
 		configs.Version = ESP32A1SCodec::Versions::V2974;
 		configs.SampleRate = 44100;
 		configs.BitsPerSample = ESP32A1SCodec::BitsPerSamples::BPS32;
-		configs.ChannelFormat = ESP32A1SCodec::ChannelFormats::LeftAndRight;
 		configs.BufferCount = 3;
 		configs.BufferLength = 300;
 		configs.InputMode = ESP32A1SCodec::InputModes::Microphone1AndMicrophone2;

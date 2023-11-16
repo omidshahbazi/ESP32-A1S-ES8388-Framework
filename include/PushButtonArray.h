@@ -2,12 +2,11 @@
 #ifndef PUSH_BUTTON_ARRAY_H
 #define PUSH_BUTTON_ARRAY_H
 
-#include "IControl.h"
+#include "Control.h"
 #include "Memory.h"
 #include <functional>
-#include <Arduino.h>
 
-class PushButtonArray : public IControl
+class PushButtonArray : public Control
 {
 public:
 	typedef std::function<void(void)> EventHandler;
@@ -27,7 +26,7 @@ private:
 
 public:
 	PushButtonArray(GPIOPins Pin, uint8 ButtonCount)
-		: m_Pin(Pin),
+		: Control(Pin, Modes::Input),
 		  m_Bindings(nullptr),
 		  m_BindingCount(ButtonCount)
 	{
@@ -41,10 +40,6 @@ public:
 			info.MinValue = (i + 1) * diff;
 			info.MaxValue = ((i + 2) * diff) - 1;
 		}
-
-		pinMode((uint8)m_Pin, INPUT);
-
-		analogReadResolution(10);
 	}
 
 	void Bind(uint8 Index, EventHandler &&OnDown, EventHandler &&OnHold, EventHandler &&OnUp)
@@ -62,7 +57,7 @@ public:
 
 	void Update(void) override
 	{
-		int32 value = analogRead((uint8)m_Pin);
+		uint16 value = AnalogRead();
 
 		bool aButtonBacksUp = false;
 		for (uint8 i = 0; i < m_BindingCount; ++i)
@@ -111,9 +106,9 @@ public:
 	}
 
 private:
-	GPIOPins m_Pin;
 	BindingInfo *m_Bindings;
 	uint8 m_BindingCount;
+
 	static const char *TAG;
 };
 

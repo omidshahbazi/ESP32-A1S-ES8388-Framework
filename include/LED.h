@@ -2,22 +2,19 @@
 #ifndef LED_H
 #define LED_H
 
-#include "IControl.h"
-#include "Common.h"
+#include "Control.h"
 #include "Time.h"
-#include <Arduino.h>
 
-class LED : public IControl
+class LED : public Control
 {
 public:
 	LED(GPIOPins Pin)
-		: m_Pin(Pin),
+		: Control(Pin, Modes::Output),
 		  m_TurnedOn(false),
 		  m_IsBlinking(false),
 		  m_BlinkRate(0),
 		  m_NextBlinkTime(0)
 	{
-		pinMode((uint8)m_Pin, OUTPUT);
 	}
 
 	void SetTurnedOn(bool Value)
@@ -52,6 +49,7 @@ public:
 		return m_IsBlinking;
 	}
 
+protected:
 	void Update(void) override
 	{
 		if (!m_IsBlinking)
@@ -70,11 +68,10 @@ public:
 private:
 	void UpdatePin(void)
 	{
-		digitalWrite((uint8)m_Pin, m_TurnedOn);
+		DigitalWrite(m_TurnedOn);
 	}
 
 private:
-	GPIOPins m_Pin;
 	bool m_TurnedOn;
 	bool m_IsBlinking;
 	float m_BlinkRate;
