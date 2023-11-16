@@ -2,11 +2,12 @@
 #ifndef LED_H
 #define LED_H
 
+#include "IControl.h"
 #include "Common.h"
 #include "Time.h"
 #include <Arduino.h>
 
-class LED
+class LED : public IControl
 {
 public:
 	LED(GPIOPins Pin)
@@ -51,7 +52,7 @@ public:
 		return m_IsBlinking;
 	}
 
-	void Update(void)
+	void Update(void) override
 	{
 		if (!m_IsBlinking)
 			return;

@@ -1,12 +1,13 @@
 #pragma once
-#ifndef LED_H
-#define LED_H
+#ifndef PUSH_BUTTON_ARRAY_H
+#define PUSH_BUTTON_ARRAY_H
 
+#include "IControl.h"
 #include "Memory.h"
 #include <functional>
 #include <Arduino.h>
 
-class PushButtonArray
+class PushButtonArray : public IControl
 {
 public:
 	typedef std::function<void(void)> EventHandler;
@@ -59,7 +60,7 @@ public:
 		info.OnUp = OnUp;
 	}
 
-	void Update(void)
+	void Update(void) override
 	{
 		int32 value = analogRead((uint8)m_Pin);
 
