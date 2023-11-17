@@ -23,13 +23,13 @@ public:
 public:
 	static void SetMask(Types Mask)
 	{
-		m_Mask = Mask;
+		GetMask() = Mask;
 	}
 
 	template <typename... ArgsT>
 	static void Write(Types Type, const char *Tag, const char *FormattedMessage, ArgsT... Args)
 	{
-		if (!Bitwise::IsEnabled(m_Mask, Type))
+		if (!Bitwise::IsEnabled(GetMask(), Type))
 			return;
 
 		if (FormattedMessage == nullptr)
@@ -131,9 +131,12 @@ public:
 	}
 
 private:
-	static Types m_Mask;
-};
+	static Types &GetMask(void)
+	{
+		static Types mask;
 
-Log::Types Log::m_Mask = Log::Types::None;
+		return mask;
+	}
+};
 
 #endif

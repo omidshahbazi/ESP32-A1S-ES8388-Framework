@@ -3,8 +3,6 @@
 #define HIGH_PASS_FILTER_H
 
 #include "Wave.h"
-
-#include "Wave.h"
 #include "../Math.h"
 
 class HighPassFilter : public Wave
@@ -22,7 +20,7 @@ public:
 	void SetCutoffFrequencye(float Value)
 	{
 		m_CutoffFrequency = Value;
-		m_TimeConstant = 1 / (2 * Math::PI * m_CutoffFrequency);
+		m_TimeConstant = 1 / (2 * Math::PI_VALUE * m_CutoffFrequency);
 	}
 	float GetCutoffFrequencye(void) const
 	{

@@ -1,16 +1,16 @@
 #pragma once
-#ifndef CONTROL_MANAGER_H
-#define CONTROL_MANAGER_H
+#ifndef CONTROL_FACTORY_H
+#define CONTROL_FACTORY_H
 
 #include "Control.h"
 #include "Memory.h"
 #include "Task.h"
 #include <vector>
 
-class ControlManager
+class ControlFactory
 {
 public:
-	ControlManager(void)
+	ControlFactory(void)
 	{
 		Task::Create(
 			[&]()
@@ -29,6 +29,14 @@ public:
 		m_Controls.push_back(control);
 
 		return control;
+	}
+
+	template <typename T>
+	void Destroy(T *Control)
+	{
+		m_Controls.erase(std::find(m_Controls.begin, m_Controls.end, Control));
+
+		Memory::Deallocate(Control);
 	}
 
 private:

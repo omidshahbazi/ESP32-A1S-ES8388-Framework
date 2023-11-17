@@ -4,6 +4,7 @@
 
 #include "Control.h"
 #include "Time.h"
+#include "Math.h"
 
 class LED : public Control
 {
