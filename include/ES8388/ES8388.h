@@ -2,13 +2,11 @@
 #ifndef ES8388_H
 #define ES8388_H
 
-#include "Bitwise.h"
-#include "Debug.h"
-#include "ESPDebug.h"
-#include "I2CUtils.h"
 #include "ES8388Interface.h"
-#include <driver/i2s.h>
-#include <driver/i2c.h>
+#include "../Bitwise.h"
+#include "../Debug.h"
+#include "../ESPDebug.h"
+#include "../I2CUtils.h"
 
 class ES8388
 {
@@ -121,8 +119,7 @@ public:
 		CHECK_CALL(SetMute(false));
 	}
 
-	bool
-	SetBitsPerSample(BitsPerSamples BitsPerSample)
+	bool SetBitsPerSample(BitsPerSamples BitsPerSample)
 	{
 		if (m_InputMode != InputModes::None)
 			CHECK_CALL(ES8388Interface::SetADCBitsPerSample((ES8388Interface::BitsPerSamples)BitsPerSample));

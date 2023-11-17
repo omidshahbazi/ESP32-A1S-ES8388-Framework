@@ -2,10 +2,9 @@
 #ifndef ESP32_A1S_CODEC_H
 #define ESP32_A1S_CODEC_H
 
-#include "ES8388.h"
+#include "ES8388/ES8388.h"
 #include "Memory.h"
 #include <driver/i2s.h>
-#include <driver/i2c.h>
 
 // ESP32-A1S Product Specification.pdf
 // esp32-a1s_v2.3_specification.pdf

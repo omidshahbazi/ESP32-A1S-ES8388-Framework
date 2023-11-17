@@ -2,7 +2,7 @@
 #ifndef ES8388_CONTROL_H
 #define ES8388_CONTROL_H
 
-#include "I2CUtils.h"
+#include "../I2CUtils.h"
 
 // ES8388 DS.pdf
 // https://docs.google.com/spreadsheets/d/1_UdXtrtpj_dzi36CSwv5tBphtGsBrY2Npdi79h1dYUk/edit#gid=0

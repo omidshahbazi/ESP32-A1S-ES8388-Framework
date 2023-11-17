@@ -3,7 +3,7 @@
 #define PUSH_BUTTON_ARRAY_H
 
 #include "Control.h"
-#include "Memory.h"
+#include "../Memory.h"
 #include <functional>
 
 class PushButtonArray : public Control

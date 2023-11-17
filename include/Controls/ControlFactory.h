@@ -3,8 +3,8 @@
 #define CONTROL_FACTORY_H
 
 #include "Control.h"
-#include "Memory.h"
-#include "Task.h"
+#include "../Memory.h"
+#include "../Task.h"
 #include <vector>
 
 class ControlFactory

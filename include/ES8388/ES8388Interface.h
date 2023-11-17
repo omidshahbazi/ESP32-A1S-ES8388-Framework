@@ -3,7 +3,7 @@
 #define ES8388_INTERFACE_H
 
 #include "ES8388Control.h"
-#include "Math.h"
+#include "../Math.h"
 
 // https://dl.radxa.com/rock2/docs/hw/ds/ES8388%20user%20Guide.pdf
 class ES8388Interface

@@ -2,7 +2,7 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include "Common.h"
+#include "../Common.h"
 #include <Arduino.h>
 
 class Control

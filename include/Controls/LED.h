@@ -3,8 +3,8 @@
 #define LED_H
 
 #include "Control.h"
-#include "Time.h"
-#include "Math.h"
+#include "../Time.h"
+#include "../Math.h"
 
 class LED : public Control
 {
