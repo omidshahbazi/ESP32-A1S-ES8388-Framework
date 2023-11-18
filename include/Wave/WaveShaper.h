@@ -24,7 +24,7 @@ public:
 		float val = (Value + 1) * 127.5f;
 		val = Math::Clamp(val, 0, 255);
 
-		return LookupLinear(m_TransferFunctionTable, val);
+		return Math::TableLookupLinear(m_TransferFunctionTable, val);
 	}
 
 private:

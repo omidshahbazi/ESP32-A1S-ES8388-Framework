@@ -32,6 +32,8 @@ public:
 
 	void SetFrequency(float Value)
 	{
+		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_FREQUENCY);
+
 		m_Frequency = Value;
 
 		Update();
@@ -73,7 +75,7 @@ public:
 		if (m_Phase >= TABLE_SIZE)
 			m_Phase -= TABLE_SIZE;
 
-		return LookupLinear(m_WaveTable, m_Phase);
+		return Math::TableLookupLinear(m_WaveTable, m_Phase);
 	}
 
 private:

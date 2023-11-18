@@ -33,7 +33,7 @@ public:
 
 	void SetFrequency(float Value)
 	{
-		Value = Math::Clamp(Value, 1, 20000);
+		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_FREQUENCY);
 
 		m_Frequency = Value;
 

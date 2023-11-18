@@ -35,8 +35,17 @@ public:
 		return Min + (diff * Time);
 	}
 
+	// Ranges from 0 to 255
+	template <typename T>
+	static T TableLookupLinear(const T *Table, T Value)
+	{
+		uint32 index = (int32)Value;
+		T frac = Value - (T)index;
+		return Table[index] + (frac * (Table[index + 1] - Table[index]));
+	}
+
 public:
-	static const double PI_VALUE;
+	static constexpr double PI_VALUE = 3.14159265;
 };
 
 #endif

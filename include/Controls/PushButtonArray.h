@@ -37,8 +37,13 @@ public:
 		{
 			BindingInfo &info = m_Bindings[i];
 
+			info.AlreadyBound = false;
 			info.MinValue = (i + 1) * diff;
 			info.MaxValue = ((i + 2) * diff) - 1;
+			info.IsDown = false;
+			info.OnDown = nullptr;
+			info.OnHold = nullptr;
+			info.OnUp = nullptr;
 		}
 	}
 
@@ -64,6 +69,9 @@ public:
 		{
 			BindingInfo &info = m_Bindings[i];
 
+			if (!info.AlreadyBound)
+				continue;
+
 			if (info.MinValue <= value && value <= info.MaxValue)
 				continue;
 
@@ -84,6 +92,9 @@ public:
 		for (uint8 i = 0; i < m_BindingCount; ++i)
 		{
 			BindingInfo &info = m_Bindings[i];
+
+			if (!info.AlreadyBound)
+				continue;
 
 			if (value < info.MinValue || info.MaxValue < value)
 				continue;

@@ -18,6 +18,8 @@ public:
 
 	void SetCutoffFrequencye(float Value)
 	{
+		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_FREQUENCY);
+
 		m_CutoffFrequency = Value;
 
 		m_TimeConstant = 1 / (2 * Math::PI_VALUE * m_CutoffFrequency);

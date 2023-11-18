@@ -16,6 +16,9 @@ typedef uint32_t uint32;
 #define KHz 1000
 #define MHz 1000 * KHz
 
+#define MIN_FREQUENCY 1
+#define MAX_FREQUENCY 20154
+
 enum class GPIOPins
 {
 	Pin0 = (uint8)GPIO_NUM_0,

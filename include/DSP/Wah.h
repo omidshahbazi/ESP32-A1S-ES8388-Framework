@@ -5,6 +5,7 @@
 #include "IDSP.h"
 #include "../Wave/LowPassFilter.h"
 #include "../Wave/Tables.h"
+#include <stdio.h>
 
 class Wah : public IDSP
 {
@@ -20,14 +21,14 @@ public:
 
 	void SetFrequency(float Value)
 	{
+		Value = Math::Clamp(Value, 200, 20000);
+
 		m_Frequency = Value;
 
-		m_LowPassFilter.SetCutoffFrequencye(m_Frequency);
-
-		m_Step = (int32)(m_Frequency * TABLE_SIZE / m_SampleRate);
+		m_Step = (int32)((m_Frequency * TABLE_SIZE) / m_SampleRate);
 	}
 
-	float GetDelayTime(void) const
+	float GetFrequency(void) const
 	{
 		return m_Frequency;
 	}
@@ -37,8 +38,6 @@ public:
 		for (uint16 i = 0; i < Count; ++i)
 		{
 			float modulator = SINE_TABLE[m_Position];
-
-			// Log::WriteInfo("Output %f,%f,%f", Buffer[i], modulator, Buffer[i] * modulator);
 
 			Buffer[i] = m_LowPassFilter.Process(Buffer[i] * modulator);
 
