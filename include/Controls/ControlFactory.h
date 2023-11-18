@@ -49,6 +49,8 @@ private:
 			for (Control *control : m_Controls)
 				control->Process();
 		}
+
+		Task::Delete();
 	}
 
 private:
