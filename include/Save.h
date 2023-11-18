@@ -4,8 +4,10 @@
 
 #include "Common.h"
 #include <EEPROM.h>
+#include <nvs_flash.h>
 
-const uint16 FLASH_SIZE = 65535; // 520;
+const uint16 FLASH_SIZE = 520;
+const uint32 INITIALIZED_SIGNATURE = 0xF0F0;
 
 class Save
 {
@@ -13,32 +15,40 @@ private:
 	class Header
 	{
 	public:
-		uint8 Initialized;
+		uint32 Initialized;
 	};
 
 	template <typename T>
 	class ObjectHeader
 	{
 	public:
-		uint16 Size;
+		uint8 Size;
 		T Object;
 	};
 
 public:
 	static void Initialize(void)
 	{
+		nvs_flash_init();
+
 		EEPROM.begin(FLASH_SIZE);
 
 		Header header;
 		ReadHeader(&header);
 
-		if (header.Initialized == 255)
+		if (header.Initialized == INITIALIZED_SIGNATURE)
+		{
+			Log::WriteInfo("Save", "EEPROM has already intialized");
+
 			return;
+		}
+
+		Log::WriteInfo("Save", "Initializing the EEPROM");
 
 		Delete();
 
 		Header heaedr;
-		header.Initialized = 255;
+		header.Initialized = INITIALIZED_SIGNATURE;
 		WriteHeader(&header);
 	}
 
@@ -83,7 +93,7 @@ private:
 
 			if (Index-- == 0)
 			{
-				ASSERT(objectHeader.Size == 0 || objectHeader.Size == sizeof(T), "Save", "Object stored int the slot %i is having %ib, but the incoming object size is %ib", Index, objectHeader.Size, sizeof(T));
+				ASSERT(objectHeader.Size == 0 || objectHeader.Size == sizeof(T), "Save", "Object stored in the slot %i is having %ib, but the incoming object size is %ib", Index, objectHeader.Size, sizeof(T));
 
 				break;
 			}
