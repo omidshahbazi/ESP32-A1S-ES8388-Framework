@@ -25,7 +25,7 @@ public:
 
 		m_Frequency = Value;
 
-		m_Step = (int32)((m_Frequency * TABLE_SIZE) / m_SampleRate);
+		m_Step = (m_Frequency * TABLE_SIZE) / m_SampleRate;
 	}
 
 	float GetFrequency(void) const

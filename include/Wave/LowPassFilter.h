@@ -5,12 +5,13 @@
 #include "Wave.h"
 #include "../Math.h"
 
+// https://en.wikipedia.org/wiki/Low-pass_filter
 class LowPassFilter : public Wave
 {
 public:
 	LowPassFilter(void)
 		: m_CutoffFrequency(0),
-		  m_TimeConstant(0),
+		  m_Alpha(0),
 		  m_PreviousOutput(0)
 	{
 		SetCutoffFrequencye(1000);
@@ -22,7 +23,9 @@ public:
 
 		m_CutoffFrequency = Value;
 
-		m_TimeConstant = 1 / (2 * Math::PI_VALUE * m_CutoffFrequency);
+		double timeConstant = 1 / (2 * Math::PI_VALUE * m_CutoffFrequency);
+
+		m_Alpha = DELTA_TIME / (timeConstant + DELTA_TIME);
 	}
 	float GetCutoffFrequencye(void) const
 	{
@@ -31,9 +34,7 @@ public:
 
 	double Process(double Value) override
 	{
-		double alpha = 1 / (1 + m_TimeConstant);
-
-		double output = alpha * Value + (1 - alpha) * m_PreviousOutput;
+		double output = (m_Alpha * Value) + ((1 - m_Alpha) * m_PreviousOutput);
 
 		m_PreviousOutput = output;
 
@@ -42,8 +43,10 @@ public:
 
 private:
 	float m_CutoffFrequency;
-	float m_TimeConstant;
+	double m_Alpha;
 	float m_PreviousOutput;
+
+	static constexpr float DELTA_TIME = 1;
 };
 
 #endif

@@ -5,12 +5,13 @@
 #include "Wave.h"
 #include "../Math.h"
 
+// https://en.wikipedia.org/wiki/High-pass_filter
 class HighPassFilter : public Wave
 {
 public:
 	HighPassFilter(void)
 		: m_CutoffFrequency(0),
-		  m_TimeConstant(0),
+		  m_Alpha(0),
 		  m_PreviousInput(0),
 		  m_PreviousOutput(0)
 	{
@@ -22,7 +23,10 @@ public:
 		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_FREQUENCY);
 
 		m_CutoffFrequency = Value;
-		m_TimeConstant = 1 / (2 * Math::PI_VALUE * m_CutoffFrequency);
+
+		double timeConstant = 1 / (2 * Math::PI_VALUE * m_CutoffFrequency);
+
+		m_Alpha = timeConstant / (timeConstant + DELTA_TIME);
 	}
 	float GetCutoffFrequencye(void) const
 	{
@@ -31,9 +35,7 @@ public:
 
 	double Process(double Value) override
 	{
-		double alpha = m_TimeConstant / (1 + m_TimeConstant);
-
-		double output = alpha * (m_PreviousOutput + Value - m_PreviousInput);
+		double output = (m_Alpha * m_PreviousOutput) + (m_Alpha * (Value - m_PreviousInput));
 
 		m_PreviousInput = Value;
 		m_PreviousOutput = output;
@@ -42,11 +44,12 @@ public:
 	}
 
 private:
-	uint16 m_SampleRate;
 	float m_CutoffFrequency;
-	float m_TimeConstant;
+	double m_Alpha;
 	float m_PreviousInput;
 	float m_PreviousOutput;
+
+	static constexpr float DELTA_TIME = 1;
 };
 
 #endif
