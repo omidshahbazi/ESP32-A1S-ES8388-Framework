@@ -18,6 +18,8 @@ public:
 
 	void SetTone(float Value)
 	{
+		Value = Math::Clamp01(Value);
+
 		m_Tone = Value;
 	}
 	float GetTone(void) const
@@ -27,8 +29,7 @@ public:
 
 	double Process(double Value) override
 	{
-		// return (m_Tone * m_HighPassFilter.Process(Value)) + ((1 - m_Tone) * m_LowPassFilter.Process(Value));
-		return Math::Lerp(m_LowPassFilter.Process(Value), m_HighPassFilter.Process(Value), m_Tone);
+		return Math::Lerp(m_HighPassFilter.Process(Value), m_LowPassFilter.Process(Value), m_Tone);
 	}
 
 private:

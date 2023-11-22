@@ -30,9 +30,7 @@ public:
 	{
 		Time = Clamp01(Time);
 
-		T diff = Max - Min;
-
-		return Min + (diff * Time);
+		return (Min * Time) + (Max * (1 - Time));
 	}
 
 	// Ranges from 0 to 255

@@ -32,7 +32,8 @@ public:
 private:
 	static void OutputTask(void *args)
 	{
-		SineWaveGenerator<int16> sineWave(SAMPLE_RATE);
+		SineWaveGenerator<int16> sineWave;
+		sineWave.SetSampleRate(SAMPLE_RATE);
 
 		int32 amplitude = sineWave.GetAmplitude();
 		int32 step = 25;
@@ -55,6 +56,6 @@ private:
 	static const uint16 SAMPLE_RATE;
 };
 
-const uint16 SineWavePlayer::SAMPLE_RATE = 44100;
+const uint16 SineWavePlayer::SAMPLE_RATE = SAMPLE_RATE_44100;
 
 #endif

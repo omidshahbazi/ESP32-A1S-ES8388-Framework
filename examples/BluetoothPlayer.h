@@ -64,6 +64,6 @@ private:
 	static const uint16 SAMPLE_RATE;
 };
 
-const uint16 BluetoothPlayer::SAMPLE_RATE = 44100;
+const uint16 BluetoothPlayer::SAMPLE_RATE = SAMPLE_RATE_44100;
 
 #endif

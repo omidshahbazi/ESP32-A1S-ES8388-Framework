@@ -4,13 +4,14 @@
 
 #include "Wave.h"
 #include "Tables.h"
+#include "Notes.h"
 
 class Oscillator : public Wave
 {
 public:
 	Oscillator(void)
-		: m_SampleRate(44100),
-		  m_Frequency(700),
+		: m_SampleRate(SAMPLE_RATE_44100),
+		  m_Frequency(NOTE_G5),
 		  m_PhaseShift(0),
 		  m_WaveTable(nullptr),
 		  m_Phase(0),
@@ -21,6 +22,8 @@ public:
 
 	void SetSampleRate(uint16 Value)
 	{
+		Value = Math::Clamp(Value, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
+
 		m_SampleRate = Value;
 
 		Update();

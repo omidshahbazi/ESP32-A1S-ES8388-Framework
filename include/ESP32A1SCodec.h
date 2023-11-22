@@ -233,6 +233,7 @@ private:
 
 	static bool InitializeI2S(Configs *Configs)
 	{
+		Configs->SampleRate = Math::Clamp(Configs->SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
 		Configs->BufferLength = Math::Clamp(Configs->BufferLength, 1, 1024);
 
 		Log::WriteInfo(TAG, "Initializing I2S");

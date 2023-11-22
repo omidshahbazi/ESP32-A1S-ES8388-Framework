@@ -16,6 +16,14 @@ typedef uint32_t uint32;
 #define KHz 1000
 #define MHz 1000 * KHz
 
+#define SAMPLE_RATE_44100 44.1 * KHz
+#define SAMPLE_RATE_48000 48 * KHz
+#define SAMPLE_RATE_96000 96 * KHz
+#define SAMPLE_RATE_192000 192 * KHz
+
+#define MIN_SAMPLE_RATE SAMPLE_RATE_44100
+#define MAX_SAMPLE_RATE SAMPLE_RATE_192000
+
 #define MIN_FREQUENCY 1
 #define MAX_FREQUENCY 20154
 

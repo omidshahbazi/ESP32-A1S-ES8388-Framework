@@ -4,28 +4,31 @@
 
 #include "../../include/ESP32A1SCodec.h"
 #include "../Math.h"
+#include "../Notes.h"
 
 template <typename T>
 class SineWaveGenerator
 {
 public:
-	SineWaveGenerator(uint16 SampleRate = 44100, float Frequency = 700, float Amplitude = 8000, bool DoubleBuffer = true)
-		: m_SampleRate(1), m_Frequency(1), m_Amplitude(1), m_Buffer(nullptr), m_BufferLength(0)
+	SineWaveGenerator(void)
+		: m_SampleRate(SAMPLE_RATE_44100),
+		  m_Frequency(NOTE_G5),
+		  m_Amplitude(8000),
+		  m_DoubleBuffer(true),
+		  m_Buffer(nullptr),
+		  m_BufferLength(0)
 	{
-		SetSampleRate(SampleRate);
-		SetFrequency(Frequency);
-		SetFrequency(Amplitude);
+		SetupWave();
 	}
 
 	void SetSampleRate(uint16 Value)
 	{
-		Value = Math::Clamp(Value, 1, 192000);
+		Value = Math::Clamp(Value, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
 
 		m_SampleRate = Value;
 
 		SetupWave();
 	}
-
 	uint16 GetSampleRate(void) const
 	{
 		return m_SampleRate;
@@ -39,7 +42,6 @@ public:
 
 		SetupWave();
 	}
-
 	float GetFrequency(void) const
 	{
 		return m_Frequency;
@@ -53,17 +55,26 @@ public:
 
 		SetupWave();
 	}
-
 	float GetAmplitude(void) const
 	{
 		return m_Amplitude;
+	}
+
+	void SetDoubleBuffered(bool Value)
+	{
+		m_DoubleBuffer = Value;
+
+		SetupWave();
+	}
+	bool GetDoubleBuffered(void) const
+	{
+		return m_DoubleBuffer;
 	}
 
 	const T *GetBuffer(void) const
 	{
 		return m_Buffer;
 	}
-
 	uint16 GetBufferLength(void) const
 	{
 		return m_BufferLength;

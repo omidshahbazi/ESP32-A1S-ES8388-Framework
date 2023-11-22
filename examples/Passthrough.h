@@ -13,7 +13,7 @@ public:
 
 		ESP32A1SCodec::Configs configs;
 		configs.Version = ESP32A1SCodec::Versions::V2974;
-		configs.SampleRate = 44100;
+		configs.SampleRate = SAMPLE_RATE_44100;
 		configs.BitsPerSample = ESP32A1SCodec::BitsPerSamples::BPS32;
 		configs.BufferCount = 3;
 		configs.BufferLength = 300;
@@ -51,6 +51,6 @@ private:
 };
 
 const uint16 Passthrough::FRAME_LENGTH = 64;
-const uint16 Passthrough::SAMPLE_RATE = 44100;
+const uint16 Passthrough::SAMPLE_RATE = SAMPLE_RATE_44100;
 
 #endif
