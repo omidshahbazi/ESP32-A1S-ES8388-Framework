@@ -26,9 +26,11 @@ public:
 	}
 
 	// 0 = -70dB, 1 = -10dB
-	void SetThreshold(float val)
+	void SetThreshold(float Value)
 	{
-		float dB = -70 + 60 * val;
+		Value = Math::Clamp01(Value);
+
+		float dB = -70 + 60 * Value;
 
 		m_UpperThreshold = powf(10, dB / 20);
 		m_LowerThreshold = m_UpperThreshold / 2;
