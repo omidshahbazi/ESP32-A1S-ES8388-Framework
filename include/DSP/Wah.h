@@ -4,7 +4,7 @@
 
 #include "IDSP.h"
 #include "../Wave/LowPassFilter.h"
-#include "../Wave/Tables.h"
+#include "../Tables.h"
 #include <stdio.h>
 
 class Wah : public IDSP

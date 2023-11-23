@@ -3,7 +3,7 @@
 #define OSCILLATOR_H
 
 #include "Wave.h"
-#include "Tables.h"
+#include "../Tables.h"
 #include "Notes.h"
 
 class Oscillator : public Wave

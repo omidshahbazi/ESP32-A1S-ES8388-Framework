@@ -3,7 +3,7 @@
 #define WAVE_SHAPER_H
 
 #include "Wave.h"
-#include "Tables.h"
+#include "../Tables.h"
 #include "../Math.h"
 
 class WaveShaper : public Wave
