@@ -2,7 +2,7 @@
 #ifndef TABLES_H
 #define TABLES_H
 
-#include "../Common.h"
+#include "Common.h"
 
 const float SINE_TABLE[] =
 	{
