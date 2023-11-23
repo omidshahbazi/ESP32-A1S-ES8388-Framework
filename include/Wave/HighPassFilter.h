@@ -15,10 +15,10 @@ public:
 		  m_PreviousInput(0),
 		  m_PreviousOutput(0)
 	{
-		SetCutoffFrequencye(1000);
+		SetCutoffFrequency(1000);
 	}
 
-	void SetCutoffFrequencye(float Value)
+	void SetCutoffFrequency(float Value)
 	{
 		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_FREQUENCY);
 
@@ -28,7 +28,7 @@ public:
 
 		m_Alpha = timeConstant / (timeConstant + DELTA_TIME);
 	}
-	float GetCutoffFrequencye(void) const
+	float GetCutoffFrequency(void) const
 	{
 		return m_CutoffFrequency;
 	}

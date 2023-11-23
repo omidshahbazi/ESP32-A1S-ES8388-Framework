@@ -12,8 +12,8 @@ public:
 	ToneControl(void)
 		: m_Tone(1)
 	{
-		m_LowPassFilter.SetCutoffFrequencye(408.0895981378369);	 // Emulate big muff R39k and C10nF
-		m_HighPassFilter.SetCutoffFrequencye(1476.390939459707); // Emulate big muff R22k and C4.9nF
+		m_LowPassFilter.SetCutoffFrequency(408.0895981378369);	// Emulate big muff R39k and C10nF
+		m_HighPassFilter.SetCutoffFrequency(1476.390939459707); // Emulate big muff R22k and C4.9nF
 	}
 
 	void SetTone(float Value)
@@ -29,7 +29,7 @@ public:
 
 	double Process(double Value) override
 	{
-		return Math::Lerp(m_HighPassFilter.Process(Value), m_LowPassFilter.Process(Value), m_Tone);
+		return Math::Lerp(m_LowPassFilter.Process(Value), m_HighPassFilter.Process(Value), m_Tone);
 	}
 
 private:

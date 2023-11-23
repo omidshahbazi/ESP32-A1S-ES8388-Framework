@@ -12,11 +12,24 @@ class Wah : public IDSP
 public:
 	Wah(uint32 SampleRate)
 		: m_Frequency(0),
-		  m_SampleRate(SampleRate),
+		  m_SampleRate(0),
 		  m_Step(0),
 		  m_Position(0)
 	{
+		m_SampleRate = Math::Clamp(m_SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
+
+		SetCutoffFrequency(10);
 		SetFrequency(5000);
+	}
+
+	void SetCutoffFrequency(float Value)
+	{
+		m_LowPassFilter.SetCutoffFrequency(Value);
+	}
+
+	float GetCutoffFrequency(void) const
+	{
+		return m_LowPassFilter.GetCutoffFrequency();
 	}
 
 	void SetFrequency(float Value)

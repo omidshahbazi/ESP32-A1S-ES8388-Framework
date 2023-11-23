@@ -109,6 +109,25 @@ public:
 		CHECK_CALL(InitializeI2S(Configs));
 	}
 
+	// dBMin [-12dB, 30dB]
+	// dBMax [-6.5dB, 35.5dB]
+	// dBTarget [-16.5dB, -1.5dB]
+	// HoldTime [0ms, 1360ms]
+	// AttackTime [0.104ms/0.0227ms, 106ms/23.2ms]
+	// DecayTime [0.410ms/0.0908ms, 420ms/93ms]
+	static void SetAutomaticLevelControlParameters(float dBMin, float dBMax, float dBTarget, float HoldTime, float AttackTime, float DecayTime, uint8 WindowsSize, bool ZeroCrossTimeout, bool UseZeroCrossDetection, bool LimiterMode)
+	{
+		CHECK_CALL(m_Codec->SetAutomaticLevelControlParameters(dBMin, dBMax, dBTarget, HoldTime, AttackTime, DecayTime, WindowsSize, ZeroCrossTimeout, UseZeroCrossDetection, LimiterMode));
+	}
+
+	//[-76.5dBFS, -30dBFS]
+	static bool SetNoiseGateParameters(float dBFS, bool MuteOnNoise)
+	{
+		CHECK_CALL(m_Codec->SetNoiseGateParameters(dBFS, MuteOnNoise));
+
+		return true;
+	}
+
 	//[0dB, 24dB]
 	static void SetMicrophoneGain(float dB)
 	{
@@ -120,6 +139,17 @@ public:
 		return m_Codec->GetMicrophoneGain();
 	}
 
+	//[-15dB, 6dB]
+	static void SetInputToMixerGain(float dB)
+	{
+		CHECK_CALL(m_Codec->SetInputToMixerGain(dB));
+	}
+
+	static float GetInputToMixerGain(void)
+	{
+		return m_Codec->GetInputToMixerGain();
+	}
+
 	//[-96dB, 0dB]
 	static void SetInputVolume(float dB)
 	{
@@ -129,6 +159,17 @@ public:
 	static float GetInputVolume(void)
 	{
 		return m_Codec->GetInputVolume();
+	}
+
+	//[-96dB, 0dB]
+	static void SetDigitalVolume(float dB)
+	{
+		CHECK_CALL(m_Codec->SetDigitalVolume(dB));
+	}
+
+	static float GetDigitalVolume(void)
+	{
+		return m_Codec->GetDigitalVolume();
 	}
 
 	//[-45dB, 4.5dB]

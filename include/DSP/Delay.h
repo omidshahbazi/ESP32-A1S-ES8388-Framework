@@ -13,8 +13,9 @@
 // 		  m_BufferLength(FrameLength * 2),
 // 		  m_BufferIndex(FrameLength),
 // 		  m_DelayTime(0),
-// 		  m_SampleRate(SampleRate)
+// 		  m_SampleRate(0)
 // 	{
+// m_SampleRate = Math::Clamp(m_SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
 // 		m_Buffer = Memory::Allocate<double>(m_BufferLength);
 // 	}
 
