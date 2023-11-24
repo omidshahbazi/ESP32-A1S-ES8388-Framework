@@ -34,7 +34,7 @@ public:
 
 	double Process(double Value) override
 	{
-		double output = (m_Alpha * Value) + ((1 - m_Alpha) * m_PreviousOutput);
+		double output = Math::Lerp(m_PreviousOutput, Value, m_Alpha);
 
 		m_PreviousOutput = output;
 

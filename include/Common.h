@@ -24,8 +24,8 @@ typedef uint32_t uint32;
 #define MIN_SAMPLE_RATE SAMPLE_RATE_44100
 #define MAX_SAMPLE_RATE SAMPLE_RATE_192000
 
-#define MIN_FREQUENCY 1
-#define MAX_FREQUENCY 20154
+#define MIN_FREQUENCY 1.0
+#define MAX_FREQUENCY 20154.0
 
 enum class GPIOPins
 {
