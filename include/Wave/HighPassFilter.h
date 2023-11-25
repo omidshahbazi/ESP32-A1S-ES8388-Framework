@@ -5,7 +5,6 @@
 #include "Wave.h"
 #include "../Math.h"
 
-// https://en.wikipedia.org/wiki/High-pass_filter
 class HighPassFilter : public Wave
 {
 public:

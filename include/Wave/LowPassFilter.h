@@ -4,16 +4,19 @@
 
 #include "Wave.h"
 #include "../Math.h"
+#include <stdio.h>
 
-// https://en.wikipedia.org/wiki/Low-pass_filter
 class LowPassFilter : public Wave
 {
 public:
-	LowPassFilter(void)
-		: m_CutoffFrequency(0),
+	LowPassFilter(uint32 SampleRate)
+		: m_SampleRate(0),
+		  m_CutoffFrequency(0),
 		  m_Alpha(0),
 		  m_PreviousOutput(0)
 	{
+		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
+
 		SetCutoffFrequency(1000);
 	}
 
@@ -25,7 +28,9 @@ public:
 
 		double timeConstant = 1 / (2 * Math::PI_VALUE * m_CutoffFrequency);
 
-		m_Alpha = DELTA_TIME / (timeConstant + DELTA_TIME);
+		m_Alpha = 1 / (timeConstant / m_SampleRate);
+
+		// printf("Vals %f, %f, %f", Value, timeConstant, m_Alpha);
 	}
 	float GetCutoffFrequency(void) const
 	{
@@ -34,19 +39,18 @@ public:
 
 	double Process(double Value) override
 	{
-		double output = Math::Lerp(m_PreviousOutput, Value, m_Alpha);
+		float delta = (Value - m_PreviousOutput) * m_Alpha;
 
-		m_PreviousOutput = output;
+		m_PreviousOutput += delta;
 
-		return output;
+		return m_PreviousOutput;
 	}
 
 private:
+	uint32 m_SampleRate;
 	float m_CutoffFrequency;
 	double m_Alpha;
 	float m_PreviousOutput;
-
-	static constexpr float DELTA_TIME = 1;
 };
 
 #endif

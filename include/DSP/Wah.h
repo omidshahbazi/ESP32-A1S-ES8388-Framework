@@ -16,7 +16,7 @@ public:
 		  m_Step(0),
 		  m_Position(0)
 	{
-		m_SampleRate = Math::Clamp(m_SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
+		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
 
 		SetCutoffFrequency(10);
 		SetFrequency(5000);

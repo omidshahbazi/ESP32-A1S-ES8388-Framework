@@ -11,15 +11,13 @@ class Test : public IDSP
 {
 public:
 	Test(void)
-		: m_Value(0.001F)
 	{
 	}
 
 	void SetValue(float Value)
 	{
-		// printf("val %f %f\n", Value, Math::Lerp(MIN_FREQUENCY, MAX_FREQUENCY, Value));
+		//  printf("val %f %f\n", Value, Math::Lerp(MIN_FREQUENCY, MAX_FREQUENCY, Value));
 		m_Wave.SetCutoffFrequency(Math::Lerp(MIN_FREQUENCY, MAX_FREQUENCY, Value));
-		m_Value = Value;
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
@@ -32,7 +30,6 @@ public:
 	}
 
 private:
-	float m_Value;
 	LowPassFilter m_Wave;
 };
 
