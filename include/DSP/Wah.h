@@ -11,7 +11,8 @@ class Wah : public IDSP
 {
 public:
 	Wah(uint32 SampleRate)
-		: m_Frequency(0),
+		: m_LowPassFilter(SampleRate),
+		  m_Frequency(0),
 		  m_SampleRate(0),
 		  m_Step(0),
 		  m_Position(0)

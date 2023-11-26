@@ -21,7 +21,7 @@ public:
 
 	double Process(double Value) override
 	{
-		float val = (Value + 1) * 127.5f;
+		double val = (Value + 1) * 127.5f;
 		val = Math::Clamp(val, 0, 255);
 
 		return Math::TableLookupLinear(m_TransferFunctionTable, val);

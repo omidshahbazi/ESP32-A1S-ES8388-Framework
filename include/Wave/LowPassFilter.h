@@ -13,11 +13,11 @@ public:
 		: m_SampleRate(0),
 		  m_CutoffFrequency(0),
 		  m_Alpha(0),
-		  m_PreviousOutput(0)
+		  m_CapacitorVoltage(0)
 	{
 		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
 
-		SetCutoffFrequency(1000);
+		SetCutoffFrequency(MAX_FREQUENCY);
 	}
 
 	void SetCutoffFrequency(float Value)
@@ -29,8 +29,6 @@ public:
 		double timeConstant = 1 / (2 * Math::PI_VALUE * m_CutoffFrequency);
 
 		m_Alpha = 1 / (timeConstant / m_SampleRate);
-
-		// printf("Vals %f, %f, %f", Value, timeConstant, m_Alpha);
 	}
 	float GetCutoffFrequency(void) const
 	{
@@ -39,18 +37,18 @@ public:
 
 	double Process(double Value) override
 	{
-		float delta = (Value - m_PreviousOutput) * m_Alpha;
+		double delta = (Value - m_CapacitorVoltage) * m_Alpha;
 
-		m_PreviousOutput += delta;
+		m_CapacitorVoltage += delta;
 
-		return m_PreviousOutput;
+		return m_CapacitorVoltage;
 	}
 
 private:
 	uint32 m_SampleRate;
-	float m_CutoffFrequency;
+	double m_CutoffFrequency;
 	double m_Alpha;
-	float m_PreviousOutput;
+	double m_CapacitorVoltage;
 };
 
 #endif

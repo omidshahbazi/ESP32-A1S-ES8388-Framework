@@ -8,13 +8,15 @@
 class HighPassFilter : public Wave
 {
 public:
-	HighPassFilter(void)
-		: m_CutoffFrequency(0),
+	HighPassFilter(uint32 SampleRate)
+		: m_SampleRate(0),
+		  m_CutoffFrequency(0),
 		  m_Alpha(0),
-		  m_PreviousInput(0),
-		  m_PreviousOutput(0)
+		  m_CapacitorVoltage(0)
 	{
-		SetCutoffFrequency(1000);
+		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
+
+		SetCutoffFrequency(MIN_FREQUENCY);
 	}
 
 	void SetCutoffFrequency(float Value)
@@ -25,7 +27,7 @@ public:
 
 		double timeConstant = 1 / (2 * Math::PI_VALUE * m_CutoffFrequency);
 
-		m_Alpha = timeConstant / (timeConstant + DELTA_TIME);
+		m_Alpha = 1 / (timeConstant / m_SampleRate);
 	}
 	float GetCutoffFrequency(void) const
 	{
@@ -34,21 +36,18 @@ public:
 
 	double Process(double Value) override
 	{
-		double output = (m_Alpha * m_PreviousOutput) + (m_Alpha * (Value - m_PreviousInput));
+		double delta = (Value - m_CapacitorVoltage) * m_Alpha;
 
-		m_PreviousInput = Value;
-		m_PreviousOutput = output;
+		m_CapacitorVoltage += delta;
 
-		return output;
+		return Value - m_CapacitorVoltage;
 	}
 
 private:
-	float m_CutoffFrequency;
+	uint32 m_SampleRate;
+	double m_CutoffFrequency;
 	double m_Alpha;
-	float m_PreviousInput;
-	float m_PreviousOutput;
-
-	static constexpr float DELTA_TIME = 1;
+	double m_CapacitorVoltage;
 };
 
 #endif

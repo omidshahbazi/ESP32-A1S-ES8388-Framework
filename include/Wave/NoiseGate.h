@@ -55,7 +55,7 @@ public:
 
 private:
 	BiquadFilter m_BiquadFilter;
-	float m_LowerThreshold;
-	float m_UpperThreshold;
+	double m_LowerThreshold;
+	double m_UpperThreshold;
 };
 #endif

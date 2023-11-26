@@ -10,13 +10,13 @@
 class Test : public IDSP
 {
 public:
-	Test(void)
+	Test(uint32 SampleRate)
+		: m_Wave(SampleRate)
 	{
 	}
 
 	void SetValue(float Value)
 	{
-		//  printf("val %f %f\n", Value, Math::Lerp(MIN_FREQUENCY, MAX_FREQUENCY, Value));
 		m_Wave.SetCutoffFrequency(Math::Lerp(MIN_FREQUENCY, MAX_FREQUENCY, Value));
 	}
 
