@@ -5,14 +5,14 @@
 #include "BiquadFilter.h"
 #include "../Math.h"
 
+// TODO: Didn't Work
 class NoiseGate : public Wave
 {
 public:
 	NoiseGate(void)
 		: m_BiquadFilter(2),
 		  m_LowerThreshold(0),
-		  m_UpperThreshold(0),
-		  m_Envelope(0)
+		  m_UpperThreshold(0)
 	{
 		static const float coef[] =
 			{

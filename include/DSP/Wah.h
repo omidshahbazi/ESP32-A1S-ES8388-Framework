@@ -19,7 +19,7 @@ public:
 	{
 		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
 
-		SetCutoffFrequency(10);
+		SetCutoffFrequency(10000);
 		SetFrequency(5000);
 	}
 

@@ -6,6 +6,7 @@
 #include "../Math.h"
 #include "../Memory.h"
 
+// TODO: Not sure if it didn't work because of the NoiseGate or itself
 class BiquadFilter : public Wave
 {
 private:

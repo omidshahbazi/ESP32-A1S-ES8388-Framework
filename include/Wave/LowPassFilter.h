@@ -4,7 +4,6 @@
 
 #include "Wave.h"
 #include "../Math.h"
-#include <stdio.h>
 
 class LowPassFilter : public Wave
 {

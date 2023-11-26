@@ -54,11 +54,6 @@ protected:
 		digitalWrite((uint8)m_Pin, Value);
 	}
 
-	bool DigitalRead(void) const
-	{
-		return digitalRead((uint8)m_Pin);
-	}
-
 private:
 	GPIOPins m_Pin;
 	bool m_Enabled;

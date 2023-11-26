@@ -11,7 +11,7 @@ class WaveShaper : public Wave
 public:
 	WaveShaper(void)
 	{
-		for (uint8 i = 0; i < TABLE_SIZE; ++i)
+		for (uint16 i = 0; i < TABLE_SIZE; ++i)
 		{
 			float x = ((float)i - 127.5f) / 127.5f;
 

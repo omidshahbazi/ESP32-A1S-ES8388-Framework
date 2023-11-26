@@ -27,6 +27,7 @@ public:
 		m_OnChanged = Listener;
 	}
 
+protected:
 	void Update(void) override
 	{
 		uint16 value = AnalogRead();

@@ -60,6 +60,7 @@ public:
 		info.OnUp = OnUp;
 	}
 
+protected:
 	void Update(void) override
 	{
 		uint16 value = AnalogRead();
@@ -120,9 +121,7 @@ private:
 	BindingInfo *m_Bindings;
 	uint8 m_BindingCount;
 
-	static const char *TAG;
+	static constexpr char *TAG = "PushButtonArray";
 };
-
-const char *PushButtonArray::TAG = "PushButtonArray";
 
 #endif

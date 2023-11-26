@@ -29,20 +29,21 @@ typedef uint32_t uint32;
 
 enum class GPIOPins
 {
-	Pin0 = (uint8)GPIO_NUM_0,
-	Pin2 = (uint8)GPIO_NUM_2,
-	Pin4 = (uint8)GPIO_NUM_4,
-	Pin5 = (uint8)GPIO_NUM_5,
-	Pin12 = (uint8)GPIO_NUM_12,
-	Pin13 = (uint8)GPIO_NUM_13,
-	Pin14 = (uint8)GPIO_NUM_14,
-	Pin15 = (uint8)GPIO_NUM_15,
-	Pin18 = (uint8)GPIO_NUM_18,
-	Pin19 = (uint8)GPIO_NUM_19,
-	Pin21 = (uint8)GPIO_NUM_21,
-	Pin22 = (uint8)GPIO_NUM_22,
-	Pin23 = (uint8)GPIO_NUM_23,
-	Pin34 = (uint8)GPIO_NUM_34
+	Pin0 = (uint8)GPIO_NUM_0,	// Analog/Digital - Output
+	Pin2 = (uint8)GPIO_NUM_2,	// Analog/Digital - Input/Output
+	Pin4 = (uint8)GPIO_NUM_4,	// Analog/Digital - Input/Output
+	Pin12 = (uint8)GPIO_NUM_12, // Analog/Digital - Input/Output
+	Pin13 = (uint8)GPIO_NUM_13, // Analog/Digital - Input
+	Pin14 = (uint8)GPIO_NUM_14, // Analog/Digital - Input/Output
+	Pin15 = (uint8)GPIO_NUM_15, // Analog/Digital - Input/Output
+	Pin34 = (uint8)GPIO_NUM_34, // Analog/Digital - Input
+
+	Pin5 = (uint8)GPIO_NUM_5,	// Digital - Input/Output
+	Pin18 = (uint8)GPIO_NUM_18, // Digital - Input/Output
+	Pin19 = (uint8)GPIO_NUM_19, // Digital - Input/Output
+	Pin21 = (uint8)GPIO_NUM_21, // Digital - Input/Output
+	Pin22 = (uint8)GPIO_NUM_22, // Digital - Input/Output
+	Pin23 = (uint8)GPIO_NUM_23	// Digital - Input/Output
 };
 
 #endif

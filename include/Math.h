@@ -34,8 +34,8 @@ public:
 	}
 
 	// Ranges from 0 to 255
-	template <typename T>
-	static T TableLookupLinear(const T *Table, T Value)
+	template <typename T, typename U>
+	static T TableLookupLinear(const U *Table, T Value)
 	{
 		uint32 index = (int32)Value;
 		T frac = Value - (T)index;
