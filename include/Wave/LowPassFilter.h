@@ -28,7 +28,7 @@ public:
 
 		double timeConstant = 1 / (2 * Math::PI_VALUE * m_CutoffFrequency);
 
-		m_Alpha = 1 / (timeConstant / m_SampleRate);
+		m_Alpha = 1 / (timeConstant * m_SampleRate);
 	}
 	float GetCutoffFrequency(void) const
 	{
