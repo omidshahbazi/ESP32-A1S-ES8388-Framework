@@ -29,7 +29,6 @@ typedef uint32_t uint32;
 
 enum class GPIOPins
 {
-	Pin0 = (uint8)GPIO_NUM_0,	// Analog/Digital - Output
 	Pin2 = (uint8)GPIO_NUM_2,	// Analog/Digital - Input/Output
 	Pin4 = (uint8)GPIO_NUM_4,	// Analog/Digital - Input/Output
 	Pin12 = (uint8)GPIO_NUM_12, // Analog/Digital - Input/Output
