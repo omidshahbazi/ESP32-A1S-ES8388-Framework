@@ -17,12 +17,12 @@ public:
 	{
 		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
 
-		SetCutoffFrequency(MAX_FREQUENCY);
+		SetCutoffFrequency(MAX_CUTOFF_FREQUENCY);
 	}
 
 	void SetCutoffFrequency(float Value)
 	{
-		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_FREQUENCY);
+		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_CUTOFF_FREQUENCY);
 
 		m_CutoffFrequency = Value;
 
@@ -49,6 +49,8 @@ private:
 	double m_CutoffFrequency;
 	double m_Alpha;
 	double m_CapacitorVoltage;
+
+	static constexpr double MAX_CUTOFF_FREQUENCY = 13278.734375;
 };
 
 #endif
