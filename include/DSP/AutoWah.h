@@ -32,7 +32,7 @@ public:
 			double inputSample = Buffer[i];
 
 			// Envelope follower
-			double target = std::fabs(inputSample);
+			double target = fabs(inputSample);
 			m_Envelope += (target - m_Envelope) * (inputSample > m_Envelope ? m_AttackCoeff : m_ReleaseCoeff);
 
 			// Update filter cutoff frequency based on the envelope

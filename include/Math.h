@@ -2,7 +2,7 @@
 #ifndef Math_H
 #define Math_H
 
-#include <math.h>
+#include <cmath>
 
 class Math
 {
@@ -33,6 +33,18 @@ public:
 		return (Min * (1 - Time)) + (Max * Time);
 	}
 
+	template <typename T, typename U>
+	static T Min(T A, U B)
+	{
+		return (A < B ? A : B);
+	}
+
+	template <typename T, typename U>
+	static T Max(T A, U B)
+	{
+		return (A > B ? A : B);
+	}
+
 	// Ranges from 0 to 255
 	template <typename T, typename U>
 	static T TableLookupLinear(const U *Table, T Value)
@@ -44,6 +56,7 @@ public:
 
 public:
 	static constexpr double PI_VALUE = 3.14159265;
+	static constexpr double TWO_PI_VALUE = 2 * PI_VALUE;
 };
 
 #endif

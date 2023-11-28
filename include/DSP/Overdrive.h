@@ -4,7 +4,6 @@
 
 #include "IDSP.h"
 #include "../Math.h"
-#include "../Wave/ToneControl.h"
 
 class Overdrive : public IDSP
 {
@@ -16,7 +15,7 @@ public:
 
 	void SetDrive(float Value)
 	{
-		Value = Math::Clamp01(Value);
+		// Value = Math::Clamp01(Value);
 
 		m_Drive = Value;
 	}
@@ -28,7 +27,7 @@ public:
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
-			Buffer[i] = tanh(Buffer[i] * m_Drive * 100);
+			Buffer[i] = tanh(Buffer[i] * m_Drive); // * 100
 	}
 
 private:

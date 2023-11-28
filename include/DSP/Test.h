@@ -3,17 +3,13 @@
 #define TEST_H
 
 #include "IDSP.h"
-#include "../Wave/WaveShaper.h"
+#include "../Wave/NoiseGate.h"
 #include <math.h>
 #include <stdio.h>
 
 class Test : public IDSP
 {
 public:
-	Test(uint32 SampleRate)
-	{
-	}
-
 	void SetValue(float Value)
 	{
 		// m_Wave.SetThreshold(Value);
@@ -29,7 +25,7 @@ public:
 	}
 
 private:
-	WaveShaper m_Wave;
+	NoiseGate m_Wave;
 };
 
 #endif
