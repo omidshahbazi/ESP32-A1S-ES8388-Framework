@@ -1,6 +1,6 @@
 #pragma once
-#ifndef TEST__H
-#define TEST__H
+#ifndef TEST_H
+#define TEST_H
 
 #include "IDSP.h"
 #include "../Wave/WaveShaper.h"

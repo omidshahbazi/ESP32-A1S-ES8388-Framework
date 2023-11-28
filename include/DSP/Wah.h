@@ -1,11 +1,10 @@
 #pragma once
-#ifndef WAH__H
-#define WAH__H
+#ifndef WAH_H
+#define WAH_H
 
 #include "IDSP.h"
 #include "../Wave/LowPassFilter.h"
 #include "../Tables.h"
-#include <stdio.h>
 
 class Wah : public IDSP
 {

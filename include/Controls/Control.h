@@ -44,6 +44,11 @@ public:
 protected:
 	virtual void Update(void) = 0;
 
+	GPIOPins GetPin(void) const
+	{
+		return m_Pin;
+	}
+
 	uint16 AnalogRead(void) const
 	{
 		return analogRead((uint8)m_Pin);
