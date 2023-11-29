@@ -10,6 +10,7 @@ class HighPassFilter : public Filter
 public:
 	HighPassFilter(uint32 SampleRate)
 		: m_SampleRate(0),
+		  m_DeltaTime(1),
 		  m_CutoffFrequency(0),
 		  m_Alpha(0),
 		  m_CapacitorVoltage(0)
@@ -19,15 +20,26 @@ public:
 		SetCutoffFrequency(MIN_FREQUENCY);
 	}
 
+	void SetDeltaTime(float Value)
+	{
+		Value = Math::Clamp(Value, 0.0001F, 10);
+
+		m_DeltaTime = Value;
+
+		Update();
+	}
+	float GetDeltaTime(void) const
+	{
+		return m_DeltaTime;
+	}
+
 	void SetCutoffFrequency(float Value)
 	{
 		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_CUTOFF_FREQUENCY);
 
 		m_CutoffFrequency = Value;
 
-		double timeConstant = 1 / (2 * Math::PI_VALUE * m_CutoffFrequency);
-
-		m_Alpha = 1 / (timeConstant * m_SampleRate);
+		Update();
 	}
 	float GetCutoffFrequency(void) const
 	{
@@ -44,7 +56,16 @@ public:
 	}
 
 private:
+	void Update(void)
+	{
+		double timeConstant = 1 / (Math::TWO_PI_VALUE * m_CutoffFrequency);
+
+		m_Alpha = m_DeltaTime / (timeConstant * m_SampleRate);
+	}
+
+private:
 	uint32 m_SampleRate;
+	float m_DeltaTime;
 	double m_CutoffFrequency;
 	double m_Alpha;
 	double m_CapacitorVoltage;

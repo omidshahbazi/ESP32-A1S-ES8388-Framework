@@ -45,7 +45,7 @@ public:
 		// esp_gap_register_callback(gap_event_handler);
 		// esp_gatts_register_callback(gatts_event_handler);
 
-		// Task::Create(OutputTask);
+		// Task::Create(OutputTask, 1, 20);
 	}
 
 private:
