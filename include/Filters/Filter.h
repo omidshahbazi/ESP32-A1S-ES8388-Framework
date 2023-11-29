@@ -1,10 +1,10 @@
 #pragma once
-#ifndef WAVE_H
-#define WAVE_H
+#ifndef FILTER_H
+#define FILTER_H
 
 #include "../Common.h"
 
-class Wave
+class Filter
 {
 public:
 	virtual double Process(double Value) = 0;

@@ -1,15 +1,15 @@
 // #pragma once
-// #ifndef WAVE_SHAPER_H
-// #define WAVE_SHAPER_H
+// #ifndef NOISE_GATE_SHAPER_H
+// #define NOISE_GATE_SHAPER_H
 
 // #include "BiquadFilter.h"
 // #include "../Math.h"
 
 // // TODO: Didn't Work
-// class NoiseGate : public Wave
+// class NoiseGateFilter : public Filter
 // {
 // public:
-// 	NoiseGate(void)
+// 	NoiseGateFilter(void)
 // 		: m_BiquadFilter(2),
 // 		  m_LowerThreshold(0),
 // 		  m_UpperThreshold(0)
@@ -61,16 +61,16 @@
 // #endif
 
 #pragma once
-#ifndef WAVE_SHAPER_H
-#define WAVE_SHAPER_H
+#ifndef NOISE_GATE_FILTER_H
+#define NOISE_GATE_FILTER_H
 
-#include "Wave.h"
+#include "Filter.h"
 #include "../Math.h"
 
-class NoiseGate : public Wave
+class NoiseGateFilter : public Filter
 {
 public:
-	NoiseGate(void)
+	NoiseGateFilter(void)
 	{
 		SetThreshold(0.5F);
 		SetAttackTime(10.0);   // in milliseconds

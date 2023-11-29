@@ -2,12 +2,12 @@
 #ifndef BIQUAD_FILTER_H
 #define BIQUAD_FILTER_H
 
-#include "Wave.h"
+#include "Filter.h"
 #include "../Math.h"
 #include "../Memory.h"
 
 // TODO: Not sure if it didn't work because of the NoiseGate or itself
-class BiquadFilter : public Wave
+class BiquadFilter : public Filter
 {
 private:
 	struct State

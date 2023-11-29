@@ -3,7 +3,7 @@
 #define WAH_H
 
 #include "IDSP.h"
-#include "../Wave/LowPassFilter.h"
+#include "../Filters/LowPassFilter.h"
 #include "../Tables.h"
 
 class Wah : public IDSP

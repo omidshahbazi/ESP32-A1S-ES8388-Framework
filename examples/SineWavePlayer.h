@@ -3,7 +3,7 @@
 #define SINE_WAVE_PLAYER_H
 
 #include "../include/ESP32A1SCodec.h"
-#include "../include/Wave/SineWaveGenerator.h"
+#include "../include/SineWaveGenerator.h"
 
 class SineWavePlayer
 {

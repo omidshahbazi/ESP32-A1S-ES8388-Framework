@@ -2,10 +2,10 @@
 #ifndef LOW_PASS_FILTER_H
 #define LOW_PASS_FILTER_H
 
-#include "Wave.h"
+#include "Filter.h"
 #include "../Math.h"
 
-class LowPassFilter : public Wave
+class LowPassFilter : public Filter
 {
 public:
 	LowPassFilter(uint32 SampleRate)

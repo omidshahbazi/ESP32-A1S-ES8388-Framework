@@ -3,7 +3,7 @@
 #define TEST_H
 
 #include "IDSP.h"
-#include "../Wave/NoiseGate.h"
+#include "../Filters/NoiseGateFilter.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -25,7 +25,7 @@ public:
 	}
 
 private:
-	NoiseGate m_Wave;
+	NoiseGateFilter m_Wave;
 };
 
 #endif

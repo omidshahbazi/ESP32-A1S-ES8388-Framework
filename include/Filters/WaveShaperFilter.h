@@ -1,15 +1,15 @@
 #pragma once
-#ifndef WAVE_SHAPER_H
-#define WAVE_SHAPER_H
+#ifndef WAVE_SHAPER_FILTER_H
+#define WAVE_SHAPER_FILTER_H
 
-#include "Wave.h"
+#include "Filter.h"
 #include "../Tables.h"
 #include "../Math.h"
 
-class WaveShaper : public Wave
+class WaveShaperFilter : public Filter
 {
 public:
-	WaveShaper(void)
+	WaveShaperFilter(void)
 	{
 		for (uint16 i = 0; i < TABLE_SIZE; ++i)
 		{

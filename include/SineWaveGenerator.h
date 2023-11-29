@@ -2,9 +2,9 @@
 #ifndef SINE_WAVE_GENERATOR_H
 #define SINE_WAVE_GENERATOR_H
 
-#include "../../include/ESP32A1SCodec.h"
-#include "../Math.h"
-#include "../Notes.h"
+#include "../include/ESP32A1SCodec.h"
+#include "Math.h"
+#include "Notes.h"
 
 template <typename T>
 class SineWaveGenerator

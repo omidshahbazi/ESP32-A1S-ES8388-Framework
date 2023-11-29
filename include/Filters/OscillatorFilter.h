@@ -1,12 +1,12 @@
 #pragma once
-#ifndef OSCILLATOR_H
-#define OSCILLATOR_H
+#ifndef OSCILLATOR_FILTER_H
+#define OSCILLATOR_FILTER_H
 
-#include "Wave.h"
+#include "Filter.h"
 #include "../Tables.h"
 #include "Notes.h"
 
-class Oscillator : public Wave
+class OscillatorFilter : public Filter
 {
 public:
 	Oscillator(void)
@@ -78,7 +78,7 @@ public:
 		if (m_Phase >= TABLE_SIZE)
 			m_Phase -= TABLE_SIZE;
 
-		return Math::TableLookupLinear(m_WaveTable, m_Phase);
+		return Math::TableLookupLinear(m_WaveTable, m_Phase) + Value;
 	}
 
 private:
