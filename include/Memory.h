@@ -24,7 +24,7 @@ public:
 	template <typename T>
 	static void Deallocate(T *Memory)
 	{
-		free(Memory);
+		delete[] Memory;
 	}
 
 	template <typename T>

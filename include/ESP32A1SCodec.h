@@ -24,17 +24,17 @@ public:
 		BPS32 = (uint8)ES8388::BitsPerSamples::BPS32
 	};
 
-	// TODO: LeftAndRight works fine and the OnlyLeft didn't, so I've disabled this for now
-	//  enum class ChannelFormats
-	//  {
-	//  	LeftAndRight = I2S_CHANNEL_FMT_RIGHT_LEFT,
+	enum class ChannelFormats
+	{
+		LeftAndRight = I2S_CHANNEL_FMT_RIGHT_LEFT,
 
-	// 	AllFromLeft = I2S_CHANNEL_FMT_ALL_LEFT,
-	// 	AllFromRight = I2S_CHANNEL_FMT_ALL_RIGHT,
+		AllFromLeft = I2S_CHANNEL_FMT_ALL_LEFT,
+		AllFromRight = I2S_CHANNEL_FMT_ALL_RIGHT,
 
-	// 	OnlyLeft = I2S_CHANNEL_FMT_ONLY_LEFT,
-	// 	OnlyRight = I2S_CHANNEL_FMT_ONLY_RIGHT
-	// };
+		// TODO: LeftAndRight works fine and the OnlyLeft didn't, so I've disabled this for now
+		// OnlyLeft = I2S_CHANNEL_FMT_ONLY_LEFT,
+		// OnlyRight = I2S_CHANNEL_FMT_ONLY_RIGHT
+	};
 
 	enum class MonoMixModes
 	{
@@ -85,7 +85,7 @@ public:
 		Versions Version;
 		uint32 SampleRate;
 		BitsPerSamples BitsPerSample;
-		// ChannelFormats ChannelFormat;
+		ChannelFormats ChannelFormat;
 		uint16 BufferCount;
 		uint16 BufferLength;
 		InputModes InputMode;
@@ -305,7 +305,7 @@ private:
 		config.mode = modes;
 		config.sample_rate = Configs->SampleRate;
 		config.bits_per_sample = bps;
-		config.channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT; //(i2s_channel_fmt_t) Configs->ChannelFormat;
+		config.channel_format = (i2s_channel_fmt_t)Configs->ChannelFormat;
 		config.communication_format = I2S_COMM_FORMAT_STAND_I2S;
 		config.intr_alloc_flags = ESP_INTR_FLAG_LEVEL1;
 		config.dma_buf_count = Configs->BufferCount;
@@ -320,6 +320,8 @@ private:
 		CHECK_CALL(SetI2SPin(Configs));
 
 		i2s_channel_t channels = I2S_CHANNEL_STEREO;
+
+		// TODO: Disabled regarding to the ChannelFormats enum
 		// switch (Configs->ChannelFormat)
 		// {
 		// case ChannelFormats::OnlyLeft:

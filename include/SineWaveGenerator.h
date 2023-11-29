@@ -2,9 +2,9 @@
 #ifndef SINE_WAVE_GENERATOR_H
 #define SINE_WAVE_GENERATOR_H
 
-#include "../include/ESP32A1SCodec.h"
 #include "Math.h"
 #include "Notes.h"
+#include "Memory.h"
 
 template <typename T>
 class SineWaveGenerator
@@ -75,7 +75,7 @@ public:
 	{
 		return m_Buffer;
 	}
-	uint16 GetBufferLength(void) const
+	uint32 GetBufferLength(void) const
 	{
 		return m_BufferLength;
 	}
@@ -83,21 +83,24 @@ public:
 private:
 	void SetupWave(void)
 	{
+		const int32 Mask = 0x0FFFFFFF >> (sizeof(int32) - sizeof(T));
 		const uint16 SamplePerCycle = m_SampleRate / m_Frequency;
 
-		if (m_Buffer != nullptr)
-			Memory::Deallocate(m_Buffer);
-
 		const int8 STEP = (m_DoubleBuffer ? 2 : 1);
+		uint32 requiredBufferLen = SamplePerCycle * STEP;
 
-		m_BufferLength = SamplePerCycle * STEP;
-		m_Buffer = Memory::Allocate<T>(m_BufferLength);
-
-		const int32 Mask = 0x0FFFFFFF >> (sizeof(int32) - sizeof(T));
-
-		for (uint32 i = 0; i < m_BufferLength; ++i)
+		if (requiredBufferLen != m_BufferLength)
 		{
-			double sinVal = sin(i / 2 * 2 * Math::PI / SamplePerCycle) * m_Amplitude;
+			if (m_Buffer != nullptr)
+				Memory::Deallocate(m_Buffer);
+
+			m_BufferLength = requiredBufferLen;
+			m_Buffer = Memory::Allocate<T>(m_BufferLength);
+		}
+
+		for (uint32 i = 0; i < SamplePerCycle; ++i)
+		{
+			double sinVal = sin(i / 2 * 2 * Math::PI_VALUE / SamplePerCycle) * m_Amplitude;
 
 			uint32 index = i * STEP;
 
@@ -114,6 +117,6 @@ private:
 	float m_Amplitude;
 	bool m_DoubleBuffer;
 	T *m_Buffer;
-	uint16 m_BufferLength;
+	uint32 m_BufferLength;
 };
 #endif

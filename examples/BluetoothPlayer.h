@@ -26,6 +26,7 @@ public:
 		configs.Version = ESP32A1SCodec::Versions::V2974;
 		configs.SampleRate = SAMPLE_RATE;
 		configs.BitsPerSample = ESP32A1SCodec::BitsPerSamples::BPS16;
+		configs.ChannelFormat = ESP32A1SCodec::ChannelFormats::LeftAndRight;
 		configs.BufferCount = 3;
 		configs.BufferLength = 300;
 		configs.InputMode = ESP32A1SCodec::InputModes::None;
@@ -34,7 +35,7 @@ public:
 		configs.EnableNoiseGate = false;
 		configs.EnableAutomaticLevelControl = false;
 
-		CHECK_CALL(ESP32A1SCodec::Initialize(&configs));
+		ESP32A1SCodec::Initialize(&configs);
 
 		esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
 		esp_bt_controller_init(&bt_cfg);
@@ -48,7 +49,7 @@ public:
 	}
 
 private:
-	// static void OutputTask(void *args)
+	// static void OutputTask(void)
 	// {
 
 	// 	while (true)

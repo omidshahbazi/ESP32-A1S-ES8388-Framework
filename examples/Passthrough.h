@@ -15,6 +15,7 @@ public:
 		configs.Version = ESP32A1SCodec::Versions::V2974;
 		configs.SampleRate = SAMPLE_RATE_44100;
 		configs.BitsPerSample = ESP32A1SCodec::BitsPerSamples::BPS32;
+		configs.ChannelFormat = ESP32A1SCodec::ChannelFormats::LeftAndRight;
 		configs.BufferCount = 3;
 		configs.BufferLength = 300;
 		configs.InputMode = ESP32A1SCodec::InputModes::Microphone1AndMicrophone2;
@@ -23,13 +24,13 @@ public:
 		configs.EnableNoiseGate = false;
 		configs.EnableAutomaticLevelControl = false;
 
-		CHECK_CALL(ESP32A1SCodec::Initialize(&configs));
+		ESP32A1SCodec::Initialize(&configs);
 
 		Task::Create(OutputTask);
 	}
 
 private:
-	static void OutputTask(void *args)
+	static void OutputTask(void)
 	{
 		int32 *buffer = Memory::Allocate<int32>(FRAME_LENGTH);
 
