@@ -31,6 +31,10 @@ public:
 
 		m_Threshold = Value;
 	}
+	float GetThreshold(void)
+	{
+		return m_Threshold;
+	}
 
 	//[0s, 10s]
 	void SetAttackTime(float Value)

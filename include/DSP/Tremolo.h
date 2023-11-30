@@ -27,7 +27,6 @@ public:
 
 		m_Depth = Value;
 	}
-
 	float GetDepth(void)
 	{
 		return m_Depth;
@@ -42,7 +41,6 @@ public:
 
 		Update();
 	}
-
 	float GetRate(void)
 	{
 		return m_Rate;

@@ -27,7 +27,6 @@ public:
 	{
 		m_LowPassFilter.SetCutoffFrequency(Value);
 	}
-
 	float GetCutoffFrequency(void) const
 	{
 		return m_LowPassFilter.GetCutoffFrequency();
@@ -42,7 +41,6 @@ public:
 
 		m_Step = (m_Frequency * TABLE_SIZE) / m_SampleRate;
 	}
-
 	float GetFrequency(void) const
 	{
 		return m_Frequency;
