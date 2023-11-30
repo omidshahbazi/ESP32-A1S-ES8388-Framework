@@ -13,9 +13,10 @@ public:
 	{
 	}
 
+	//[0, 1]
 	void SetDrive(float Value)
 	{
-		// Value = Math::Clamp01(Value);
+		Value = Math::Clamp01(Value);
 
 		m_Drive = Value;
 	}
@@ -27,7 +28,7 @@ public:
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
-			Buffer[i] = tanh(Buffer[i] * m_Drive); // * 100
+			Buffer[i] = tanh(Buffer[i] * (2 + (m_Drive * 50)));
 	}
 
 private:
