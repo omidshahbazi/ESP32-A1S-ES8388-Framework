@@ -20,6 +20,7 @@ public:
 		SetRate(5);
 	}
 
+	//[0, 1]
 	void SetDepth(float Value)
 	{
 		Value = Math::Clamp01(Value);
@@ -32,6 +33,7 @@ public:
 		return m_Depth;
 	}
 
+	//[MIN_FREQUENCY, MAX_FREQUENCY]
 	void SetRate(float Value)
 	{
 		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_FREQUENCY);

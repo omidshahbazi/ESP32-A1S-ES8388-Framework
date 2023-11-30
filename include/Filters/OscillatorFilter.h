@@ -9,30 +9,20 @@
 class OscillatorFilter : public Filter
 {
 public:
-	Oscillator(void)
-		: m_SampleRate(SAMPLE_RATE_44100),
+	Oscillator(uint32 SampleRate)
+		: m_SampleRate(0),
 		  m_Frequency(NOTE_G5),
 		  m_PhaseShift(0),
 		  m_WaveTable(nullptr),
 		  m_Phase(0),
 		  m_PhaseIncrement(0)
 	{
-		Update();
-	}
-
-	void SetSampleRate(uint16 Value)
-	{
-		Value = Math::Clamp(Value, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
-
-		m_SampleRate = Value;
+		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
 
 		Update();
 	}
-	uint16 GetSampleRate(void) const
-	{
-		return m_SampleRate;
-	}
 
+	//[MIN_FREQUENCY, MAX_FREQUENCY]
 	void SetFrequency(float Value)
 	{
 		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_FREQUENCY);
@@ -55,6 +45,7 @@ public:
 		return m_PhaseShift;
 	}
 
+	// A table from Tables.h
 	void SetWaveTable(const float *Table)
 	{
 		m_WaveTable = Table;

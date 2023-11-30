@@ -18,6 +18,7 @@ public:
 		m_HighPassFilter.SetCutoffFrequency(1476.390939459707); // Emulate big muff R22k and C4.9nF
 	}
 
+	//[0, 1]
 	void SetTone(float Value)
 	{
 		Value = Math::Clamp01(Value);

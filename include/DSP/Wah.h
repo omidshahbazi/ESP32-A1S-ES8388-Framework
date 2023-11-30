@@ -22,6 +22,7 @@ public:
 		SetFrequency(5000);
 	}
 
+	//[MIN_FREQUENCY, MAX_CUTOFF_FREQUENCY]
 	void SetCutoffFrequency(float Value)
 	{
 		m_LowPassFilter.SetCutoffFrequency(Value);
@@ -32,9 +33,10 @@ public:
 		return m_LowPassFilter.GetCutoffFrequency();
 	}
 
+	//[MIN_FREQUENCY_RESPONSE, MAX_FREQUENCY_RESPONSE]
 	void SetFrequency(float Value)
 	{
-		Value = Math::Clamp(Value, 200, 20000);
+		Value = Math::Clamp(Value, MIN_FREQUENCY_RESPONSE, MAX_FREQUENCY_RESPONSE);
 
 		m_Frequency = Value;
 
@@ -66,6 +68,11 @@ private:
 	uint32 m_SampleRate;
 	int32 m_Step;
 	int32 m_Position;
+
+public:
+	static constexpr double MIN_FREQUENCY_RESPONSE = 200;
+	static constexpr double MAX_FREQUENCY_RESPONSE = 20000;
+	static constexpr double MAX_CUTOFF_FREQUENCY = LowPassFilter::MAX_CUTOFF_FREQUENCY;
 };
 
 #endif

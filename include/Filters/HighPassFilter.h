@@ -20,6 +20,7 @@ public:
 		SetCutoffFrequency(MIN_FREQUENCY);
 	}
 
+	//(0, 10]
 	void SetDeltaTime(float Value)
 	{
 		Value = Math::Clamp(Value, 0.0001F, 10);
@@ -33,6 +34,7 @@ public:
 		return m_DeltaTime;
 	}
 
+	//[MIN_FREQUENCY, MAX_CUTOFF_FREQUENCY]
 	void SetCutoffFrequency(float Value)
 	{
 		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_CUTOFF_FREQUENCY);
@@ -70,6 +72,7 @@ private:
 	double m_Alpha;
 	double m_CapacitorVoltage;
 
+public:
 	static constexpr double MAX_CUTOFF_FREQUENCY = 14066.730469;
 };
 
