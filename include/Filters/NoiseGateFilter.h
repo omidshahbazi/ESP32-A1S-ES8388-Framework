@@ -37,9 +37,9 @@ public:
 	{
 		Value = Math::Clamp(Value, 0, 10);
 
-		m_AttackTime = Value * 1000;
+		m_AttackTime = Value;
 
-		m_AttackCoefficient = exp(-1 / (0.001 * m_SampleRate * m_AttackTime));
+		m_AttackCoefficient = exp(-1 / (m_SampleRate * m_AttackTime));
 	}
 	float GetAttackTime(void)
 	{
@@ -51,9 +51,9 @@ public:
 	{
 		Value = Math::Clamp(Value, 0, 10);
 
-		m_ReleaseTime = Value * 1000;
+		m_ReleaseTime = Value;
 
-		m_ReleaseCoefficient = exp(-1 / (0.001 * m_SampleRate * m_ReleaseTime));
+		m_ReleaseCoefficient = exp(-1 / (m_SampleRate * m_ReleaseTime));
 	}
 	float GetReleaseTime(void)
 	{
