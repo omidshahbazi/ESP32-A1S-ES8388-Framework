@@ -72,6 +72,7 @@ private:
 	double m_Alpha;
 	double m_CapacitorVoltage;
 
+public:
 	static constexpr double MAX_CUTOFF_FREQUENCY = 13278.734375;
 };
 
