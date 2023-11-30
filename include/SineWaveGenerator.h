@@ -100,7 +100,8 @@ private:
 
 		for (uint32 i = 0; i < SamplePerCycle; ++i)
 		{
-			double sinVal = sin(i / 2 * 2 * Math::PI_VALUE / SamplePerCycle) * m_Amplitude;
+			double sinVal = sin((i / (double)SamplePerCycle) * Math::TWO_PI_VALUE) * m_Amplitude;
+			// double sinVal = sin(i / 2 * 2 * Math::PI_VALUE /) * m_Amplitude;
 
 			uint32 index = i * STEP;
 
