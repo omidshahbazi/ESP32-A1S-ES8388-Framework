@@ -14,7 +14,7 @@ public:
 public:
 	Potentiometer(GPIOPins Pin)
 		: Control(Pin, Modes::Input),
-		  m_Value(0)
+		  m_Value(-1)
 	{
 	}
 

@@ -9,13 +9,22 @@ class AutoWah : public IDSP
 {
 public:
 	AutoWah(uint32 SampleRate)
+		: m_SampleRate(0),
+		  m_AttackTime(0.01),
+		  m_ReleaseTime(0.1),
+		  m_WahMin(400.0),
+		  m_WahMax(1000.0),
+		  m_Q(1.0),
+		  m_Envelope(0),
+		  m_CurrentWahFreq(0),
+		  m_AttackCoeff(0),
+		  m_ReleaseCoeff(0),
+		  m_PrevInput(0),
+		  m_PrevOutput(0)
 	{
 		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
-		m_Envelope = 0.0;
-		m_CurrentWahFreq = 0.0; // You might want to set an initial value here
+
 		CalculateFilterCoefficients();
-		m_PrevInput = 0.0;
-		m_PrevOutput = 0.0;
 	}
 
 	void SetFrequency_TOTUNE(float Value)

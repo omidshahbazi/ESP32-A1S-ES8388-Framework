@@ -10,12 +10,14 @@ class Tremolo : public IDSP
 
 public:
 	Tremolo(uint32 SampleRate)
-		: m_Depth(0),
+		: m_SampleRate(0),
+		  m_Depth(0),
 		  m_Rate(0),
-		  m_SampleRate(SampleRate),
 		  m_DeltaPhase(0),
 		  m_Phase(0)
 	{
+		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
+
 		SetDepth(0.5F);
 		SetRate(5);
 	}

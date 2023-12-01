@@ -19,12 +19,17 @@ private:
 	};
 
 public:
-	static void Create(EntrypointType &&Entrypoint, uint8 CoreID = 1, uint8 Priority = 1, uint16 StackDepth = 4096)
+	static void Create(EntrypointType &&Entrypoint, const char *Name = nullptr, uint8 CoreID = 1, uint8 Priority = 1, uint32 StackDepth = 4096)
 	{
+		if (Name == nullptr)
+			Name = "Unknown";
+
 		TaskInfo *taskInfo = Memory::Allocate<TaskInfo>();
 		taskInfo->Entrypoint = Entrypoint;
 
-		xTaskCreatePinnedToCore(Stub, "PassthroughTask", StackDepth, taskInfo, Priority, nullptr, CoreID);
+		BaseType_t result = xTaskCreatePinnedToCore(Stub, Name, StackDepth, taskInfo, Priority, nullptr, CoreID);
+
+		ASSERT(result == pdPASS, "Task", "Didn't manage to create the %s on Core %i with Priority of %i and the StackDepth of %ib", Name, CoreID, Priority, StackDepth);
 	}
 
 	static void Delete(void)

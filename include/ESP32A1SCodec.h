@@ -98,6 +98,8 @@ public:
 public:
 	static void Initialize(Configs *Configs)
 	{
+		PrintSystemInfo();
+
 		CHECK_CALL(InitializeI2C(Configs));
 
 		m_Codec = Memory::Allocate<ES8388>();
@@ -239,6 +241,25 @@ public:
 		ESP_CHECK_CALL(i2s_write(I2S_PORT, Buffer, Length, WrittenByteCount, TicksToWait));
 
 		Log::WriteDebug(TAG, "Wrote %ib to the I2S from a %ib long buffer with %iticks for timeout", *WrittenByteCount, Length, TicksToWait);
+	}
+
+	static void PrintSystemInfo(void)
+	{
+		Log::WriteInfo("System Info:\n\tCPU Frequency %dMHz\n\tInternal Total Heap %db\n\tSPIRam Total Heap %db\n\tFlash Size %dHz\n\tFlash Speed %d\n\tChip Revision %d\n\tSDK Version %s",
+					   ESP.getCpuFreqMHz(),
+					   ESP.getHeapSize(),
+					   ESP.getPsramSize(),
+					   ESP.getFlashChipSize(),
+					   ESP.getFlashChipSpeed(),
+					   ESP.getChipRevision(),
+					   ESP.getSdkVersion());
+	}
+
+	static void PrintSystemStatistics(void)
+	{
+		Log::WriteInfo("System Statistics:\n\tInternal Free Heap %db\n\tSPIRam Free Heap %db",
+					   ESP.getFreeHeap(),
+					   ESP.getFreePsram());
 	}
 
 private:
