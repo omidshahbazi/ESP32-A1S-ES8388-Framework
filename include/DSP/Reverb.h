@@ -80,7 +80,7 @@ private:
 	uint16 m_DelayBufferIndex = 0;
 
 private:
-	static constexpr float MAX_BUFFER_ELEMENT_COEFF = 1000.0;
+	static constexpr double MAX_BUFFER_ELEMENT_COEFF = 32767.0;
 	static constexpr float MAX_DELAY_TIME = 1;
 };
 
