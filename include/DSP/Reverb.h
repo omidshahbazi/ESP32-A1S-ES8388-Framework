@@ -19,7 +19,7 @@ public:
 	{
 		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
 
-		m_DelayBuffer = Memory::Allocate<int16>(MAX_DELAY_TIME * m_SampleRate);
+		m_DelayBuffer = Memory::Allocate<int16>(MAX_DELAY_TIME * m_SampleRate, true);
 
 		SetDelayTime(0.5);
 		SetFeedback(0.5);

@@ -245,7 +245,7 @@ public:
 
 	static void PrintSystemInfo(void)
 	{
-		Log::WriteInfo("System Info:\n\tCPU %i Cores %dMHz\n\tInternal Total Heap %db\n\tSPIRam Total Heap %db\n\tFlash Size %dHz\n\tFlash Speed %d\n\tChip Revision %d\n\tSDK Version %s",
+		Log::WriteInfo("System Info:\n\tCPU %i Cores %dMHz\n\tInternal Total Heap %db\n\tSPIRam Total Heap %db\n\tFlash Size %db\n\tFlash Speed %dHz\n\tChip Revision %d\n\tSDK Version %s",
 					   ESP.getChipCores(),
 					   ESP.getCpuFreqMHz(),
 					   ESP.getHeapSize(),

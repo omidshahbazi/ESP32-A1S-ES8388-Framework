@@ -32,7 +32,7 @@ public:
 	{
 		float diff = 1024.0F / (m_BindingCount + 1);
 
-		m_Bindings = Memory::Allocate<BindingInfo>(m_BindingCount);
+		m_Bindings = Memory::Allocate<BindingInfo>(m_BindingCount, true);
 		for (uint8 i = 0; i < m_BindingCount; ++i)
 		{
 			BindingInfo &info = m_Bindings[i];

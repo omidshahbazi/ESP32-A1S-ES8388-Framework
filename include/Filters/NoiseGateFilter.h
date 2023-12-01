@@ -24,10 +24,10 @@ public:
 		SetReleaseTime(0.1);
 	}
 
-	//[0, 1]
+	//(0, 1]
 	void SetThreshold(float Value)
 	{
-		Value = Math::Clamp01(Value);
+		Value = Math::Clamp(0.00001, 1, Value);
 
 		m_Threshold = Value;
 	}
@@ -36,7 +36,7 @@ public:
 		return m_Threshold;
 	}
 
-	//[0s, 10s]
+	//[0s, 1s]
 	void SetAttackTime(float Value)
 	{
 		Value = Math::Clamp(Value, 0, 10);
@@ -50,7 +50,7 @@ public:
 		return m_AttackTime;
 	}
 
-	//[0s, 10s]
+	//[0s, 2s]
 	void SetReleaseTime(float Value)
 	{
 		Value = Math::Clamp(Value, 0, 10);
@@ -79,8 +79,8 @@ public:
 private:
 	uint32 m_SampleRate;
 	float m_Threshold;
-	double m_AttackTime;
-	double m_ReleaseTime;
+	float m_AttackTime;
+	float m_ReleaseTime;
 	double m_AttackCoefficient;
 	double m_ReleaseCoefficient;
 	double m_Envelope;

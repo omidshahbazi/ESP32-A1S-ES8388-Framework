@@ -17,13 +17,13 @@ public:
 			{
 				ProcessTask();
 			},
-			"ControlsTask", 0, 1);
+			4096, "ControlsTask", 0, 1);
 	}
 
 	template <typename T, typename... ArgsT>
 	T *Create(ArgsT... Args)
 	{
-		T *control = Memory::Allocate<T>();
+		T *control = Memory::Allocate<T>(1, true);
 		new (control) T(Args...);
 
 		m_Controls.push_back(control);

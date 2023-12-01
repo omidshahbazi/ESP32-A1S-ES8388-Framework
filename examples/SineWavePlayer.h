@@ -27,7 +27,7 @@ public:
 
 		ESP32A1SCodec::Initialize(&configs);
 
-		Task::Create(OutputTask, "OutputTask", 1, 20);
+		Task::Create(OutputTask, 4096, "OutputTask", 1, 20);
 	}
 
 private:

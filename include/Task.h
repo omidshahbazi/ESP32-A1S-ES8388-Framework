@@ -19,17 +19,18 @@ private:
 	};
 
 public:
-	static void Create(EntrypointType &&Entrypoint, const char *Name = nullptr, uint8 CoreID = 1, uint8 Priority = 1, uint32 StackDepth = 4096)
+	static void Create(EntrypointType &&Entrypoint, uint32 StackDepth, const char *Name = nullptr, uint8 CoreID = 1, uint8 Priority = 1, bool FromExternalRAM = false)
 	{
 		if (Name == nullptr)
 			Name = "Unknown";
 
-		TaskInfo *taskInfo = Memory::Allocate<TaskInfo>();
+		uint32 stackSizeInWords = StackDepth / 4;
+
+		TaskInfo *taskInfo = Memory::Allocate<TaskInfo>(1, true);
 		taskInfo->Entrypoint = Entrypoint;
+		BaseType_t result = xTaskCreatePinnedToCore(Stub, Name, stackSizeInWords, taskInfo, Priority, nullptr, CoreID);
 
-		BaseType_t result = xTaskCreatePinnedToCore(Stub, Name, StackDepth, taskInfo, Priority, nullptr, CoreID);
-
-		ASSERT(result == pdPASS, "Task", "Didn't manage to create the %s on Core %i with Priority of %i and the StackDepth of %ib", Name, CoreID, Priority, StackDepth);
+		ASSERT(result == pdPASS, "Task", "Didn't manage to create the %s on Core %i with Priority of %i and the StackDepth of %ib", Name, CoreID, Priority, stackSizeInWords);
 	}
 
 	static void Delete(void)
@@ -45,8 +46,9 @@ public:
 private:
 	static void Stub(void *Args)
 	{
-		TaskInfo *taskInfo = reinterpret_cast<TaskInfo *>(Args);
-		taskInfo->Entrypoint();
+		EntrypointType entryPoint = reinterpret_cast<TaskInfo *>(Args)->Entrypoint;
+		Memory::Deallocate(Args);
+		entryPoint();
 	}
 };
 #endif

@@ -6,7 +6,7 @@
 #include "LowPassFilter.h"
 #include "HighPassFilter.h"
 
-class ToneControl : public Wave
+class ToneControlFilter : public Wave
 {
 public:
 	ToneControl(uint32 SampleRate)

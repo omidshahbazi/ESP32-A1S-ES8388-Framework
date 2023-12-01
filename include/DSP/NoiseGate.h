@@ -23,7 +23,7 @@ public:
 		return m_NoiseGateFilter.GetThreshold();
 	}
 
-	//[0s, 10s]
+	//[0s, 1s]
 	void SetAttackTime(float Value)
 	{
 		m_NoiseGateFilter.SetAttackTime(Value);
@@ -33,7 +33,7 @@ public:
 		return m_NoiseGateFilter.GetAttackTime();
 	}
 
-	//[0s, 10s]
+	//[0s, 2s]
 	void SetReleaseTime(float Value)
 	{
 		m_NoiseGateFilter.SetReleaseTime(Value);

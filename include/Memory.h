@@ -5,16 +5,25 @@
 #include "Common.h"
 #include "Debug.h"
 #include <memory.h>
+#include <Esp.h>
 
 class Memory
 {
 public:
 	template <typename T>
-	static T *Allocate(uint16 Count = 1)
+	static T *Allocate(uint16 Count = 1, bool FromExternalRAM = false)
 	{
-		T *mem = reinterpret_cast<T *>(malloc(sizeof(T) * Count));
+		uint16 length = sizeof(T) * Count;
+
+		uint32 ramType = MALLOC_CAP_DEFAULT;
+		// if (FromExternalRAM)
+		// 	ramType = MALLOC_CAP_SPIRAM;
+
+		T *mem = reinterpret_cast<T *>(heap_caps_malloc(length, ramType));
 
 		ASSERT(mem != nullptr, "Memory", "Couldn't allocate memory: %i of %iB", Count, sizeof(T));
+
+		Log::WriteInfo("Memory", "%ib Allocated Count: %i, ELement Size: %i, Available RAM: %ib", length, Count, sizeof(T), ESP.getFreeHeap());
 
 		Set(mem, 0, Count);
 
@@ -24,7 +33,7 @@ public:
 	template <typename T>
 	static void Deallocate(T *Memory)
 	{
-		delete[] Memory;
+		heap_caps_free(Memory);
 	}
 
 	template <typename T>
