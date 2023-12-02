@@ -4,69 +4,118 @@
 
 #include "IDSP.h"
 #include "../Math.h"
-
-#include <vector>
+#include "../Memory.h"
 
 class Chorus : public IDSP
 {
 public:
 	Chorus(uint32 SampleRate)
 		: m_SampleRate(0),
-		  m_Depth(0.5),
-		  m_Rate(0.5),
-		  m_Delay(0.5),
-		  m_CurrentPhase(0.0)
+		  m_Depth(0),
+		  m_Rate(0),
+		  m_DelayTime(0),
+		  m_DelayBuffer(nullptr),
+		  m_DelayBufferLength(0),
+		  m_DelayBufferIndex(0),
+		  m_CurrentPhase(0)
 	{
 		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
-		m_DelayBuffer.resize(static_cast<size_t>(m_SampleRate * m_Delay), 0.0);
+
+		m_DelayBuffer = Memory::Allocate<int16>(MAX_DELAY_TIME * m_SampleRate, true);
+
+		SetDepth(0.5);
+		SetRate(0.5);
+		SetDelayTime(0.5);
+	}
+
+	~Chorus(void)
+	{
+		Memory::Deallocate(m_DelayBuffer);
+	}
+
+	//[0, 1]
+	void SetDepth(float Value)
+	{
+		Value = Math::Clamp01(Value);
+
+		m_Depth = Value;
+	}
+	float GetDepth(void)
+	{
+		return m_Depth;
+	}
+
+	//[0, 1]
+	void SetRate(float Value)
+	{
+		Value = Math::Clamp01(Value);
+
+		m_Rate = Value;
+	}
+	float GetRate(void)
+	{
+		return m_Rate;
+	}
+
+	//[0, 1]
+	void SetDelayTime(float Value)
+	{
+		Value = Math::Clamp(Value, 0, MAX_DELAY_TIME);
+
+		m_DelayTime = Value;
+
+		m_DelayBufferLength = Math::Max(m_DelayTime * m_SampleRate, 1);
+	}
+	float GetDelayTime(void)
+	{
+		return m_DelayTime;
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
 		{
-			// Calculate modulation phase
 			double modulation = m_Depth * sin(Math::TWO_PI_VALUE * m_Rate * m_CurrentPhase);
-
-			// Apply chorus effect (create delayed copies)
-			double delayedSample = GetDelayedSample(m_Delay + modulation);
-			Buffer[i] = (Buffer[i] + delayedSample) / 2.0;
-
-			// Update modulation phase
 			m_CurrentPhase += 1.0 / m_SampleRate;
 			if (m_CurrentPhase > 1.0)
-			{
 				m_CurrentPhase -= 1.0;
-			}
 
-			// Update delay buffer
-			m_DelayBuffer[m_DelayBufferIndex] = Buffer[i];
-			m_DelayBufferIndex = (m_DelayBufferIndex + 1) % m_DelayBuffer.size();
+			double delayedSample = GetDelayedSample(m_DelayTime + modulation);
+
+			Buffer[i] = (Buffer[i] + delayedSample) / 2.0;
+
+			m_DelayBuffer[m_DelayBufferIndex] = Buffer[i] * MAX_BUFFER_ELEMENT_COEFF;
+
+			m_DelayBufferIndex = ++m_DelayBufferIndex % m_DelayBufferLength;
 		}
 	}
 
 private:
-	uint32 m_SampleRate;
-	double m_Depth; // Modulation depth
-	double m_Rate;	// Modulation rate
-	double m_Delay; // Base delay time in seconds
-	double m_CurrentPhase;
-
-	std::vector<float> m_DelayBuffer;
-	size_t m_DelayBufferIndex = 0;
-
-	// Function to get a delayed sample from the delay buffer
 	double GetDelayedSample(double delayTime)
 	{
-		// Interpolation for fractional delay
-		size_t index = static_cast<size_t>(delayTime * m_SampleRate);
-		double fraction = delayTime * m_SampleRate - index;
+		uint32 index = delayTime * m_SampleRate;
+		double fraction = (delayTime * m_SampleRate) - index;
 
-		size_t indexDelayed = (m_DelayBufferIndex + index) % m_DelayBuffer.size();
-		size_t indexNext = (indexDelayed + 1) % m_DelayBuffer.size();
+		uint32 indexDelayed = (m_DelayBufferIndex + index) % m_DelayBufferLength;
+		uint32 indexNext = (indexDelayed + 1) % m_DelayBufferLength;
 
-		return Math::Lerp(m_DelayBuffer[indexDelayed], m_DelayBuffer[indexNext], fraction);
+		return Math::Lerp(m_DelayBuffer[indexDelayed], m_DelayBuffer[indexNext], fraction) / MAX_BUFFER_ELEMENT_COEFF;
 	}
+
+private:
+	uint32 m_SampleRate;
+	double m_Depth;
+	double m_Rate;
+	double m_DelayTime;
+
+	int16 *m_DelayBuffer;
+	uint32 m_DelayBufferLength;
+	uint16 m_DelayBufferIndex;
+
+	double m_CurrentPhase;
+
+	static constexpr double MAX_BUFFER_ELEMENT_COEFF = 32767.0;
+	static constexpr float MAX_DELAY_TIME = 1;
 };
 
 #endif
