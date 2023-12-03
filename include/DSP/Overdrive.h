@@ -9,8 +9,9 @@ class Overdrive : public IDSP
 {
 public:
 	Overdrive(void)
-		: m_Drive(1)
+		: m_Drive(0)
 	{
+		SetDrive(1);
 	}
 
 	//[0, 1]

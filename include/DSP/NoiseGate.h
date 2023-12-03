@@ -23,26 +23,6 @@ public:
 		return m_NoiseGateFilter.GetThreshold();
 	}
 
-	//[0s, 1s]
-	void SetAttackTime(float Value)
-	{
-		m_NoiseGateFilter.SetAttackTime(Value);
-	}
-	float GetAttackTime(void)
-	{
-		return m_NoiseGateFilter.GetAttackTime();
-	}
-
-	//[0s, 2s]
-	void SetReleaseTime(float Value)
-	{
-		m_NoiseGateFilter.SetReleaseTime(Value);
-	}
-	float GetReleaseTime(void)
-	{
-		return m_NoiseGateFilter.GetReleaseTime();
-	}
-
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)

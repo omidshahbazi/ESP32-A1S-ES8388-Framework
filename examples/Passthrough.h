@@ -43,7 +43,7 @@ private:
 
 		Memory::Deallocate(buffer);
 
-		vTaskDelete(nullptr);
+		Task::Delete();
 	}
 
 private:

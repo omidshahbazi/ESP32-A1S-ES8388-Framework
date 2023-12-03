@@ -50,7 +50,7 @@ private:
 			ESP32A1SCodec::Write(sineWave.GetBuffer(), sineWave.GetBufferLength());
 		}
 
-		vTaskDelete(nullptr);
+		Task::Delete();
 	}
 
 private:
