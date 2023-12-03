@@ -62,18 +62,11 @@ private:
 		float alpha = sinw0 / (2 * m_Bandwidth);
 
 		Coefficients coeffs;
-		coeffs.a1 = 1;
-		coeffs.a2 = -2 * cosw0;
-		coeffs.b0 = 1;
-		coeffs.b1 = (1 + alpha) / 2;
-		coeffs.b2 = -cosw0;
-
-		// Coefficients coeffs;
-		// coeffs.a1 = (1 + alpha) / 2;
-		// coeffs.a2 = 0;
-		// coeffs.b0 = -(1 + alpha) / 2;
-		// coeffs.b1 = -2 * cosw0;
-		// coeffs.b2 = 1;
+		coeffs.a1 = (1 + alpha) / 2;
+		coeffs.a2 = 0;
+		coeffs.b0 = -(1 + alpha) / 2;
+		coeffs.b1 = -2 * cosw0;
+		coeffs.b2 = 1;
 
 		// coeffs.a1 /= coeffs.b0;
 		// coeffs.a2 /= coeffs.b0;
