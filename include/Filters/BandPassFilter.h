@@ -13,7 +13,7 @@ public:
 		  m_CenterFrequency(0),
 		  m_Bandwidth(0)
 	{
-		SetBandwidth(0.1);
+		SetBandwidth(2000 / MAX_FREQUENCY);
 		SetCenterFrequency(0.5 * MAX_FREQUENCY);
 	}
 
@@ -54,12 +54,12 @@ public:
 private:
 	void Update(void)
 	{
-		float w0 = Math::TWO_PI_VALUE * m_CenterFrequency;
+		double w0 = Math::TWO_PI_VALUE * m_CenterFrequency;
 
-		float cosw0 = cosf(w0);
-		float sinw0 = sinf(w0);
+		double cosw0 = cosf(w0);
+		double sinw0 = sinf(w0);
 
-		float alpha = sinw0 / (2 * m_Bandwidth);
+		double alpha = sinw0 / (2 * m_Bandwidth);
 
 		Coefficients coeffs;
 		coeffs.a1 = (1 + alpha) / 2;
@@ -68,11 +68,11 @@ private:
 		coeffs.b1 = -2 * cosw0;
 		coeffs.b2 = 1;
 
-		// coeffs.a1 /= coeffs.b0;
-		// coeffs.a2 /= coeffs.b0;
-		// coeffs.b0 /= coeffs.b0;
-		// coeffs.b1 /= coeffs.b0;
-		// coeffs.b2 /= coeffs.b0;
+		coeffs.a1 /= coeffs.b0;
+		coeffs.a2 /= coeffs.b0;
+		coeffs.b0 /= coeffs.b0;
+		coeffs.b1 /= coeffs.b0;
+		coeffs.b2 /= coeffs.b0;
 
 		SetCoefficients(&coeffs);
 	}

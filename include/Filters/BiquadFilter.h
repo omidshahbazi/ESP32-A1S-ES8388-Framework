@@ -13,21 +13,21 @@ public:
 	struct Coefficients
 	{
 		// The denominator (feedback part) of the filter transfer function.
-		float a1;
-		float a2;
+		double a1;
+		double a2;
 
 		// The numerator (feedforward part) of the filter transfer function.
-		float b0;
-		float b1;
-		float b2;
+		double b0;
+		double b1;
+		double b2;
 	};
 
 private:
 	struct Stage
 	{
 		Coefficients Coeffs;
-		float w0;
-		float w1;
+		double w0;
+		double w1;
 	};
 
 public:
@@ -50,12 +50,7 @@ public:
 		ASSERT(Values != nullptr, "BiquadFilter", "Values cannot be null");
 
 		for (uint8 i = 0; i < m_StageCount; ++i)
-		{
 			m_Stages[i].Coeffs = Values[i];
-
-			// printf("Coeffs %i, a1: %f, a2: %f, b0: %f, b1: %f, b2: %f\n",
-			// 	   i, Values[i].a1, Values[i].a2, Values[i].b0, Values[i].b1, Values[i].b2);
-		}
 	}
 
 	void Reset(void)
@@ -71,20 +66,20 @@ public:
 
 	double Process(double Value) override
 	{
+		if (m_Stages == nullptr)
+			return Value;
+
 		for (uint8 i = 0; i < m_StageCount; ++i)
 		{
 			double input = Value;
 
 			Stage &stage = m_Stages[i];
 
-			float temp = Value + stage.Coeffs.a1 * stage.w0 + stage.Coeffs.a2 * stage.w1;
+			double temp = Value + stage.Coeffs.a1 * stage.w0 + stage.Coeffs.a2 * stage.w1;
 			Value = temp * stage.Coeffs.b0 + stage.Coeffs.b1 * stage.w0 + stage.Coeffs.b2 * stage.w1;
 
 			stage.w1 = stage.w0;
 			stage.w0 = temp;
-
-			// printf("Values %i, temp: %f, in: %f, out: %f, w0: %f, w1: %f\n",
-			// 	   i, temp, input, Value, stage.w0, stage.w1);
 		}
 
 		return Value;
