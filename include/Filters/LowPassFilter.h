@@ -23,7 +23,7 @@ public:
 	//(0, 10]
 	void SetDeltaTime(float Value)
 	{
-		Value = Math::Clamp(Value, 0.0001F, 10);
+		Value = Math::ClampExcluded0To1(Value);
 
 		m_DeltaTime = Value;
 

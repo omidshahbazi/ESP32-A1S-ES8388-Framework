@@ -27,7 +27,7 @@ public:
 	//(0, 1]
 	void SetThreshold(float Value)
 	{
-		Value = Math::Clamp(0.00001, 1, Value);
+		Value = Math::ClampExcluded0To1(Value);
 
 		m_Threshold = Value;
 	}

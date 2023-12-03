@@ -17,7 +17,7 @@ public:
 			{
 				ProcessTask();
 			},
-			1024, "ControlsTask", 0, 1);
+			2048, "ControlsTask", 0, 1);
 	}
 
 	template <typename T, typename... ArgsT>
