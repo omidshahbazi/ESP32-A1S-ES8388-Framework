@@ -4,6 +4,7 @@
 
 #include "IDSP.h"
 #include "../Math.h"
+#include "../Debug.h"
 
 class Overdrive : public IDSP
 {
@@ -17,7 +18,7 @@ public:
 	//[0, 1]
 	void SetDrive(float Value)
 	{
-		Value = Math::Clamp01(Value);
+		ASSERT(0 <= Value && Value <= 1, "Overdrive", "Invalid Value");
 
 		m_Drive = Value;
 	}

@@ -14,11 +14,13 @@ public:
 	Test(uint32 SampleRate)
 		: m_Wave()
 	{
+		m_Wave.SetCenterFrequency(700);
+		m_Wave.SetBandwidth(100);
 	}
 
 	void SetValue(float Value)
 	{
-		m_Wave.SetCenterFrequency(Value * MAX_FREQUENCY);
+		// m_Wave.SetCenterFrequency(Value * MAX_FREQUENCY);
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override

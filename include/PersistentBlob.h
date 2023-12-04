@@ -22,7 +22,7 @@ public:
 	PersistentBlob(const char *Name)
 		: m_EEPROM(Name)
 	{
-		ASSERT(Name != nullptr, "PersistentBlob", "Name cannot be null");
+		ASSERT(Name != nullptr, "Name cannot be null");
 
 		nvs_flash_init();
 		m_EEPROM.begin(sizeof(Header));
@@ -36,7 +36,7 @@ public:
 
 		if (m_Header.Hash == hash)
 		{
-			ASSERT(m_Header.Size == sizeof(T), "PersistentBlob", "PersistentBlob %s has already initialized with %ib, but you're initializing it again with %ib", Name, m_Header.Size, sizeof(T));
+			ASSERT(m_Header.Size == sizeof(T), "PersistentBlob %s has already initialized with %ib, but you're initializing it again with %ib", Name, m_Header.Size, sizeof(T));
 
 			Log::WriteDebug("PersistentBlob", "PersistentBlob %s has already intialized", Name);
 

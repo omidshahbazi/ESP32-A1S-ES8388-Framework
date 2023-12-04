@@ -567,13 +567,13 @@ public:
 		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
 			return false;
 
-		dBMin = Math::Clamp(dBMin, -12, 30);
-		dBMax = Math::Clamp(dBMax, -6.5F, 35.5F);
-		dBTarget = Math::Clamp(dBTarget, -16.5F, -1.5F);
-		HoldTime = Math::Clamp(HoldTime, 0, 1360);
-		AttackTime = Math::Clamp(AttackTime, 0.104, 106);
-		DecayTime = Math::Clamp(DecayTime, 0.410, 420);
-		WindowsSize = Math::Clamp(WindowsSize, 96, 496);
+		ASSERT(-12 <= dBMin && dBMin <= 30, "Invalid dBMin");
+		ASSERT(-6.5F <= dBMax && dBMax <= 35.5F, "Invalid dBMax");
+		ASSERT(-16.5F <= dBTarget && dBTarget <= -1.5F, "Invalid dBTarget");
+		ASSERT(0 <= HoldTime && HoldTime <= 1360, "Invalid HoldTime");
+		ASSERT(0.104 <= AttackTime && AttackTime <= 106, "Invalid AttackTime");
+		ASSERT(0.410 <= DecayTime && DecayTime <= 420, "Invalid DecayTime");
+		ASSERT(96 <= WindowsSize && WindowsSize <= 496, "Invalid WindowsSize");
 
 		Log::WriteInfo(TAG, "Setting Automatic Level Control Parameters, Min: %.1fdB, Max: %.1fdB, Target: %.1fdB, Hold Time: %.1fms, Attack Time: %.1fms, Decay Time: %.1fms", dBMin, dBMax, dBTarget, HoldTime, AttackTime, DecayTime);
 
@@ -623,7 +623,7 @@ public:
 		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
 			return 0;
 
-		dBFS = Math::Clamp(dBFS, -76.5F, -30);
+		ASSERT(-76.5F <= dBFS && dBFS <= -30, "Invalid dBFS");
 
 		Log::WriteInfo(TAG, "Setting Noise Gate: %.1fdBFS, Mute On Noise: %i", dBFS, MuteOnNoise);
 
@@ -642,7 +642,7 @@ public:
 		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1)))
 			return false;
 
-		dB = Math::Clamp(dB, 0, 24);
+		ASSERT(0 <= dB && dB <= 24, "Invalid dB");
 
 		Log::WriteInfo(TAG, "Setting Microphone Gain: %.1fdB", dB);
 
@@ -679,7 +679,7 @@ public:
 		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
 			return false;
 
-		dB = Math::Clamp(dB, -15, 6);
+		ASSERT(-15 <= dB && dB <= 6, "Invalid dB");
 
 		Log::WriteInfo(TAG, "Setting Input to Mixer Gain: %.1fdB", dB);
 
@@ -716,7 +716,7 @@ public:
 		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
 			return false;
 
-		dB = Math::Clamp(dB, -96, 0);
+		ASSERT(-96 <= dB && dB <= 0, "Invalid dB");
 
 		Log::WriteInfo(TAG, "Setting Input Volume: %.1fdB", dB);
 
@@ -773,7 +773,7 @@ public:
 		if (!(Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2)))
 			return false;
 
-		dB = Math::Clamp(dB, -96, 0);
+		ASSERT(-96 <= dB && dB <= 0, "Invalid dB");
 
 		Log::WriteInfo(TAG, "Setting Digital Volume: %.1fdB", dB);
 
@@ -810,7 +810,7 @@ public:
 		if (!(Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2)))
 			return 0;
 
-		dB = Math::Clamp(dB, -45, 4.5F);
+		ASSERT(-45 <= dB && dB <= 4.5F, "Invalid dB");
 
 		Log::WriteInfo(TAG, "Setting Output Volume: %.1fdB", dB);
 

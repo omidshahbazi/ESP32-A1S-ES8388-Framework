@@ -3,6 +3,7 @@
 #define TONE_CONTROL_H
 
 #include "../Math.h"
+#include "../Debug.h"
 #include "LowPassFilter.h"
 #include "HighPassFilter.h"
 
@@ -21,7 +22,7 @@ public:
 	//[0, 1]
 	void SetTone(float Value)
 	{
-		Value = Math::Clamp01(Value);
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
 		m_Tone = Value;
 	}

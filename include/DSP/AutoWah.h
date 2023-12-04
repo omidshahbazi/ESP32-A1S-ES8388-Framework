@@ -4,34 +4,13 @@
 
 #include "IDSP.h"
 #include "../Math.h"
+#include "../Filters/BandPassFilter.h"
 
 class AutoWah : public IDSP
 {
 public:
-	AutoWah(uint32 SampleRate)
-		: m_SampleRate(0),
-		  m_AttackTime(0.01),
-		  m_ReleaseTime(0.1),
-		  m_WahMin(400.0),
-		  m_WahMax(1000.0),
-		  m_Q(1.0),
-		  m_Envelope(0),
-		  m_CurrentWahFreq(0),
-		  m_AttackCoeff(0),
-		  m_ReleaseCoeff(0),
-		  m_PrevInput(0),
-		  m_PrevOutput(0)
+	AutoWah(void)
 	{
-		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
-
-		CalculateFilterCoefficients();
-	}
-
-	void SetFrequency_TOTUNE(float Value)
-	{
-		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_FREQUENCY);
-
-		m_CurrentWahFreq = Value;
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
@@ -40,63 +19,32 @@ public:
 		{
 			double inputSample = Buffer[i];
 
-			// Envelope follower
-			double target = fabs(inputSample);
-			m_Envelope += (target - m_Envelope) * (inputSample > m_Envelope ? m_AttackCoeff : m_ReleaseCoeff);
+			// Apply envelope follower (you may need to implement this)
+			double envelope = CalculateEnvelope(inputSample);
 
-			// Update filter cutoff frequency based on the envelope
-			double wahFreq = m_WahMin + (m_WahMax - m_WahMin) * m_Envelope;
+			// Adjust the filter frequency based on the envelope
+			double filterFrequency = Math::Lerp(m_MinFrequency, m_MaxFrequency, envelope);
+			m_BandPassFilter.SetCenterFrequency(filterFrequency);
 
-			// Update filter coefficients if the frequency has changed
-			if (wahFreq != m_CurrentWahFreq)
-			{
-				m_CurrentWahFreq = wahFreq;
-				CalculateFilterCoefficients();
-			}
+			// Process the input sample through the bandpass filter
+			double outputSample = m_BandPassFilter.Process(inputSample);
 
-			// Resonant low-pass filter
-			double w = 2.0 * M_PI * m_CurrentWahFreq / m_SampleRate;
-			double g = tan(w * 0.5) / m_Q;
-			double h = 1.0 / (1.0 + g);
+			// printf("envelope: %f, filterFrequency: %f, outputSample: %f\n", envelope, filterFrequency, outputSample);
 
-			// Update filter state
-			double filtered = h * (inputSample + m_PrevInput - m_Q * m_PrevOutput);
-			m_PrevInput = inputSample;
-			m_PrevOutput = filtered;
-
-			// Store the processed sample back to the buffer
-			Buffer[i] = filtered;
+			// Replace the input sample with the processed output
+			Buffer[i] = outputSample;
 		}
 	}
 
-private:
-	void CalculateFilterCoefficients()
+	double CalculateEnvelope(double inputSample)
 	{
-		double w = 2.0 * M_PI * m_CurrentWahFreq / m_SampleRate;
-		double g = tan(w * 0.5) / m_Q;
-		double h = 1.0 / (1.0 + g);
-
-		// Update filter coefficients
-		m_AttackCoeff = exp(-1.0 / (m_SampleRate * m_AttackTime));
-		m_ReleaseCoeff = exp(-1.0 / (m_SampleRate * m_ReleaseTime));
+		// Simple envelope follower: absolute value of the input sample
+		return std::abs(inputSample);
 	}
 
-	// Add member variables for parameters
-	double m_SampleRate;
-	double m_AttackTime = 0.01; // You might want to set initial values
-	double m_ReleaseTime = 0.1;
-	double m_WahMin = 400.0;
-	double m_WahMax = 1000.0;
-	double m_Q = 1.0;
-
-	double m_Envelope;
-	double m_CurrentWahFreq;
-
-	double m_AttackCoeff;
-	double m_ReleaseCoeff;
-
-	double m_PrevInput;
-	double m_PrevOutput;
+private:
+	BandPassFilter m_BandPassFilter;
+	double m_MinFrequency = 200.0; // Adjust these values as needed
+	double m_MaxFrequency = 2000.0;
 };
-
 #endif

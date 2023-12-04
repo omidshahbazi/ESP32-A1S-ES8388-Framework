@@ -21,7 +21,7 @@ public:
 
 		T *mem = reinterpret_cast<T *>(heap_caps_malloc(length, ramType));
 
-		ASSERT(mem != nullptr, "Memory", "Couldn't allocate memory: %i of %iB", Count, sizeof(T));
+		ASSERT(mem != nullptr, "Couldn't allocate memory: %i of %iB", Count, sizeof(T));
 
 		Log::WriteInfo("Memory", "%ib Allocated Count: %i, ELement Size: %i, Available RAM: %ib", length, Count, sizeof(T), ESP.getFreeHeap());
 

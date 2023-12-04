@@ -42,8 +42,10 @@ public:
 
 	void SetBlinking(float BlinkRate)
 	{
+		ASSERT(0 < BlinkRate && BlinkRate <= 1000, "Invalid BlinkRate");
+
 		m_IsBlinking = true;
-		m_BlinkRate = Math::Clamp(BlinkRate, Math::EPSILON, 1000);
+		m_BlinkRate = BlinkRate;
 	}
 	bool GetBlinking(void) const
 	{

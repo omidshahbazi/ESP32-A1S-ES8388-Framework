@@ -28,7 +28,7 @@ public:
 		taskInfo->Entrypoint = Entrypoint;
 		BaseType_t result = xTaskCreatePinnedToCore(Stub, Name, StackSize, taskInfo, Priority, nullptr, CoreID);
 
-		ASSERT(result == pdPASS, "Task", "Didn't manage to create the %s on Core %i with Priority of %i and the StackDepth of %ib", Name, CoreID, Priority, StackSize);
+		ASSERT(result == pdPASS, "Didn't manage to create the %s on Core %i with Priority of %i and the StackDepth of %ib", Name, CoreID, Priority, StackSize);
 	}
 
 	static void Delete(void)

@@ -10,7 +10,7 @@ class Chorus : public IDSP
 {
 public:
 	Chorus(uint32 SampleRate)
-		: m_SampleRate(0),
+		: m_SampleRate(SampleRate),
 		  m_Depth(0),
 		  m_Rate(0),
 		  m_DelayTime(0),
@@ -19,7 +19,7 @@ public:
 		  m_DelayBufferIndex(0),
 		  m_CurrentPhase(0)
 	{
-		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
+		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
 		m_DelayBuffer = Memory::Allocate<int16>(MAX_DELAY_TIME * m_SampleRate, true);
 
@@ -36,7 +36,7 @@ public:
 	//[0, 1]
 	void SetDepth(float Value)
 	{
-		Value = Math::Clamp01(Value);
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
 		m_Depth = Value;
 	}
@@ -48,7 +48,7 @@ public:
 	//[0, 1]
 	void SetRate(float Value)
 	{
-		Value = Math::Clamp01(Value);
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
 		m_Rate = Value;
 	}
@@ -57,10 +57,10 @@ public:
 		return m_Rate;
 	}
 
-	//[0, 1]
+	//[0, MAX_DELAY_TIME]
 	void SetDelayTime(float Value)
 	{
-		Value = Math::Clamp(Value, 0, MAX_DELAY_TIME);
+		ASSERT(0 <= Value && Value <= MAX_DELAY_TIME, "Invalid Value");
 
 		m_DelayTime = Value;
 

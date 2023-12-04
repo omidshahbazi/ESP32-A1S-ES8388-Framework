@@ -23,7 +23,7 @@ public:
 
 	void SetSampleRate(uint16 Value)
 	{
-		Value = Math::Clamp(Value, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
+		ASSERT(MIN_SAMPLE_RATE <= Value && Value <= MAX_SAMPLE_RATE, "Invalid Value");
 
 		m_SampleRate = Value;
 
@@ -36,7 +36,7 @@ public:
 
 	void SetFrequency(float Value)
 	{
-		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_FREQUENCY);
+		ASSERT(MIN_FREQUENCY <= Value && Value <= MAX_FREQUENCY, "Invalid Value");
 
 		m_Frequency = Value;
 
@@ -49,7 +49,7 @@ public:
 
 	void SetAmplitude(float Value)
 	{
-		Value = Math::Clamp(Value, 15, 15000);
+		ASSERT(0 <= Value && Value <= 32768, "Invalid Value");
 
 		m_Amplitude = Value;
 

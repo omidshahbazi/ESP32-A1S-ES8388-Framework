@@ -829,7 +829,7 @@ public:
 
 	static void Write(Registers Register, Values Value, Masks Mask)
 	{
-		ASSERT(((uint8)Value & ~(uint8)Mask) == 0, TAG, "Mask %i and Value %i are not compatible", (uint8)Mask, (uint8)Value);
+		ASSERT(((uint8)Value & ~(uint8)Mask) == 0, "Mask %i and Value %i are not compatible", (uint8)Mask, (uint8)Value);
 
 		Log::WriteDebug(TAG, "Writing to address: 0x%02x register: 0x%02x the value: 0x%02x with the mask: 0x%02x", ADDRESS, Register, Value, Mask);
 

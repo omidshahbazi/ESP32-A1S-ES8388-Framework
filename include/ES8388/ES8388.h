@@ -96,12 +96,12 @@ public:
 			if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1)) // Optimized for Microphone
 			{
 				CHECK_CALL(SetNoiseGateParameters(-40.5F, true));
-				CHECK_CALL(SetAutomaticLevelControlParameters(0, 23.5F, -4.5F, 0, 0.416F, 0.820F, 21, false, false, false));
+				CHECK_CALL(SetAutomaticLevelControlParameters(0, 23.5F, -4.5F, 0, 0.416F, 0.820F, 96, false, false, false));
 			}
 			else if (Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)) // Optimized for Music
 			{
 				CHECK_CALL(SetNoiseGateParameters(-60, false));
-				CHECK_CALL(SetAutomaticLevelControlParameters(-12, 35.5F, -12, 0, 6.66F, 420, 21, false, false, false));
+				CHECK_CALL(SetAutomaticLevelControlParameters(-12, 35.5F, -12, 0, 6.66F, 420, 96, false, false, false));
 			}
 
 			if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1))
@@ -299,7 +299,7 @@ public:
 		static float INPUT_GAIN[] = {0, 6, 12, 18, 24};
 		static float OUTPUT_VOLUME[] = {0, -6, -12, -18, -24};
 
-		Range = Math::Clamp(Range, 0, 4);
+		ASSERT(0 <= Range && Range <= 4, "Invalid Range");
 
 		Log::WriteInfo(TAG, "Optimizing Conversion: %i, Input Gain: %.1ffdB, Output Volume: %.1ffdB", Range, INPUT_GAIN[Range], OUTPUT_VOLUME[Range]);
 

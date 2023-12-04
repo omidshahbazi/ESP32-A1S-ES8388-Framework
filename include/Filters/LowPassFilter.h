@@ -15,7 +15,7 @@ public:
 		  m_Alpha(0),
 		  m_CapacitorVoltage(0)
 	{
-		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
+		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
 		SetCutoffFrequency(MAX_CUTOFF_FREQUENCY);
 	}
@@ -23,7 +23,7 @@ public:
 	//(0, 10]
 	void SetDeltaTime(float Value)
 	{
-		Value = Math::ClampExcluded0To1(Value);
+		ASSERT(0 < Value && Value <= 1, "Invalid Value");
 
 		m_DeltaTime = Value;
 
@@ -37,7 +37,7 @@ public:
 	//[MIN_FREQUENCY, MAX_CUTOFF_FREQUENCY]
 	void SetCutoffFrequency(float Value)
 	{
-		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_CUTOFF_FREQUENCY);
+		ASSERT(MIN_FREQUENCY <= Value && Value <= MAX_CUTOFF_FREQUENCY, "Invalid Value");
 
 		m_CutoffFrequency = Value;
 

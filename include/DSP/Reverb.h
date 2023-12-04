@@ -17,7 +17,7 @@ public:
 		  m_DelayBufferLength(0),
 		  m_DelayBufferIndex(0)
 	{
-		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
+		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
 		m_DelayBuffer = Memory::Allocate<int16>(MAX_DELAY_TIME * m_SampleRate, true);
 
@@ -33,7 +33,7 @@ public:
 	//[0, 1]
 	void SetDelayTime(float Value)
 	{
-		Value = Math::Clamp(Value, 0, MAX_DELAY_TIME);
+		ASSERT(0 <= Value && Value <= MAX_DELAY_TIME, "Invalid Value");
 
 		m_DelayTime = Value;
 
@@ -47,7 +47,7 @@ public:
 	//[0, 1]
 	void SetFeedback(float Value)
 	{
-		Value = Math::Clamp(Value, 0, 1);
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
 		m_Feedback = Value;
 	}

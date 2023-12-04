@@ -4,6 +4,7 @@
 
 #include "IDSP.h"
 #include "../Math.h"
+#include "../Debug.h"
 
 class Tremolo : public IDSP
 {
@@ -16,7 +17,7 @@ public:
 		  m_DeltaPhase(0),
 		  m_Phase(0)
 	{
-		m_SampleRate = Math::Clamp(SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
+		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
 		SetDepth(0.5F);
 		SetRate(5);
@@ -25,7 +26,7 @@ public:
 	//[0, 1]
 	void SetDepth(float Value)
 	{
-		Value = Math::Clamp01(Value);
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
 		m_Depth = Value;
 	}
@@ -37,7 +38,7 @@ public:
 	//[MIN_FREQUENCY, MAX_FREQUENCY]
 	void SetRate(float Value)
 	{
-		Value = Math::Clamp(Value, MIN_FREQUENCY, MAX_FREQUENCY);
+		ASSERT(MIN_FREQUENCY <= Value && Value <= MAX_FREQUENCY, "Invalid Value");
 
 		m_Rate = Value;
 

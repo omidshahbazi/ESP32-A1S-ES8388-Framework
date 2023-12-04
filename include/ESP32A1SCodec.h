@@ -296,8 +296,8 @@ private:
 
 	static bool InitializeI2S(Configs *Configs)
 	{
-		Configs->SampleRate = Math::Clamp(Configs->SampleRate, MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
-		Configs->BufferLength = Math::Clamp(Configs->BufferLength, 1, 1024);
+		ASSERT(MIN_SAMPLE_RATE <= Configs->SampleRate && Configs->SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
+		ASSERT(1 <= Configs->BufferLength && Configs->BufferLength <= 1024, "Invalid SampleRate");
 
 		Log::WriteInfo(TAG, "Initializing I2S");
 
@@ -393,8 +393,8 @@ private:
 
 	static void SetMasterClockPin(i2s_port_t Port, gpio_num_t GPIO)
 	{
-		ASSERT(Port != I2S_NUM_MAX, "Setting MasterClockPin", "Does not support I2S_NUM_MAX");
-		ASSERT(GPIO == GPIO_NUM_0 || GPIO == GPIO_NUM_1 || GPIO == GPIO_NUM_3, "Setting MasterClockPin", "GPIO_NUM_0, GPIO_NUM_1 and GPIO_NUM_3 are only supported for master");
+		ASSERT(Port != I2S_NUM_MAX, "Does not support I2S_NUM_MAX");
+		ASSERT(GPIO == GPIO_NUM_0 || GPIO == GPIO_NUM_1 || GPIO == GPIO_NUM_3, "GPIO_NUM_0, GPIO_NUM_1 and GPIO_NUM_3 are only supported for master");
 
 		Log::WriteInfo(TAG, "Setting the master clock for I2S%d on GPIO%d", Port, GPIO);
 
