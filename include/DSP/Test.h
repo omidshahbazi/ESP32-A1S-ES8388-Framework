@@ -14,8 +14,8 @@ public:
 	Test(uint32 SampleRate)
 		: m_Wave()
 	{
-		m_Wave.SetCenterFrequency(700);
-		m_Wave.SetBandwidth(100);
+		m_Wave.SetCenterFrequency(10000);
+		m_Wave.SetBandwidth(1000);
 	}
 
 	void SetValue(float Value)
