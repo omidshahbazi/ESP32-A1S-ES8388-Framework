@@ -20,7 +20,7 @@ public:
 
 	void SetValue(float Value)
 	{
-		// m_Wave.SetCenterFrequency(Value * MAX_FREQUENCY);
+		// m_Wave.SetCenterFrequency(Math::Max(1, Value * MAX_FREQUENCY));
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override

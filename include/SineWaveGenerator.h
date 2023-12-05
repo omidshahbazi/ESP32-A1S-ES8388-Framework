@@ -9,6 +9,8 @@
 template <typename T>
 class SineWaveGenerator
 {
+	static_assert(std::is_same<T, int8>() || std::is_same<T, int16>() || std::is_same<T, int32>(), "T can only be either int8, int16 or int32");
+
 public:
 	SineWaveGenerator(void)
 		: m_SampleRate(SAMPLE_RATE_44100),
@@ -21,6 +23,7 @@ public:
 		SetupWave();
 	}
 
+	//[MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
 	void SetSampleRate(uint16 Value)
 	{
 		ASSERT(MIN_SAMPLE_RATE <= Value && Value <= MAX_SAMPLE_RATE, "Invalid Value");
@@ -34,6 +37,7 @@ public:
 		return m_SampleRate;
 	}
 
+	//[MIN_FREQUENCY, MAX_FREQUENCY]
 	void SetFrequency(float Value)
 	{
 		ASSERT(MIN_FREQUENCY <= Value && Value <= MAX_FREQUENCY, "Invalid Value");
@@ -47,9 +51,10 @@ public:
 		return m_Frequency;
 	}
 
+	//[0, 1]
 	void SetAmplitude(float Value)
 	{
-		ASSERT(0 <= Value && Value <= 32768, "Invalid Value");
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
 		m_Amplitude = Value;
 
@@ -83,7 +88,8 @@ public:
 private:
 	void SetupWave(void)
 	{
-		const int32 Mask = 0x0FFFFFFF >> (sizeof(int32) - sizeof(T));
+		static const int32 MAX_VALUE = 0x7FFFFFFF >> (sizeof(int32) - sizeof(T));
+
 		const uint16 SamplePerCycle = m_SampleRate / m_Frequency;
 
 		const int8 STEP = (m_DoubleBuffer ? 2 : 1);
@@ -100,12 +106,11 @@ private:
 
 		for (uint32 i = 0; i < SamplePerCycle; ++i)
 		{
-			double sinVal = sin((i / (double)SamplePerCycle) * Math::TWO_PI_VALUE) * m_Amplitude;
-			// double sinVal = sin(i / 2 * 2 * Math::PI_VALUE /) * m_Amplitude;
+			double sinVal = sin((i / (double)SamplePerCycle) * Math::TWO_PI_VALUE);
 
 			uint32 index = i * STEP;
 
-			m_Buffer[index] = (int32)sinVal & Mask;
+			m_Buffer[index] = sinVal * Math::Lerp(0.0, MAX_VALUE, m_Amplitude);
 
 			if (m_DoubleBuffer)
 				m_Buffer[index + 1] = m_Buffer[index];

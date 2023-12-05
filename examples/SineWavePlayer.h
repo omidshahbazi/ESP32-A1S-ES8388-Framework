@@ -36,13 +36,13 @@ private:
 		SineWaveGenerator<int16> sineWave;
 		sineWave.SetSampleRate(SAMPLE_RATE);
 
-		int32 amplitude = sineWave.GetAmplitude();
-		int32 step = 25;
+		float amplitude = sineWave.GetAmplitude();
+		float step = 0.025;
 
 		while (true)
 		{
 			amplitude -= step;
-			if (amplitude <= 50 || 15000 <= amplitude)
+			if (amplitude <= 0 || 1 <= amplitude)
 				step *= -1;
 
 			sineWave.SetAmplitude(amplitude);

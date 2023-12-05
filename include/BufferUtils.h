@@ -6,19 +6,29 @@
 
 const int32 FULL_24_BITS = 0x7FFFFF;
 
-// Convert to 24 bit int then to float and scale to 1.0
-#define CONVERT_TO_24_AND_NORMALIZED_DOUBLE(DoubleBuffer, DoubleBufferIndex, Int32Buffer, Int32BufferIndexOffset)       \
-	{                                                                                                                   \
-		DoubleBuffer[DoubleBufferIndex] = (double)(Int32Buffer[(DoubleBufferIndex * 2) + Int32BufferIndexOffset] >> 8); \
-		DoubleBuffer[DoubleBufferIndex] /= FULL_24_BITS;                                                                \
+#define CONVERT_TO_NORMALIZED_DOUBLE(SourceBuffer, SourceIsDoubleBuffered, SourceElementShiftBitCount, SourceBufferOffset, DestinationBuffer, Index) \
+	{                                                                                                                                                \
+		DestinationBuffer[Index] = SourceBuffer[(Index * (SourceIsDoubleBuffered ? 2 : 1)) + SourceBufferOffset] >> SourceElementShiftBitCount;      \
+		DestinationBuffer[Index] /= FULL_24_BITS;                                                                                                    \
 	}
 
-// Scale to 24 bit range and saturated 32
-#define SCALE_TO_24_AND_SATURATED_32(DoubleBuffer, DoubleBufferIndex, Int32Buffer, Int32BufferIndexOffset) \
-	{                                                                                                      \
-		double process = DoubleBuffer[DoubleBufferIndex] * FULL_24_BITS;                                   \
-		process = Math::Clamp(process, -FULL_24_BITS, FULL_24_BITS);                                       \
-		Int32Buffer[(DoubleBufferIndex * 2) + Int32BufferIndexOffset] = ((int32)process) << 8;             \
+#define CONVERT_INT16_TO_NORMALIZED_DOUBLE(SourceBuffer, SourceIsDoubleBuffered, SourceBufferOffset, DestinationBuffer, Index) \
+	CONVERT_TO_NORMALIZED_DOUBLE(SourceBuffer, SourceIsDoubleBuffered, 0, SourceBufferOffset, DestinationBuffer, Index)
+
+#define CONVERT_INT32_TO_NORMALIZED_DOUBLE(SourceBuffer, SourceIsDoubleBuffered, SourceBufferOffset, DestinationBuffer, Index) \
+	CONVERT_TO_NORMALIZED_DOUBLE(SourceBuffer, SourceIsDoubleBuffered, 8, SourceBufferOffset, DestinationBuffer, Index)
+
+#define SCALE_NORMALIZED_DOUBLE(SourceBuffer, Index, DestinationBuffer, DestinationIsDoubleBuffered, DestinationElementShiftBitCount, DestinationBufferOffset) \
+	{                                                                                                                                                          \
+		double process = SourceBuffer[Index] * FULL_24_BITS;                                                                                                   \
+		process = Math::Clamp(process, -FULL_24_BITS, FULL_24_BITS);                                                                                           \
+		DestinationBuffer[(Index * (DestinationIsDoubleBuffered ? 2 : 1)) + DestinationBufferOffset] = ((int32)process) << DestinationElementShiftBitCount;    \
 	}
+
+#define SCALE_NORMALIZED_DOUBLE_TO_INT16(SourceBuffer, Index, DestinationBuffer, DestinationIsDoubleBuffered, DestinationBufferOffset) \
+	SCALE_NORMALIZED_DOUBLE(SourceBuffer, Index, DestinationBuffer, DestinationIsDoubleBuffered, 0, DestinationBufferOffset)
+
+#define SCALE_NORMALIZED_DOUBLE_TO_INT32(SourceBuffer, Index, DestinationBuffer, DestinationIsDoubleBuffered, DestinationBufferOffset) \
+	SCALE_NORMALIZED_DOUBLE(SourceBuffer, Index, DestinationBuffer, DestinationIsDoubleBuffered, 8, DestinationBufferOffset)
 
 #endif
