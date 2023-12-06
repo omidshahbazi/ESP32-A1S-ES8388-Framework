@@ -1,14 +1,14 @@
 #pragma once
-#ifndef BAND_PASS_FILTER_H
-#define BAND_PASS_FILTER_H
+#ifndef BAND_STOP_FILTER_H
+#define BAND_STOP_FILTER_H
 
 #include "BiquadFilter.h"
 #include "../Math.h"
 
-class BandPassFilter : private BiquadFilter
+class BandStopFilter : private BiquadFilter
 {
 public:
-	BandPassFilter(uint32 SampleRate)
+	BandStopFilter(uint32 SampleRate)
 		: BiquadFilter(1),
 		  m_SampleRate(SampleRate),
 		  m_CenterFrequency(1),
@@ -29,6 +29,7 @@ public:
 
 		Update();
 	}
+
 	float GetCenterFrequency(void) const
 	{
 		return m_CenterFrequency;
@@ -56,7 +57,7 @@ public:
 private:
 	void Update(void)
 	{
-		BiquadFilter::SetBandPassFilterCoefficients(this, m_SampleRate, m_CenterFrequency, m_Bandwidth);
+		BiquadFilter::SetBandStopFilterCoefficients(this, m_SampleRate, m_CenterFrequency, m_Bandwidth);
 	}
 
 private:

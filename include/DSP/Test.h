@@ -3,7 +3,7 @@
 #define TEST_H
 
 #include "IDSP.h"
-#include "../Filters/BandPassFilter.h"
+#include "../Filters/ThreeToneControlFilter.h"
 #include <math.h>
 #include <stdio.h>
 #include <sstream>
@@ -12,15 +12,13 @@ class Test : public IDSP
 {
 public:
 	Test(uint32 SampleRate)
-		: m_Wave()
+		: m_Wave(SampleRate)
 	{
-		m_Wave.SetCenterFrequency(10000);
-		m_Wave.SetBandwidth(1000);
 	}
 
 	void SetValue(float Value)
 	{
-		// m_Wave.SetCenterFrequency(Math::Max(1, Value * MAX_FREQUENCY));
+		m_Wave.SetMidTone(Value);
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
@@ -30,7 +28,7 @@ public:
 	}
 
 private:
-	BandPassFilter m_Wave;
+	ThreeToneControlFilter m_Wave;
 };
 
 #endif

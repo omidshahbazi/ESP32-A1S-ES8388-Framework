@@ -8,19 +8,27 @@
 
 // https://en.wikipedia.org/wiki/Digital_biquad_filter#Direct_form_2
 // https://www.earlevel.com/main/2012/11/26/biquad-c-source-code/
+// https://music-dsp.music.columbia.narkive.com/YF4UlHAc/auto-wah-implementation#post6
 class BiquadFilter : public Filter
 {
 public:
 	struct Coefficients
 	{
-		double a0;
-		double a1;
-		double a2;
-		double b1;
-		double b2;
+		double a0; // Feedback (denominator) coefficient (pole)
+		double a1; // Feedback (denominator) coefficient (pole)
+		double a2; // Feedback (denominator) coefficient (pole)
+		double b1; // Feedforward (numerator) coefficient (zero)
+		double b2; // Feedforward (numerator) coefficient (zero)
 	};
 
 private:
+	struct Parameters
+	{
+		float quality;
+		float k;
+		float normalized;
+	};
+
 	struct Stage
 	{
 		Coefficients Coeffs;
@@ -49,9 +57,6 @@ public:
 
 		for (uint8 i = 0; i < m_StageCount; ++i)
 			m_Stages[i].Coeffs = Values[i];
-
-		// for (uint8 i = 0; i < m_StageCount; ++i)
-		// 	printf("Coeffs%i, a0: %f, a1: %f, a2: %f, b1: %f, b2: %f\n", i, Values[i].a0, Values[i].a1, Values[i].a2, Values[i].b1, Values[i].b2);
 	}
 
 	void Reset(void)
@@ -76,97 +81,111 @@ public:
 
 			Stage &stage = m_Stages[i];
 
-			Value = input * stage.Coeffs.a0 + stage.z1;
-			stage.z1 = input * stage.Coeffs.a1 + stage.z2 - stage.Coeffs.b1 * Value;
-			stage.z2 = input * stage.Coeffs.a2 - stage.Coeffs.b2 * Value;
+			Value = (input * stage.Coeffs.a0) + stage.z1;
+			stage.z1 = (input * stage.Coeffs.a1) + stage.z2 - (stage.Coeffs.b1 * Value);
+			stage.z2 = (input * stage.Coeffs.a2) - (stage.Coeffs.b2 * Value);
 		}
 
 		return Value;
 	}
 
 private:
-	uint8 m_StageCount;
-	Stage *m_Stages;
-
-private:
-	static double CalculateQFactor(uint32 SampleRate, float Frequency)
+	static Parameters GetParameters(uint32 SampleRate, float Frequency, float Bandwidth)
 	{
-		return 1 / (2 * cosf(Math::TWO_PI_VALUE * Frequency / SampleRate));
+		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
+		ASSERT(MIN_FREQUENCY <= Frequency && Frequency <= MAX_FREQUENCY, "Invalid Frequency");
+		ASSERT(MIN_FREQUENCY <= Bandwidth && Bandwidth <= MAX_FREQUENCY, "Invalid Bandwidth");
+
+		Parameters params;
+
+		params.quality = Frequency / Bandwidth;
+		params.k = tan(Math::PI_VALUE * Frequency / SampleRate);
+		params.normalized = 1 / (1 + (params.k / params.quality) + (params.k * params.k));
+
+		return params;
 	}
 
 public:
-	// Needs a 2nd Order BiquadFilter with 1 Stage
+	// Needs a 1 stage BiquadFilter
+	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
+	// CenterFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
+	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
+	static void SetLowPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth)
+	{
+		ASSERT(Filter != nullptr, "Filter cannot be null");
+
+		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth);
+
+		Coefficients coeffs;
+		coeffs.a0 = params.k * params.k * params.normalized;
+		coeffs.a1 = 2 * coeffs.a0;
+		coeffs.a2 = coeffs.a0;
+		coeffs.b1 = 2 * ((params.k * params.k) - 1) * params.normalized;
+		coeffs.b2 = (1 - (params.k / params.quality) + (params.k * params.k)) * params.normalized;
+
+		Filter->SetCoefficients(&coeffs);
+	}
+
+	// Needs a 1 stage BiquadFilter
+	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
+	// CenterFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
+	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
+	static void SetHighPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth)
+	{
+		ASSERT(Filter != nullptr, "Filter cannot be null");
+
+		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth);
+
+		Coefficients coeffs;
+		coeffs.a0 = params.normalized;
+		coeffs.a1 = -2 * coeffs.a0;
+		coeffs.a2 = coeffs.a0;
+		coeffs.b1 = 2 * ((params.k * params.k) - 1) * params.normalized;
+		coeffs.b2 = (1 - (params.k / params.quality) + (params.k * params.k)) * params.normalized;
+
+		Filter->SetCoefficients(&coeffs);
+	}
+
+	// Needs a 1 stage BiquadFilter
 	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
 	// CenterFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
 	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
 	static void SetBandPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth)
 	{
 		ASSERT(Filter != nullptr, "Filter cannot be null");
-		ASSERT(MIN_FREQUENCY <= CenterFrequency && CenterFrequency <= MAX_FREQUENCY, "Invalid CenterFrequency");
-		ASSERT(MIN_FREQUENCY <= Bandwidth && Bandwidth <= MAX_FREQUENCY, "Invalid Bandwidth");
 
-		const float q = CenterFrequency / Bandwidth;
-		const float k = tan(Math::PI_VALUE * CenterFrequency / SampleRate);
-		const float normalized = 1 / (1 + k / q + k * k);
+		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth);
 
 		Coefficients coeffs;
-		coeffs.a0 = k / q * normalized;
+		coeffs.a0 = (params.k / params.quality) * params.normalized;
 		coeffs.a1 = 0;
 		coeffs.a2 = -coeffs.a0;
-		coeffs.b1 = 2 * (k * k - 1) * normalized;
-		coeffs.b2 = (1 - k / q + k * k) * normalized;
-
-		// printf("CenterFrequency: %f, Bandwidth: %f, q: %f, k: %f, normalized: %f\n", CenterFrequency, Bandwidth, q, k, normalized);
+		coeffs.b1 = 2 * ((params.k * params.k) - 1) * params.normalized;
+		coeffs.b2 = (1 - (params.k / params.quality) + (params.k * params.k)) * params.normalized;
 
 		Filter->SetCoefficients(&coeffs);
 	}
 
-	// Needs a 4th Order BiquadFilter with 2 Stages
+	// Needs a 1 stage BiquadFilter
 	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
-	// CutoffFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
-	static void SetNoiseGateCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CutoffFrequency)
+	// CenterFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
+	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
+	static void SetBandStopFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth)
 	{
-		ASSERT(Filter != nullptr, "Filter cannot be null");
-		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
-		ASSERT(MIN_FREQUENCY <= CutoffFrequency && CutoffFrequency <= MAX_FREQUENCY, "Invalid CutoffFrequency");
+		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth);
 
-		// double w0 = Math::TWO_PI_VALUE * CutoffFrequency / SampleRate;
+		Coefficients coeffs;
+		coeffs.a0 = (1 + (params.k * params.k)) * params.normalized;
+		coeffs.a1 = 2 * ((params.k * params.k) - 1) * params.normalized;
+		coeffs.a2 = coeffs.a0;
+		coeffs.b1 = coeffs.a1;
+		coeffs.b2 = (1 - (params.k / params.quality) + (params.k * params.k)) * params.normalized;
 
-		// double cosw0 = cosf(w0);
-		// double alpha = sinf(w0 / 2);
-
-		// Coefficients coeffs[2];
-		// {
-		// 	coeffs[0].a1 = -2 * cosw0;
-		// 	coeffs[0].a2 = 1 - alpha;
-		// 	coeffs[0].b0 = (1 - cosw0) / 2;
-		// 	coeffs[0].b1 = 1 - cosw0;
-		// 	coeffs[0].b2 = (1 - cosw0) / 2;
-		// }
-		// {
-		// 	coeffs[1].a1 = coeffs[0].a1;
-		// 	coeffs[1].a2 = coeffs[0].a2;
-		// 	coeffs[1].b0 = coeffs[0].b0;
-		// 	coeffs[1].b1 = -cosw0;
-		// 	coeffs[1].b2 = coeffs[0].b2;
-		// }
-
-		// // 4th order 20Hz lpf (44.1KHz)
-		// // {
-		// // coeffs[0].a1 = 1.9947405124091158;
-		// // coeffs[0].a2 = -0.9947486108316238;
-		// // coeffs[0].b0 = 0.000002152381733479521;
-		// // coeffs[0].b1 = 0.000004304763466959042;
-		// // coeffs[0].b2 = 0.000002152381733479521;
-
-		// // coeffs[1].a1 = 1.997813341671618;
-		// // coeffs[1].a2 = -0.9978214525694677;
-		// // coeffs[1].b0 = 0.0000019073486328125;
-		// // coeffs[1].b1 = 0.000003814697265625;
-		// // coeffs[1].b2 = 0.0000019073486328125;
-		// // }
-
-		// Filter->SetCoefficients(coeffs);
+		Filter->SetCoefficients(&coeffs);
 	}
+
+private:
+	uint8 m_StageCount;
+	Stage *m_Stages;
 };
 #endif

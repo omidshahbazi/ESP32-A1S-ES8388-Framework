@@ -10,7 +10,7 @@ class Reverb : public IDSP
 {
 public:
 	Reverb(uint32 SampleRate)
-		: m_SampleRate(0),
+		: m_SampleRate(SampleRate),
 		  m_DelayTime(0),
 		  m_Feedback(0),
 		  m_DelayBuffer(nullptr),

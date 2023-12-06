@@ -3,6 +3,7 @@
 #define Math_H
 
 #include <cmath>
+#include <type_traits>
 
 class Math
 {
@@ -34,6 +35,8 @@ public:
 	template <typename T, typename U, typename V>
 	static T Lerp(T Min, U Max, V Time)
 	{
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
+
 		Time = Clamp01(Time);
 
 		return (Min * (1 - Time)) + (Max * Time);

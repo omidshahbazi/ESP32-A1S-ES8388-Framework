@@ -9,7 +9,7 @@ class LowPassFilter : public Filter
 {
 public:
 	LowPassFilter(uint32 SampleRate)
-		: m_SampleRate(0),
+		: m_SampleRate(SampleRate),
 		  m_DeltaTime(1),
 		  m_CutoffFrequency(0),
 		  m_Alpha(0),

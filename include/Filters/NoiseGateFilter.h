@@ -2,20 +2,21 @@
 #ifndef NOISE_GATE_FILTER_H
 #define NOISE_GATE_FILTER_H
 
-#include "BiquadFilter.h"
+#include "BandStopFilter.h"
 #include "../Math.h"
 
-class NoiseGateFilter : private BiquadFilter
+class NoiseGateFilter : private BandStopFilter
 {
 public:
 	NoiseGateFilter(uint32 SampleRate)
-		: BiquadFilter(2),
+		: BandStopFilter(SampleRate),
 		  m_LowerThreshold(0),
 		  m_UpperThreshold(0)
 	{
 		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
-		BiquadFilter::SetNoiseGateCoefficients(this, SampleRate, CUTOFF_FREQUENCY);
+		SetCenterFrequency(CUTOFF_FREQUENCY);
+		SetCenterFrequency(1000);
 
 		SetThreshold(0);
 	}
@@ -39,7 +40,7 @@ public:
 
 	double Process(double Value) override
 	{
-		float envelope = 1.4142 * BiquadFilter::Process(fabsf(Value));
+		float envelope = 1.4142 * BandStopFilter::Process(fabsf(Value));
 
 		// detecting the gate and expansion area
 		if (envelope < m_LowerThreshold)

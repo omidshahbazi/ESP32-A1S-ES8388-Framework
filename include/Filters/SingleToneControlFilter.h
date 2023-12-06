@@ -1,16 +1,16 @@
 #pragma once
-#ifndef TONE_CONTROL_H
-#define TONE_CONTROL_H
+#ifndef SINGLE_TONE_CONTROL_FILTER_H
+#define SINGLE_TONE_CONTROL_FILTER_H
 
 #include "../Math.h"
 #include "../Debug.h"
 #include "LowPassFilter.h"
 #include "HighPassFilter.h"
 
-class ToneControlFilter : public Wave
+class SingleToneControlFilter : public Filter
 {
 public:
-	ToneControl(uint32 SampleRate)
+	SingleToneControlFilter(uint32 SampleRate)
 		: m_LowPassFilter(SampleRate),
 		  m_HighPassFilter(SampleRate),
 		  m_Tone(1)

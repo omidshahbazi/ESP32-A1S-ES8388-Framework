@@ -99,7 +99,7 @@ private:
 		uint32 indexDelayed = (m_DelayBufferIndex + index) % m_DelayBufferLength;
 		uint32 indexNext = (indexDelayed + 1) % m_DelayBufferLength;
 
-		return Math::Lerp(m_DelayBuffer[indexDelayed], m_DelayBuffer[indexNext], fraction) / MAX_BUFFER_ELEMENT_COEFF;
+		return Math::Lerp((double)m_DelayBuffer[indexDelayed], m_DelayBuffer[indexNext], fraction) / MAX_BUFFER_ELEMENT_COEFF;
 	}
 
 private:

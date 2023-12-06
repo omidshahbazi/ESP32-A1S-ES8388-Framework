@@ -9,8 +9,11 @@
 class AutoWah : public IDSP
 {
 public:
-	AutoWah(void)
+	AutoWah(uint32 SampleRate)
+		: m_BandPassFilter(SampleRate)
 	{
+		m_BandPassFilter.SetCenterFrequency(2000);
+		m_BandPassFilter.SetBandwidth(2325);
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
@@ -44,7 +47,7 @@ public:
 
 private:
 	BandPassFilter m_BandPassFilter;
-	double m_MinFrequency = 200.0; // Adjust these values as needed
+	double m_MinFrequency = 1000.0; // Adjust these values as needed
 	double m_MaxFrequency = 2000.0;
 };
 #endif

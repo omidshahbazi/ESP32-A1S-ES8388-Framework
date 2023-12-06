@@ -11,7 +11,7 @@ class Tremolo : public IDSP
 
 public:
 	Tremolo(uint32 SampleRate)
-		: m_SampleRate(0),
+		: m_SampleRate(SampleRate),
 		  m_Depth(0),
 		  m_Rate(0),
 		  m_DeltaPhase(0),
