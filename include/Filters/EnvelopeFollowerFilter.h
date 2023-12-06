@@ -22,11 +22,6 @@ public:
 		m_Release = pow(0.01, 1 / (ReleaseTime * SampleRate));
 	}
 
-	double GetEnvelope(void) const
-	{
-		return m_Envelope;
-	}
-
 	double Process(double Value) override
 	{
 		double absValue = fabs(Value);
@@ -35,6 +30,8 @@ public:
 			m_Envelope = m_Attack * (m_Envelope - absValue) + absValue;
 		else
 			m_Envelope = m_Release * (m_Envelope - absValue) + absValue;
+
+		return m_Envelope;
 	}
 
 protected:
