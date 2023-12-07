@@ -25,6 +25,6 @@
 	} while (false)
 #endif
 
-#define CHECK_CALL(Expression) ASSERT(Expression, "CHECK_CALL", "Call Failed: %s", #Expression)
+#define CHECK_CALL(Expression) ASSERT(Expression, "CHECK_CALL", "Calling %s Failed", #Expression)
 
 #endif
