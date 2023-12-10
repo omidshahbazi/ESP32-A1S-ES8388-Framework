@@ -19,7 +19,7 @@ private:
 	};
 
 public:
-	static void Create(EntrypointType &&Entrypoint, uint32 StackSize, const char *Name = nullptr, uint8 CoreID = 1, uint8 Priority = 1)
+	static void Create(EntrypointType &&Entrypoint, uint32 StackSize, const char *Name = nullptr, uint8 CoreID = 0, uint8 Priority = 1)
 	{
 		if (Name == nullptr)
 			Name = "Unknown";

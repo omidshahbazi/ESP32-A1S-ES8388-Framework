@@ -42,7 +42,7 @@ public:
 	double CalculateEnvelope(double inputSample)
 	{
 		// Simple envelope follower: absolute value of the input sample
-		return std::abs(inputSample);
+		return fabs(inputSample);
 	}
 
 private:

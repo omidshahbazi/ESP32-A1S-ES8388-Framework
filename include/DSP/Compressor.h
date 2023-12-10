@@ -4,7 +4,6 @@
 
 #include "IDSP.h"
 
-// TODO: Finalize this
 class Compressor : public IDSP
 {
 private:

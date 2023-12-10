@@ -6,7 +6,6 @@
 
 #include "IDSP.h"
 
-// TODO: Finalize between this and the bottom one
 class Sustain : public IDSP
 {
 public:

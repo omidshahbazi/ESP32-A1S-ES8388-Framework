@@ -18,13 +18,13 @@
 		esp_restart();                                                                                          \
 	} while (false)
 #else
-#define ASSERT(Expression, Tag, Message, ...) \
-	do                                        \
-	{                                         \
-		Expression;                           \
+#define ASSERT(Expression, Message, ...) \
+	do                                   \
+	{                                    \
+		Expression;                      \
 	} while (false)
 #endif
 
-#define CHECK_CALL(Expression) ASSERT(Expression, "CHECK_CALL", "Calling %s Failed", #Expression)
+#define CHECK_CALL(Expression) ASSERT(Expression, "CHECK_CALL", "CallFailed")
 
 #endif

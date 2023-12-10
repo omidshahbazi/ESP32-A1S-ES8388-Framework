@@ -4,6 +4,7 @@
 
 #include "IDSP.h"
 #include "../Math.h"
+#include "../Filters/HighPassFilter.h"
 #include "../Debug.h"
 
 class Overdrive : public IDSP
@@ -13,6 +14,8 @@ public:
 		: m_Drive(0)
 	{
 		SetDrive(1);
+
+		m_HighPassFilter.SetCutoffFrequency(20);
 	}
 
 	//[0, 1]
@@ -30,11 +33,18 @@ public:
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
-			Buffer[i] = tanh(Buffer[i] * (2 + (m_Drive * 50)));
+		{
+			double value = tanh(Buffer[i] * (2 + (m_Drive * 50)));
+
+			value = m_HighPassFilter.Process(value);
+
+			Buffer[i] = value;
+		}
 	}
 
 private:
 	float m_Drive;
+	HighPassFilter m_HighPassFilter;
 };
 
 #endif

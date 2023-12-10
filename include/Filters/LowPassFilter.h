@@ -10,13 +10,14 @@ class LowPassFilter : public Filter
 public:
 	LowPassFilter(uint32 SampleRate)
 		: m_SampleRate(SampleRate),
-		  m_DeltaTime(1),
+		  m_DeltaTime(0),
 		  m_CutoffFrequency(0),
 		  m_Alpha(0),
 		  m_CapacitorVoltage(0)
 	{
 		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
+		SetDeltaTime(1);
 		SetCutoffFrequency(MAX_CUTOFF_FREQUENCY);
 	}
 
