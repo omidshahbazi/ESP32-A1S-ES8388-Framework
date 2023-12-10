@@ -9,7 +9,7 @@
 class EnvelopeFollowerFilter : public Filter
 {
 public:
-	EnvelopeFollower(uint32 SampleRate, double AttackTime, double ReleaseTime)
+	EnvelopeFollowerFilter(uint32 SampleRate, double AttackTime, double ReleaseTime)
 		: m_Attack(0),
 		  m_Release(0),
 		  m_Envelope(0)
