@@ -16,8 +16,7 @@ public:
 	{
 		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
-		SetBandwidth(2000);
-		SetCenterFrequency(100);
+		SetFrequencies(1950, 2050);
 	}
 
 	//[MIN_FREQUENCY, MAX_FREQUENCY]
@@ -47,6 +46,18 @@ public:
 	float GetBandwidth(void) const
 	{
 		return m_Bandwidth;
+	}
+
+	//[MIN_FREQUENCY, MAX_FREQUENCY]
+	void SetFrequencies(float Min, float Max)
+	{
+		ASSERT(MIN_FREQUENCY <= Min && Min <= MAX_FREQUENCY, "Invalid Min");
+		ASSERT(MIN_FREQUENCY <= Max && Max <= MAX_FREQUENCY, "Invalid Max");
+
+		m_Bandwidth = Max - Min;
+		m_CenterFrequency = m_Bandwidth / 2;
+
+		Update();
 	}
 
 	double Process(double Value) override

@@ -14,8 +14,7 @@ public:
 	Wah(uint32 SampleRate)
 		: m_BandPassFilter(SampleRate)
 	{
-		m_BandPassFilter.SetCenterFrequency(2000);
-		m_BandPassFilter.SetBandwidth(2325);
+		m_BandPassFilter.SetFrequencies(175, 2500);
 		m_EnvelopePos = 0.0f;
 		m_EnvelopeDirection = 1;
 	}

@@ -12,8 +12,7 @@ public:
 	AutoWah(uint32 SampleRate)
 		: m_BandPassFilter(SampleRate)
 	{
-		m_BandPassFilter.SetCenterFrequency(2000);
-		m_BandPassFilter.SetBandwidth(2325);
+		m_BandPassFilter.SetFrequencies(175, 2500);
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override

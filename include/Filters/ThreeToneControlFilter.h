@@ -4,33 +4,30 @@
 
 #include "../Math.h"
 #include "../Debug.h"
+#include "LowPassFilter.h"
 #include "BandPassFilter.h"
+#include "HighPassFilter.h"
 
 class ThreeToneControlFilter : public Filter
 {
 public:
 	ThreeToneControlFilter(uint32 SampleRate)
-		: m_LowTone(1),
-		  m_MidTone(1),
-		  m_HighTone(1),
-		  m_LowRangeBandPassFilter(SampleRate),
-		  m_MidRangeBandPassFilter(SampleRate),
-		  m_HighRangeBandPassFilter(SampleRate)
+		: m_LowTone(0),
+		  m_MidTone(0),
+		  m_HighTone(0),
+		  m_LowPassFilter(SampleRate),
+		  m_BandPassFilter(SampleRate),
+		  m_HighPassFilter(SampleRate)
 	{
-		m_LowRangeBandPassFilter.SetCenterFrequency(150);
-		m_LowRangeBandPassFilter.SetBandwidth(300);
-
-		m_MidRangeBandPassFilter.SetCenterFrequency(1850);
-		m_MidRangeBandPassFilter.SetBandwidth(3700);
-
-		m_HighRangeBandPassFilter.SetCenterFrequency(8077.25);
-		m_HighRangeBandPassFilter.SetBandwidth(16154.5);
+		m_LowPassFilter.SetCenterFrequency(100);
+		m_BandPassFilter.SetFrequencies(100, 5000);
+		m_HighPassFilter.SetCenterFrequency(5000);
 	}
 
-	//[0, 1]
+	//[-20dB, 0dB]
 	void SetLowTone(float Value)
 	{
-		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+		ASSERT(-20 <= Value && Value <= 0, "Invalid Value");
 
 		m_LowTone = Value;
 	}
@@ -39,10 +36,10 @@ public:
 		return m_LowTone;
 	}
 
-	//[0, 1]
+	//[-20dB, 0dB]
 	void SetMidTone(float Value)
 	{
-		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+		ASSERT(-20 <= Value && Value <= 0, "Invalid Value");
 
 		m_MidTone = Value;
 	}
@@ -51,10 +48,10 @@ public:
 		return m_MidTone;
 	}
 
-	//[0, 1]
+	//[-20dB, 0dB]
 	void SetHighTone(float Value)
 	{
-		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+		ASSERT(-20 <= Value && Value <= 0, "Invalid Value");
 
 		m_HighTone = Value;
 	}
@@ -65,9 +62,9 @@ public:
 
 	double Process(double Value) override
 	{
-		return Math::Lerp(0.0, m_LowRangeBandPassFilter.Process(Value), m_LowTone) +
-			   Math::Lerp(0.0, m_MidRangeBandPassFilter.Process(Value), m_MidTone) +
-			   Math::Lerp(0.0, m_HighRangeBandPassFilter.Process(Value), m_HighTone);
+		return (m_LowRangeBandPassFilter.Process(Value) * pow(10, m_LowTone / 20)) +
+			   (m_MidRangeBandPassFilter.Process(Value) * pow(10, m_MidTone / 20)) +
+			   (m_HighRangeBandPassFilter.Process(Value) * pow(10, m_HighTone / 20));
 	}
 
 private:
@@ -75,8 +72,8 @@ private:
 	float m_MidTone;
 	float m_HighTone;
 
-	BandPassFilter m_LowRangeBandPassFilter;
-	BandPassFilter m_MidRangeBandPassFilter;
-	BandPassFilter m_HighRangeBandPassFilter;
+	LowPassFilter m_LowPassFilter;
+	BandPassFilter m_BandPassFilter;
+	HighPassFilter m_HighPassFilter;
 };
 #endif
