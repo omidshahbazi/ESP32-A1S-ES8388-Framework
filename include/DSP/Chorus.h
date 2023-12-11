@@ -115,6 +115,8 @@ private:
 	double m_CurrentPhase;
 
 	static constexpr double MAX_BUFFER_ELEMENT_COEFF = 32767.0;
+
+public:
 	static constexpr float MAX_DELAY_TIME = 1;
 };
 

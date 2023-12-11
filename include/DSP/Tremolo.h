@@ -35,10 +35,10 @@ public:
 		return m_Depth;
 	}
 
-	//[MIN_FREQUENCY, MAX_FREQUENCY]
+	//[0, 1]
 	void SetRate(float Value)
 	{
-		ASSERT(MIN_FREQUENCY <= Value && Value <= MAX_FREQUENCY, "Invalid Value");
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
 		m_Rate = Value;
 
@@ -67,7 +67,7 @@ public:
 private:
 	void Update(void)
 	{
-		m_DeltaPhase = Math::TWO_PI_VALUE * m_Rate / m_SampleRate;
+		m_DeltaPhase = Math::TWO_PI_VALUE * Math::Lerp(MIN_FREQUENCY, MAX_FREQUENCY, m_Rate) / m_SampleRate;
 	}
 
 private:

@@ -30,7 +30,7 @@ public:
 		Memory::Deallocate(m_DelayBuffer);
 	}
 
-	//[0, 1]
+	//[0, MAX_DELAY_TIME]
 	void SetDelayTime(float Value)
 	{
 		ASSERT(0 <= Value && Value <= MAX_DELAY_TIME, "Invalid Value");
@@ -80,6 +80,8 @@ private:
 	uint16 m_DelayBufferIndex;
 
 	static constexpr double MAX_BUFFER_ELEMENT_COEFF = 32767.0;
+
+public:
 	static constexpr float MAX_DELAY_TIME = 1;
 };
 

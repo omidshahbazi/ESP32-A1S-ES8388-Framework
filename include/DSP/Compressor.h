@@ -6,35 +6,49 @@
 
 class Compressor : public IDSP
 {
-private:
-	double threshold; // Threshold for compression
-	double ratio;	  // Compression ratio
-
 public:
-	Compressor(uint32 SampleRate, double Threshold = -0.9, double Ratio = 2.0)
-		: threshold(Threshold), ratio(Ratio)
+	Compressor(voide)
 	{
-		// Initialize your compressor with necessary parameters
+		SetThreshold(-0.9);
+		SetRatio(2);
+	}
+
+	//[0, 1]
+	void SetThreshold(float Value)
+	{
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+
+		m_Threshold = Value;
+	}
+	float GetThreshold(void)
+	{
+		return m_Threshold;
+	}
+
+	//[0, 1]
+	void SetRatio(float Value)
+	{
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+
+		m_Ratio = Value;
+	}
+	float GetRatio(void)
+	{
+		return m_Ratio;
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
 		{
-			// Apply compression to each sample in the buffer
-			double input = Buffer[i];
-
-			// Apply compression algorithm
-			if (input > threshold)
-			{
-				double gainReduction = (input - threshold) / ratio;
-				Buffer[i] = threshold + gainReduction;
-			}
-			// No compression applied if input is below the threshold
-
-			// You can add makeup gain here if needed
+			if (input > m_Threshold)
+				Buffer[i] = (m_Threshold - 1) + (Buffer[i] - (m_Threshold - 1) / (m_Ratio - 1));
 		}
 	}
+
+private:
+	float m_Threshold;
+	float m_Ratio;
 };
 
 #endif
