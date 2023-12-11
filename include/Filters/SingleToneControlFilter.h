@@ -3,7 +3,6 @@
 #define SINGLE_TONE_CONTROL_FILTER_H
 
 #include "../Math.h"
-#include "../Debug.h"
 #include "LowPassFilter.h"
 #include "HighPassFilter.h"
 

@@ -5,6 +5,7 @@
 #include "Filter.h"
 #include "../Math.h"
 #include "../Memory.h"
+#include "../Debug.h"
 
 // https://en.wikipedia.org/wiki/Digital_biquad_filter#Direct_form_2
 // https://www.earlevel.com/main/2012/11/26/biquad-c-source-code/

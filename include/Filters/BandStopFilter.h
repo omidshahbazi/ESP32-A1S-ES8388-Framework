@@ -4,6 +4,7 @@
 
 #include "BiquadFilter.h"
 #include "../Math.h"
+#include "../Debug.h"
 
 class BandStopFilter : private BiquadFilter
 {

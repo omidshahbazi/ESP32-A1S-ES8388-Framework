@@ -54,6 +54,12 @@ public:
 		return (A > B ? A : B);
 	}
 
+	template <typename T>
+	static int8 Sign(T Value)
+	{
+		return (0 < Value) - (Value < 0);
+	}
+
 	// Ranges from 0 to 255
 	template <typename T, typename U>
 	static T TableLookupLinear(const U *Table, T Value)

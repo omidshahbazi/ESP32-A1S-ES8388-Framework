@@ -3,7 +3,6 @@
 #define THREE_TONE_CONTROL_FILTER_H
 
 #include "../Math.h"
-#include "../Debug.h"
 #include "LowPassFilter.h"
 #include "BandPassFilter.h"
 #include "HighPassFilter.h"

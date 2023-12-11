@@ -4,6 +4,7 @@
 
 #include "EnvelopeFollowerFilter.h"
 #include "../Math.h"
+#include "../Debug.h"
 
 class NoiseGateFilter : private EnvelopeFollowerFilter
 {
@@ -33,8 +34,8 @@ public:
 
 		if (envelope < m_Threshold)
 		{
-			// Calculate a gain factor based on the envelope level
 			double gainFactor = 1 - (envelope / m_Threshold);
+			// double gainFactor = Math::Clamp01(1.0 - ((envelope - m_Threshold) / (1 - m_Threshold)));
 
 			Value *= gainFactor;
 		}

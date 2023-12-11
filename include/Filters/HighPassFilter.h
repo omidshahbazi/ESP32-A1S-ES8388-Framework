@@ -4,6 +4,7 @@
 
 #include "Filter.h"
 #include "../Math.h"
+#include "../Debug.h"
 
 class HighPassFilter : public Filter
 {

@@ -3,6 +3,7 @@
 #define WAH_H
 
 #include "IDSP.h"
+#include "../Filters/EnvelopeFollowerFilter.h"
 #include "../Filters/BandPassFilter.h"
 
 // Cry-Baby 175Hz - 2500Hz 7.9
@@ -12,11 +13,10 @@ class Wah : public IDSP
 {
 public:
 	Wah(uint32 SampleRate)
-		: m_BandPassFilter(SampleRate)
+		: m_EnvelopeFollowerFilter(SampleRate, 0.005, 0.02),
+		  m_BandPassFilter(SampleRate)
 	{
 		m_BandPassFilter.SetFrequencies(175, 2500);
-		m_EnvelopePos = 0.0f;
-		m_EnvelopeDirection = 1;
 	}
 
 	void SetFrequency(float Value)
@@ -54,13 +54,11 @@ public:
 	}
 
 private:
+	EnvelopeFollowerFilter m_EnvelopeFollowerFilter;
 	BandPassFilter m_BandPassFilter;
-	float m_EnvelopePos;
-	int m_EnvelopeDirection;
 	float m_Frequency;
 	uint32 m_SampleRate;
 	float m_Step;
-	float m_Phase;
 };
 
 #endif
