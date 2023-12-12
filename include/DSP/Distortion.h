@@ -30,7 +30,7 @@ public:
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
-			Buffer[i] = Math::ExponentialSaturation(Buffer[i], m_Rate + 1);
+			Buffer[i] = Math::ExponentialSaturation(Buffer[i], m_Rate);
 	}
 
 private:
