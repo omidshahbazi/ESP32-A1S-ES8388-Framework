@@ -60,6 +60,46 @@ public:
 		return (0 < Value) - (Value < 0);
 	}
 
+	template <typename T>
+	static T SoftClip(T Value, float Factor)
+	{
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
+
+		return atan(Value * Factor) * Factor;
+	}
+
+	template <typename T>
+	static T HardClip(T Value, float Factor)
+	{
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
+
+		return (abs(Value) > Factor ? Sign(Value) : Value);
+	}
+
+	template <typename T>
+	static T ExponentialSaturation(T Value, float Factor)
+	{
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
+
+		return exp(Factor * 4.6 * fabs(Value)) * Math::Sign(Value) * 0.01;
+	}
+
+	template <typename T>
+	static T AsymmetricSineSaturation(T Value, float Factor)
+	{
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
+
+		return sin(Value * HALF_PI_VALUE) * Factor;
+	}
+
+	template <typename T>
+	static T FoldbackDistortion(T Value, float Factor)
+	{
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
+
+		return (abs(Value) > Factor ? Value : -1);
+	}
+
 	// Ranges from 0 to 255
 	template <typename T, typename U>
 	static T TableLookupLinear(const U *Table, T Value)
@@ -71,6 +111,7 @@ public:
 
 public:
 	static constexpr double PI_VALUE = 3.14159265;
+	static constexpr double HALF_PI_VALUE = PI_VALUE / 2;
 	static constexpr double TWO_PI_VALUE = 2 * PI_VALUE;
 	static constexpr double EPSILON = 0.0001F;
 };

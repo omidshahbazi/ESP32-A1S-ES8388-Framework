@@ -25,7 +25,7 @@ public:
 			double envelope = m_EnvelopeFollowerFilter.Process(Buffer[i]);
 
 			// Adjust the filter frequency based on the envelope
-			double filterFrequency = Math::Lerp(m175, 2500, envelope);
+			double filterFrequency = Math::Lerp(.0, 2500, envelope);
 			m_BandPassFilter.SetCenterFrequency(filterFrequency);
 
 			// Process the input sample through the bandpass filter
