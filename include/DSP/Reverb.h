@@ -72,12 +72,12 @@ public:
 
 private:
 	uint32 m_SampleRate;
-	double m_DelayTime;
-	double m_Feedback;
+	float m_DelayTime;
+	float m_Feedback;
 
 	int16 *m_DelayBuffer;
 	uint32 m_DelayBufferLength;
-	uint16 m_DelayBufferIndex;
+	uint32 m_DelayBufferIndex;
 
 	static constexpr double MAX_BUFFER_ELEMENT_COEFF = 32767.0;
 
