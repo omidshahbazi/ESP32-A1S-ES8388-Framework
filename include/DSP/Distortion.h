@@ -1,40 +1,40 @@
 #pragma once
-#ifndef OVERDRIVE_H
-#define OVERDRIVE_H
+#ifndef DISTORTION_H
+#define DISTORTION_H
 
 #include "IDSP.h"
 #include "../Math.h"
 #include "../Debug.h"
 
-class Overdrive : public IDSP
+class Distortion : public IDSP
 {
 public:
-	Overdrive(void)
-		: m_Drive(0)
+	Distortion(void)
+		: m_Rate(0)
 	{
-		SetDrive(1);
+		SetRate(1);
 	}
 
 	//[0, 1]
-	void SetDrive(float Value)
+	void SetRate(float Value)
 	{
 		ASSERT(0 <= Value && Value <= 1, "Overdrive", "Invalid Value");
 
-		m_Drive = Value;
+		m_Rate = Value;
 	}
-	float GetDrive(void)
+	float GetRate(void)
 	{
-		return m_Drive;
+		return m_Rate;
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
-			Buffer[i] = Math::SoftClip(Buffer[i], m_Drive + 1);
+			Buffer[i] = Math::ExponentialSaturation(Buffer[i], m_Rate + 1);
 	}
 
 private:
-	float m_Drive;
+	float m_Rate;
 };
 
 #endif
