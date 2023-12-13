@@ -91,7 +91,7 @@ public:
 	}
 
 private:
-	static Parameters GetParameters(uint32 SampleRate, float Frequency, float Bandwidth)
+	static Parameters GetParameters(uint32 SampleRate, float Frequency, float Bandwidth, float Resonance = 1)
 	{
 		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 		ASSERT(MIN_FREQUENCY <= Frequency && Frequency <= MAX_FREQUENCY, "Invalid Frequency");
@@ -99,7 +99,7 @@ private:
 
 		Parameters params;
 
-		params.quality = Frequency / Bandwidth;
+		params.quality = Resonance * Frequency / Bandwidth;
 		params.k = tan(Math::PI_VALUE * Frequency / SampleRate);
 		params.normalized = 1 / (1 + (params.k / params.quality) + (params.k * params.k));
 
@@ -151,11 +151,11 @@ public:
 	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
 	// CenterFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
 	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
-	static void SetBandPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth)
+	static void SetBandPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth, float Resonance = 1)
 	{
 		ASSERT(Filter != nullptr, "Filter cannot be null");
 
-		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth);
+		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth, Resonance);
 
 		Coefficients coeffs;
 		coeffs.a0 = (params.k / params.quality) * params.normalized;

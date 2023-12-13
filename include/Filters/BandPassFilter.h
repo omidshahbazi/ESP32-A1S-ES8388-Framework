@@ -18,6 +18,7 @@ public:
 		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
 		SetFrequencies(1950, 2050);
+		SetResonance(1);
 	}
 
 	//[MIN_FREQUENCY, MAX_FREQUENCY]
@@ -48,6 +49,20 @@ public:
 		return m_Bandwidth;
 	}
 
+	//[1, 4000]
+	void SetResonance(float Value)
+	{
+		ASSERT(1 <= Value && Value <= 4000, "Invalid Value");
+
+		m_Resonance = Value;
+
+		Update();
+	}
+	float GetResonance(void) const
+	{
+		return m_Resonance;
+	}
+
 	//[MIN_FREQUENCY, MAX_FREQUENCY]
 	void SetFrequencies(float Min, float Max)
 	{
@@ -68,13 +83,14 @@ public:
 private:
 	void Update(void)
 	{
-		BiquadFilter::SetBandPassFilterCoefficients(this, m_SampleRate, m_CenterFrequency, m_Bandwidth);
+		BiquadFilter::SetBandPassFilterCoefficients(this, m_SampleRate, m_CenterFrequency, m_Bandwidth, m_Resonance);
 	}
 
 private:
 	uint32 m_SampleRate;
 	float m_CenterFrequency;
 	float m_Bandwidth;
+	float m_Resonance;
 };
 
 #endif
