@@ -49,20 +49,6 @@ public:
 		return m_Bandwidth;
 	}
 
-	//[1, 4000]
-	void SetResonance(float Value)
-	{
-		ASSERT(1 <= Value && Value <= 4000, "Invalid Value");
-
-		m_Resonance = Value;
-
-		Update();
-	}
-	float GetResonance(void) const
-	{
-		return m_Resonance;
-	}
-
 	//[MIN_FREQUENCY, MAX_FREQUENCY]
 	void SetFrequencies(float Min, float Max)
 	{
@@ -73,6 +59,20 @@ public:
 		m_CenterFrequency = m_Bandwidth / 2;
 
 		Update();
+	}
+
+	//(0, 4000]
+	void SetResonance(float Value)
+	{
+		ASSERT(0 < Value && Value <= 4000, "Invalid Value");
+
+		m_Resonance = Value;
+
+		Update();
+	}
+	float GetResonance(void) const
+	{
+		return m_Resonance;
 	}
 
 	double Process(double Value) override
