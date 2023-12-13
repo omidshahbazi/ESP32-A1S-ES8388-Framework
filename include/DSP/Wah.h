@@ -18,6 +18,11 @@ private:
 		float High;
 	};
 
+	const FrequencyRange FREQUENCY_RANGES[3] = {
+		{175, 2.5 * KHz, 7.9, 300, 1.5 * KHz}, // Cry Baby 175Hz - 2500Hz 7.9
+		{100, 5 * KHz, 9, 400, 4 * KHz},	   // Boutique 100Hz - 5000Hz 8-10
+		{20, 20 * KHz, 7.9, 500, 19 * KHz}};   // Full Range 20Hz - 20kHz 7.9
+
 public:
 	enum Types
 	{
@@ -66,18 +71,19 @@ public:
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
-			Buffer[i] = m_BandPassFilter.Process(Buffer[i]);
+			Buffer[i] = Process(Buffer[i]);
+	}
+
+protected:
+	double Process(double Value)
+	{
+		return m_BandPassFilter.Process(Value);
 	}
 
 private:
 	BandPassFilter m_BandPassFilter;
 	Types m_Type;
 	float m_Ratio;
-
-	const FrequencyRange FREQUENCY_RANGES[3] = {
-		{175, 2.5 * KHz, 7.9, 300, 1.5 * KHz}, // Cry Baby 175Hz - 2500Hz 7.9
-		{100, 5 * KHz, 9, 400, 4 * KHz},	   // Boutique 100Hz - 5000Hz 8-10
-		{20, 20 * KHz, 7.9, 500, 19 * KHz}};   // Full Range 20Hz - 20kHz 7.9
 };
 
 #endif
