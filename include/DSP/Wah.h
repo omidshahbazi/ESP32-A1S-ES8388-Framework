@@ -60,8 +60,8 @@ public:
 
 		const FrequencyRange &freqRange = FREQUENCY_RANGES[m_Type];
 
-		m_BandPassFilter.SetCenterFrequency(Math::Lerp(freqRange.Low, freqRange.High, Value));
-		m_BandPassFilter.SetResonance(Math::Lerp(freqRange.Resonance, freqRange.Resonance / 2, Value));
+		m_BandPassFilter.SetCenterFrequency(Math::Lerp(freqRange.Low, freqRange.High, m_Ratio));
+		m_BandPassFilter.SetResonance(Math::Lerp(freqRange.Resonance, freqRange.Resonance / 2, m_Ratio));
 	}
 	float GetRatio(void) const
 	{

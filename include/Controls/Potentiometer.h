@@ -18,7 +18,7 @@ public:
 		  //   m_Filter(1),
 		  m_Value(-1)
 	{
-		// BiquadFilter::SetLowPassFilterCoefficients(&m_Filter, 1000, 4, 1000);
+		// BiquadFilter::SetLowPassFilterCoefficients(&m_Filter, 1000, 4, 1000, 10);
 	}
 
 	float GetValue(void) const

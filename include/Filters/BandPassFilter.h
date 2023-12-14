@@ -13,7 +13,8 @@ public:
 		: BiquadFilter(1),
 		  m_SampleRate(SampleRate),
 		  m_CenterFrequency(1),
-		  m_Bandwidth(1)
+		  m_Bandwidth(1),
+		  m_Resonance(1)
 	{
 		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 

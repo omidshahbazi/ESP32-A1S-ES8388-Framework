@@ -61,9 +61,9 @@ public:
 
 	double Process(double Value) override
 	{
-		return (m_LowRangeBandPassFilter.Process(Value) * pow(10, m_LowTone / 20)) +
-			   (m_MidRangeBandPassFilter.Process(Value) * pow(10, m_MidTone / 20)) +
-			   (m_HighRangeBandPassFilter.Process(Value) * pow(10, m_HighTone / 20));
+		return (m_LowPassFilter.Process(Value) * pow(10, m_LowTone / 20)) +
+			   (m_BandPassFilter.Process(Value) * pow(10, m_MidTone / 20)) +
+			   (m_HighPassFilter.Process(Value) * pow(10, m_HighTone / 20));
 	}
 
 private:

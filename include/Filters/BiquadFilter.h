@@ -91,7 +91,7 @@ public:
 	}
 
 private:
-	static Parameters GetParameters(uint32 SampleRate, float Frequency, float Bandwidth, float Resonance = 1)
+	static Parameters GetParameters(uint32 SampleRate, float Frequency, float Bandwidth, float Resonance)
 	{
 		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 		ASSERT(MIN_FREQUENCY <= Frequency && Frequency <= MAX_FREQUENCY, "Invalid Frequency");
@@ -111,11 +111,11 @@ public:
 	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
 	// CenterFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
 	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
-	static void SetLowPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth)
+	static void SetLowPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth, float Resonance = 1)
 	{
 		ASSERT(Filter != nullptr, "Filter cannot be null");
 
-		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth);
+		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth, Resonance);
 
 		Coefficients coeffs;
 		coeffs.a0 = params.k * params.k * params.normalized;
@@ -131,11 +131,11 @@ public:
 	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
 	// CenterFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
 	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
-	static void SetHighPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth)
+	static void SetHighPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth, float Resonance = 1)
 	{
 		ASSERT(Filter != nullptr, "Filter cannot be null");
 
-		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth);
+		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth, Resonance);
 
 		Coefficients coeffs;
 		coeffs.a0 = params.normalized;
@@ -171,9 +171,9 @@ public:
 	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
 	// CenterFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
 	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
-	static void SetBandStopFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth)
+	static void SetBandStopFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth, float Resonance = 1)
 	{
-		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth);
+		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth, Resonance);
 
 		Coefficients coeffs;
 		coeffs.a0 = (1 + (params.k * params.k)) * params.normalized;
