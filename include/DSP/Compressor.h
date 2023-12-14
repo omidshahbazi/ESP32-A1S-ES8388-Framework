@@ -3,20 +3,21 @@
 #define COMPRESSOR_H
 
 #include "IDSP.h"
+#include "../Debug.h"
 
 class Compressor : public IDSP
 {
 public:
-	Compressor(voide)
+	Compressor(void)
 	{
 		SetThreshold(-0.9);
 		SetRatio(2);
 	}
 
-	//[0, 1]
+	//[-1, 1]
 	void SetThreshold(float Value)
 	{
-		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+		ASSERT(-1 <= Value && Value <= 1, "Invalid Value");
 
 		m_Threshold = Value;
 	}
@@ -25,10 +26,10 @@ public:
 		return m_Threshold;
 	}
 
-	//[0, 1]
+	//(0, 2]
 	void SetRatio(float Value)
 	{
-		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+		ASSERT(0 < Value && Value <= 2, "Invalid Value");
 
 		m_Ratio = Value;
 	}
@@ -41,8 +42,8 @@ public:
 	{
 		for (uint16 i = 0; i < Count; ++i)
 		{
-			if (input > m_Threshold)
-				Buffer[i] = (m_Threshold - 1) + (Buffer[i] - (m_Threshold - 1) / (m_Ratio - 1));
+			if (Buffer[i] > m_Threshold)
+				Buffer[i] = m_Threshold + (Buffer[i] - (m_Threshold / m_Ratio));
 		}
 	}
 

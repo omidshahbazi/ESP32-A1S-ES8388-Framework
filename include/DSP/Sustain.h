@@ -18,7 +18,7 @@ public:
 		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
 		m_BufferLength = MAX_DELAY_TIME * m_SampleRate;
-		m_Buffer = Memory::Allocate<int16>(m_BufferLength, true);
+		m_Buffer = Memory::Allocate<float>(m_BufferLength, true);
 
 		SetFeedback(1);
 	}
@@ -44,11 +44,11 @@ public:
 	{
 		for (uint16 i = 0; i < Count; ++i)
 		{
-			double delayedSample = m_Buffer[(m_BufferIndex + m_BufferLength / 2) % m_BufferLength] / MAX_BUFFER_ELEMENT_COEFF;
+			double delayedSample = m_Buffer[(m_BufferIndex + m_BufferLength / 2) % m_BufferLength];
 
 			double outputSample = Buffer[i] + m_Feedback * delayedSample;
 
-			m_Buffer[m_BufferIndex] = Buffer[i] * MAX_BUFFER_ELEMENT_COEFF;
+			m_Buffer[m_BufferIndex] = Buffer[i];
 			m_BufferIndex = (m_BufferIndex + 1) % m_BufferLength;
 
 			Buffer[i] = outputSample;
@@ -59,11 +59,10 @@ private:
 	uint32 m_SampleRate;
 	float m_Feedback;
 
-	int16 *m_Buffer;
+	float *m_Buffer;
 	uint32 m_BufferLength;
 	uint32 m_BufferIndex;
 
-	static constexpr double MAX_BUFFER_ELEMENT_COEFF = 32767.0;
 	static constexpr float MAX_DELAY_TIME = 1;
 };
 

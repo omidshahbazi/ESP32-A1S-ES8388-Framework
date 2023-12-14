@@ -17,11 +17,11 @@ typedef uint32_t uint32;
 #define MHz 1000 * KHz
 
 #define SAMPLE_RATE_8000 8 * KHz
-#define SAMPLE_RATE_8000 16 * KHz
 #define SAMPLE_RATE_15750 15.75 * KHz
+#define SAMPLE_RATE_16000 16 * KHz
 #define SAMPLE_RATE_22050 22.05 * KHz
-#define SAMPLE_RATE_22050 24 * KHz
-#define SAMPLE_RATE_22050 32 * KHz
+#define SAMPLE_RATE_24000 24 * KHz
+#define SAMPLE_RATE_32000 32 * KHz
 #define SAMPLE_RATE_44100 44.1 * KHz
 #define SAMPLE_RATE_48000 48 * KHz
 #define SAMPLE_RATE_96000 96 * KHz

@@ -19,8 +19,8 @@ public:
 	{
 		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
-		SetDepth(0.5F);
-		SetRate(5);
+		SetDepth(0.5);
+		SetRate(0.5);
 	}
 
 	//[0, 1]
@@ -42,7 +42,7 @@ public:
 
 		m_Rate = Value;
 
-		Update();
+		m_DeltaPhase = Math::TWO_PI_VALUE * Math::Lerp(MIN_FREQUENCY, MAX_FREQUENCY, m_Rate) / m_SampleRate;
 	}
 	float GetRate(void)
 	{
@@ -62,12 +62,6 @@ public:
 			if (m_Phase >= Math::TWO_PI_VALUE)
 				m_Phase -= Math::TWO_PI_VALUE;
 		}
-	}
-
-private:
-	void Update(void)
-	{
-		m_DeltaPhase = Math::TWO_PI_VALUE * Math::Lerp(MIN_FREQUENCY, MAX_FREQUENCY, m_Rate) / m_SampleRate;
 	}
 
 private:
