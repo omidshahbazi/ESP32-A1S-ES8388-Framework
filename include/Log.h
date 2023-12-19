@@ -36,7 +36,7 @@ public:
 			return;
 
 		const int16 SIZE = 512;
-		char buff[SIZE];
+		static char buff[SIZE];
 
 		int16 index = 0;
 

@@ -54,7 +54,7 @@ public:
 		LineR = (uint8)ES8388::InputModes::Right2, // LINEINR, MIC2N
 
 		Microphone1AndMicrophone2 = (uint8)ES8388::InputModes::Left1AndRight1, // MIC1P and MIC1N
-		LineLAndLineR = (uint8)ES8388::InputModes::Left2AndRight2,			   //(LINEINL, MIC2P) and (LINEINR, MIC2N)
+		LineLAndLineR = (uint8)ES8388::InputModes::Left2AndRight2,			   // (LINEINL, MIC2P) and (LINEINR, MIC2N)
 
 		Microphone1AndMicrophone2Differential = (uint8)ES8388::InputModes::Left1AndRight1Differential, // MIC1P - MIC1N
 		LineLAndLineRDifferential = (uint8)ES8388::InputModes::Left2AndRight2Differential			   // (LINEINL, MIC2P) - (LINEINR, MIC2N)
