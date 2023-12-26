@@ -30,7 +30,7 @@ public:
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
-			Buffer[i] = Math::SoftClip(Buffer[i], m_Drive + 1);
+			Buffer[i] = Math::SoftClip(Buffer[i], (1 + m_Drive) * 2.5);
 	}
 
 private:

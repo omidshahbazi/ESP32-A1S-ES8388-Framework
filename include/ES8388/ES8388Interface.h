@@ -89,7 +89,7 @@ public:
 public:
 	static bool TurnOn(bool MasterMode, MiddleVoltageResistances MiddleVoltageResistance)
 	{
-		Log::WriteInfo(TAG, "Turning On");
+		Log::WriteDebug(TAG, "Turning On");
 
 		CHECK_CALL(SetADCEnabled(true));
 		CHECK_CALL(SetDACEnabled(true));
@@ -113,7 +113,7 @@ public:
 
 	static bool TurnOff(void)
 	{
-		Log::WriteInfo(TAG, "Turning Off");
+		Log::WriteDebug(TAG, "Turning Off");
 
 		SetADCEnabled(false);
 		SetDACEnabled(false);
@@ -126,7 +126,7 @@ public:
 	// This needs to act based on the initial Configs, i.e. it shouldn't turn on/off all of the Outputs regarless of the initial Configs
 	//  static bool Standby(void)
 	//  {
-	//  	Log::WriteInfo(TAG, "Standing by");
+	//  	Log::WriteDebug(TAG, "Standing by");
 
 	// 	CHECK_CALL(SetInputMute(true));
 	// 	CHECK_CALL(SetOutputMute(true));
@@ -143,7 +143,7 @@ public:
 	// This needs to act based on the initial Configs, i.e. it shouldn't turn on/off all of the Outputs regarless of the initial Configs
 	//  static bool Resume(void)
 	//  {
-	//  	Log::WriteInfo(TAG, "Resuming");
+	//  	Log::WriteDebug(TAG, "Resuming");
 
 	// 	CHECK_CALL(SetADCPowered(true, InputModes::BothDifferential));
 	// 	CHECK_CALL(SetDACPowered(true, OutputModes::All, OutputResistances::R1K5));
@@ -159,15 +159,15 @@ public:
 
 	static bool SetADCPowered(bool Powered, InputModes InputMode, MonoMixModes MonoMixMode)
 	{
-		Log::WriteInfo(TAG, "Setting ADC Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Left1 and Right1 Diffrential: %i, Left2 and Right2 Diffrential: %i, Mono Mix to Left: %i, Mono Mix to Right: %i", Powered,
-					   Bitwise::IsEnabled(InputMode, InputModes::Left1),
-					   Bitwise::IsEnabled(InputMode, InputModes::Right1),
-					   Bitwise::IsEnabled(InputMode, InputModes::Left2),
-					   Bitwise::IsEnabled(InputMode, InputModes::Right2),
-					   Bitwise::IsEnabled(InputMode, InputModes::Left1AndRight1Differential),
-					   Bitwise::IsEnabled(InputMode, InputModes::Left2AndRight2Differential),
-					   Bitwise::IsEnabled(MonoMixMode, MonoMixModes::MonoMixToLeft),
-					   Bitwise::IsEnabled(MonoMixMode, MonoMixModes::MonoMixToRight));
+		Log::WriteDebug(TAG, "Setting ADC Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Left1 and Right1 Diffrential: %i, Left2 and Right2 Diffrential: %i, Mono Mix to Left: %i, Mono Mix to Right: %i", Powered,
+						Bitwise::IsEnabled(InputMode, InputModes::Left1),
+						Bitwise::IsEnabled(InputMode, InputModes::Right1),
+						Bitwise::IsEnabled(InputMode, InputModes::Left2),
+						Bitwise::IsEnabled(InputMode, InputModes::Right2),
+						Bitwise::IsEnabled(InputMode, InputModes::Left1AndRight1Differential),
+						Bitwise::IsEnabled(InputMode, InputModes::Left2AndRight2Differential),
+						Bitwise::IsEnabled(MonoMixMode, MonoMixModes::MonoMixToLeft),
+						Bitwise::IsEnabled(MonoMixMode, MonoMixModes::MonoMixToRight));
 
 		ES8388Control::Values adcPower = ES8388Control::Values::ADCPower_int1LP_1;
 		ES8388Control::Values adcFlashPower = ES8388Control::Values::ADCPower_flashLP_1;
@@ -284,12 +284,12 @@ public:
 
 	static bool SetDACPowered(bool Powered, OutputModes OutputMode, OutputResistances OutputResistance)
 	{
-		Log::WriteInfo(TAG, "Setting DAC Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Output Resistance: %i", Powered,
-					   Bitwise::IsEnabled(OutputMode, OutputModes::Left1),
-					   Bitwise::IsEnabled(OutputMode, OutputModes::Right1),
-					   Bitwise::IsEnabled(OutputMode, OutputModes::Left2),
-					   Bitwise::IsEnabled(OutputMode, OutputModes::Right2),
-					   OutputResistance);
+		Log::WriteDebug(TAG, "Setting DAC Powered: %i, Left1: %i, Right1: %i, Left2: %i, Right2: %i, Output Resistance: %i", Powered,
+						Bitwise::IsEnabled(OutputMode, OutputModes::Left1),
+						Bitwise::IsEnabled(OutputMode, OutputModes::Right1),
+						Bitwise::IsEnabled(OutputMode, OutputModes::Left2),
+						Bitwise::IsEnabled(OutputMode, OutputModes::Right2),
+						OutputResistance);
 
 		ES8388Control::Values leftDACPower = ES8388Control::Values::DACPower_PdnDACL_1;
 		ES8388Control::Values rightDACPower = ES8388Control::Values::DACPower_PdnDACR_1;
@@ -342,22 +342,22 @@ public:
 		{
 		case Formats::I2S:
 			value = ES8388Control::Values::ADCControl4_ADCFORMAT_00;
-			Log::WriteInfo(TAG, "Setting ADC Format: I2S");
+			Log::WriteDebug(TAG, "Setting ADC Format: I2S");
 			break;
 
 		case Formats::LeftJustify:
 			value = ES8388Control::Values::ADCControl4_ADCFORMAT_01;
-			Log::WriteInfo(TAG, "Setting ADC Format: LeftJustify");
+			Log::WriteDebug(TAG, "Setting ADC Format: LeftJustify");
 			break;
 
 		case Formats::RightJustify:
 			value = ES8388Control::Values::ADCControl4_ADCFORMAT_10;
-			Log::WriteInfo(TAG, "Setting ADC Format: RightJustify");
+			Log::WriteDebug(TAG, "Setting ADC Format: RightJustify");
 			break;
 
 		case Formats::DSP_PCM:
 			value = ES8388Control::Values::ADCControl4_ADCFORMAT_11;
-			Log::WriteInfo(TAG, "Setting ADC Format: DSP_PCM");
+			Log::WriteDebug(TAG, "Setting ADC Format: DSP_PCM");
 			break;
 
 		default:
@@ -379,22 +379,22 @@ public:
 		{
 		case Formats::I2S:
 			value = ES8388Control::Values::DACControl1_DACFORMAT_00;
-			Log::WriteInfo(TAG, "Setting DAC Format: I2S");
+			Log::WriteDebug(TAG, "Setting DAC Format: I2S");
 			break;
 
 		case Formats::LeftJustify:
 			value = ES8388Control::Values::DACControl1_DACFORMAT_01;
-			Log::WriteInfo(TAG, "Setting DAC Format: LeftJustify");
+			Log::WriteDebug(TAG, "Setting DAC Format: LeftJustify");
 			break;
 
 		case Formats::RightJustify:
 			value = ES8388Control::Values::DACControl1_DACFORMAT_10;
-			Log::WriteInfo(TAG, "Setting DAC Format: RightJustify");
+			Log::WriteDebug(TAG, "Setting DAC Format: RightJustify");
 			break;
 
 		case Formats::DSP_PCM:
 			value = ES8388Control::Values::DACControl1_DACFORMAT_11;
-			Log::WriteInfo(TAG, "Setting DAC Format: DSP_PCM");
+			Log::WriteDebug(TAG, "Setting DAC Format: DSP_PCM");
 			break;
 
 		default:
@@ -437,7 +437,7 @@ public:
 			return false;
 		}
 
-		Log::WriteInfo(TAG, "Setting I2S ADC Bits Per Sample: %i", BPS);
+		Log::WriteDebug(TAG, "Setting I2S ADC Bits Per Sample: %i", BPS);
 
 		ES8388Control::Write(ES8388Control::Registers::ADCControl4, value, ES8388Control::Masks::ADCControl4_ADCWL);
 
@@ -499,7 +499,7 @@ public:
 			return false;
 		}
 
-		Log::WriteInfo(TAG, "Setting I2S DAC Bits Per Sample: %i", BPS);
+		Log::WriteDebug(TAG, "Setting I2S DAC Bits Per Sample: %i", BPS);
 
 		ES8388Control::Write(ES8388Control::Registers::DACControl1, value, ES8388Control::Masks::DACControl1_DACWL);
 
@@ -536,9 +536,9 @@ public:
 		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
 			return false;
 
-		Log::WriteInfo(TAG, "Setting ALC Enabled: %i, Right: %i, Left: %i", Enabled,
-					   Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2),
-					   Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2));
+		Log::WriteDebug(TAG, "Setting ALC Enabled: %i, Right: %i, Left: %i", Enabled,
+						Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2),
+						Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2));
 
 		ES8388Control::Values value = ES8388Control::Values::ADCControl10_ALCSEL_00;
 		if (Enabled)
@@ -575,7 +575,7 @@ public:
 		ASSERT(0.410 <= DecayTime && DecayTime <= 420, "Invalid DecayTime");
 		ASSERT(96 <= WindowsSize && WindowsSize <= 496, "Invalid WindowsSize");
 
-		Log::WriteInfo(TAG, "Setting Automatic Level Control Parameters, Min: %.1fdB, Max: %.1fdB, Target: %.1fdB, Hold Time: %.1fms, Attack Time: %.1fms, Decay Time: %.1fms", dBMin, dBMax, dBTarget, HoldTime, AttackTime, DecayTime);
+		Log::WriteDebug(TAG, "Setting Automatic Level Control Parameters, Min: %.1fdB, Max: %.1fdB, Target: %.1fdB, Hold Time: %.1fms, Attack Time: %.1fms, Decay Time: %.1fms", dBMin, dBMax, dBTarget, HoldTime, AttackTime, DecayTime);
 
 		uint8 value = (dBMin + 12) / 6;
 		ES8388Control::Write(ES8388Control::Registers::ADCControl10, (ES8388Control::Values)value, ES8388Control::Masks::ADCControl10_MINGAIN);
@@ -610,7 +610,7 @@ public:
 		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
 			return 0;
 
-		Log::WriteInfo(TAG, "Setting Noise Gate Enabled: %i", Enabled);
+		Log::WriteDebug(TAG, "Setting Noise Gate Enabled: %i", Enabled);
 
 		ES8388Control::Write(ES8388Control::Registers::ADCControl14, (Enabled ? ES8388Control::Values::ADCControl14_NGAT_1 : ES8388Control::Values::ADCControl14_NGAT_0), ES8388Control::Masks::ADCControl14_NGAT);
 
@@ -625,7 +625,7 @@ public:
 
 		ASSERT(-76.5F <= dBFS && dBFS <= -30, "Invalid dBFS");
 
-		Log::WriteInfo(TAG, "Setting Noise Gate: %.1fdBFS, Mute On Noise: %i", dBFS, MuteOnNoise);
+		Log::WriteDebug(TAG, "Setting Noise Gate: %.1fdBFS, Mute On Noise: %i", dBFS, MuteOnNoise);
 
 		uint8 value = (dBFS + 76.5F) / -1.5;
 
@@ -644,7 +644,7 @@ public:
 
 		ASSERT(0 <= dB && dB <= 24, "Invalid dB");
 
-		Log::WriteInfo(TAG, "Setting Microphone Gain: %.1fdB", dB);
+		Log::WriteDebug(TAG, "Setting Microphone Gain: %.1fdB", dB);
 
 		uint8 value = (uint8)(dB / 3);
 
@@ -681,7 +681,7 @@ public:
 
 		ASSERT(-15 <= dB && dB <= 6, "Invalid dB");
 
-		Log::WriteInfo(TAG, "Setting Input to Mixer Gain: %.1fdB", dB);
+		Log::WriteDebug(TAG, "Setting Input to Mixer Gain: %.1fdB", dB);
 
 		uint8 value = 7 - (uint8)((dB + 15) / 3);
 
@@ -718,9 +718,9 @@ public:
 
 		ASSERT(-96 <= dB && dB <= 0, "Invalid dB");
 
-		Log::WriteInfo(TAG, "Setting Input Volume: %.1fdB", dB);
+		Log::WriteDebug(TAG, "Setting Input Volume: %.1fdB", dB);
 
-		ES8388Control::Values value = (ES8388Control::Values)(((uint8)(dB * 2)) & (uint8)ES8388Control::Masks::ADCControl8_LADCVOL);
+		ES8388Control::Values value = (ES8388Control::Values)(((uint8)(dB * -2)) & (uint8)ES8388Control::Masks::ADCControl8_LADCVOL);
 
 		if (Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Left2))
 			ES8388Control::Write(ES8388Control::Registers::ADCControl8, value, ES8388Control::Masks::ADCControl8_LADCVOL);
@@ -744,7 +744,7 @@ public:
 		if (Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Right2))
 			value = ES8388Control::Read(ES8388Control::Registers::ADCControl9, ES8388Control::Masks::ADCControl9_RADCVOL);
 
-		return (uint8)value / 2.0F;
+		return (uint8)value / -2.0F;
 	}
 
 	static bool SetInputMute(InputModes InputMode, bool Mute)
@@ -752,7 +752,7 @@ public:
 		if (!(Bitwise::IsEnabled(InputMode, InputModes::Left1) || Bitwise::IsEnabled(InputMode, InputModes::Right1) || Bitwise::IsEnabled(InputMode, InputModes::Left2) || Bitwise::IsEnabled(InputMode, InputModes::Right2)))
 			return false;
 
-		Log::WriteInfo(TAG, "Setting Input Mute: %i", Mute);
+		Log::WriteDebug(TAG, "Setting Input Mute: %i", Mute);
 
 		ES8388Control::Write(ES8388Control::Registers::ADCControl7, (Mute ? ES8388Control::Values::ADCControl7_ADCMute_1 : ES8388Control::Values::ADCControl7_ADCMute_0), ES8388Control::Masks::ADCControl7_ADCMute);
 
@@ -775,9 +775,9 @@ public:
 
 		ASSERT(-96 <= dB && dB <= 0, "Invalid dB");
 
-		Log::WriteInfo(TAG, "Setting Digital Volume: %.1fdB", dB);
+		Log::WriteDebug(TAG, "Setting Digital Volume: %.1fdB", dB);
 
-		ES8388Control::Values value = (ES8388Control::Values)(((uint8)(dB * 2)) & (uint8)ES8388Control::Masks::DACControl4_LDACVOL);
+		ES8388Control::Values value = (ES8388Control::Values)(((uint8)(dB * -2)) & (uint8)ES8388Control::Masks::DACControl4_LDACVOL);
 
 		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2))
 			ES8388Control::Write(ES8388Control::Registers::DACControl4, value, ES8388Control::Masks::DACControl4_LDACVOL);
@@ -801,7 +801,7 @@ public:
 		if (Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2))
 			value = ES8388Control::Read(ES8388Control::Registers::DACControl5, ES8388Control::Masks::DACControl5_RDACVOL);
 
-		return (uint8)value / 2.0F;
+		return (uint8)value / -2.0F;
 	}
 
 	//[-45dB, 4.5dB]
@@ -812,7 +812,7 @@ public:
 
 		ASSERT(-45 <= dB && dB <= 4.5F, "Invalid dB");
 
-		Log::WriteInfo(TAG, "Setting Output Volume: %.1fdB", dB);
+		Log::WriteDebug(TAG, "Setting Output Volume: %.1fdB", dB);
 
 		ES8388Control::Values value = (ES8388Control::Values)((uint8)((dB + 45) / 1.5F) & (uint8)ES8388Control::Masks::DACControl24_LOUT1VOL);
 
@@ -858,7 +858,7 @@ public:
 		if (!(Bitwise::IsEnabled(OutputMode, OutputModes::Left1) || Bitwise::IsEnabled(OutputMode, OutputModes::Right1) || Bitwise::IsEnabled(OutputMode, OutputModes::Left2) || Bitwise::IsEnabled(OutputMode, OutputModes::Right2)))
 			return 0;
 
-		Log::WriteInfo(TAG, "Setting Output Mute: %i", Mute);
+		Log::WriteDebug(TAG, "Setting Output Mute: %i", Mute);
 
 		ES8388Control::Write(ES8388Control::Registers::DACControl3, (Mute ? ES8388Control::Values::DACControl3_DACMute_1 : ES8388Control::Values::DACControl3_DACMute_0), ES8388Control::Masks::DACControl3_DACMute);
 
@@ -876,7 +876,7 @@ public:
 private:
 	static bool SetChipControls(MiddleVoltageResistances MiddleVoltageResistance, bool ResetControlPort, bool PoweredOn)
 	{
-		Log::WriteInfo(TAG, "Setting Chip Control Middle Voltage Resistance: %i, Reset Control Port: %i, Powered On: %i", MiddleVoltageResistance, ResetControlPort, PoweredOn);
+		Log::WriteDebug(TAG, "Setting Chip Control Middle Voltage Resistance: %i, Reset Control Port: %i, Powered On: %i", MiddleVoltageResistance, ResetControlPort, PoweredOn);
 
 		ES8388Control::Write(ES8388Control::Registers::ChipControl1, (ES8388Control::Values)MiddleVoltageResistance, ES8388Control::Masks::ChipControl1_VMIDSEL);
 		ES8388Control::Write(ES8388Control::Registers::ChipControl1, ES8388Control::Values::ChipControl1_EnRef_1, ES8388Control::Masks::ChipControl1_EnRef);
@@ -910,7 +910,7 @@ private:
 
 	static bool SetADCEnabled(bool Enabled, bool ChangeDLL = true)
 	{
-		Log::WriteInfo(TAG, "Setting ADC Enabled: %i, ChangeDLL: %i", Enabled, ChangeDLL);
+		Log::WriteDebug(TAG, "Setting ADC Enabled: %i, ChangeDLL: %i", Enabled, ChangeDLL);
 
 		ES8388Control::Values analogReferencePower = ES8388Control::Values::ChipPower_adcVref_PDN_1;
 		ES8388Control::Values dllPower = ES8388Control::Read(ES8388Control::Registers::ChipPower, ES8388Control::Masks::ChipPower_ADCDLL_PDN);
@@ -941,7 +941,7 @@ private:
 
 	static bool SetDACEnabled(bool Enabled, bool ChangeDLL = true)
 	{
-		Log::WriteInfo(TAG, "Setting DAC Enabled: %i, ChangeDLL: %i", Enabled, ChangeDLL);
+		Log::WriteDebug(TAG, "Setting DAC Enabled: %i, ChangeDLL: %i", Enabled, ChangeDLL);
 
 		ES8388Control::Values analogReferencePower = ES8388Control::Values::ChipPower_dacVref_PDN_1;
 		ES8388Control::Values dllPower = ES8388Control::Read(ES8388Control::Registers::ChipPower, ES8388Control::Masks::ChipPower_DACDLL_PDN);

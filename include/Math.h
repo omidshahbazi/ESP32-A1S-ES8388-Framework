@@ -65,7 +65,9 @@ public:
 	{
 		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
 
-		return atan(Value * Factor) * Factor;
+		// return atan(Value) * Factor;
+
+		return tanh(Value) * Factor;
 	}
 
 	template <typename T>
@@ -81,7 +83,9 @@ public:
 	{
 		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
 
-		return exp(Factor * 4.6 * fabs(Value)) * Math::Sign(Value) * 0.01;
+		// return exp(fabs(Value) * Factor) * Math::Sign(Value) * 0.01;
+
+		return exp(fabs(Value) * Factor) * Math::Sign(Value) * 0.6;
 	}
 
 	template <typename T>
