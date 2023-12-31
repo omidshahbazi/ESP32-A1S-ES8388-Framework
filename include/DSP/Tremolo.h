@@ -42,7 +42,7 @@ public:
 
 		m_Rate = Value;
 
-		m_DeltaPhase = Math::TWO_PI_VALUE * Math::Lerp(MIN_FREQUENCY, MAX_FREQUENCY, m_Rate) / m_SampleRate;
+		m_DeltaPhase = Math::TWO_PI_VALUE * Math::Lerp(MIN_FREQUENCY, 4 * KHz, m_Rate) / m_SampleRate;
 	}
 	float GetRate(void)
 	{

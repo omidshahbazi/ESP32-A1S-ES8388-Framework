@@ -37,7 +37,7 @@ public:
 		{
 			double input = m_LowPassFilter.Process(Buffer[i]);
 
-			input = Math::SoftClip(input, (1 + m_Drive) * 100);
+			input = Math::SoftClip(input, (m_Drive + 1) * 100);
 
 			Buffer[i] = Math::Clamp(input, -1, 1);
 		}

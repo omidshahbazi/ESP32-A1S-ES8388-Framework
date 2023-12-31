@@ -83,9 +83,9 @@ public:
 	{
 		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must be float or double");
 
-		return pow(fabs(Value), 2) * Math::Sign(Value) * Factor;
+		// return pow(abs(Value), 2) * Math::Sign(Value) * Factor;
 
-		// return exp(fabs(Value) * Factor) * Math::Sign(Value) * 0.01;
+		return exp(abs(Value)) * Math::Sign(Value) * 0.37 * Factor;
 	}
 
 	template <typename T>
