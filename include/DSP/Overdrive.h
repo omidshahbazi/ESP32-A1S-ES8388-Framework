@@ -22,7 +22,7 @@ public:
 	//[0, 1]
 	void SetDrive(float Value)
 	{
-		ASSERT(0 <= Value && Value <= 1, "Overdrive", "Invalid Value");
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
 		m_Drive = Value;
 	}

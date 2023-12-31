@@ -18,7 +18,7 @@ public:
 	//[0, 1]
 	void SetRate(float Value)
 	{
-		ASSERT(0 <= Value && Value <= 1, "Overdrive", "Invalid Value");
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
 		m_Rate = Value;
 	}

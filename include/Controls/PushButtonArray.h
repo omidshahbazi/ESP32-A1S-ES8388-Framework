@@ -49,10 +49,10 @@ public:
 
 	void Bind(uint8 Index, EventHandler &&OnDown, EventHandler &&OnHold, EventHandler &&OnUp)
 	{
-		ASSERT(Index < m_BindingCount, "PushButtonArray", "Index is out of range");
+		ASSERT(Index < m_BindingCount, "Index is out of range");
 
 		BindingInfo &info = m_Bindings[Index];
-		ASSERT(!info.AlreadyBound, "PushButtonArray", "There is already a binding to this index");
+		ASSERT(!info.AlreadyBound, "There is already a binding to this index");
 
 		info.AlreadyBound = true;
 		info.OnDown = OnDown;
