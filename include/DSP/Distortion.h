@@ -9,7 +9,7 @@
 class Distortion : public IDSP
 {
 public:
-	Distortion(void)
+	Distortion(uint32 SampleRate)
 		: m_Rate(0)
 	{
 		SetRate(1);
@@ -30,7 +30,7 @@ public:
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
-			Buffer[i] = Math::ExponentialSaturation(Buffer[i], m_Rate);
+			Buffer[i] = Math::ExponentialSaturation(Buffer[i], (m_Rate + 1) * 100);
 	}
 
 private:

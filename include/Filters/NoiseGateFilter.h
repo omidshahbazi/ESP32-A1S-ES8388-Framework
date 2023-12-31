@@ -10,7 +10,7 @@ class NoiseGateFilter : private EnvelopeFollowerFilter
 {
 public:
 	NoiseGateFilter(uint32 SampleRate)
-		: EnvelopeFollowerFilter(SampleRate, 0.005, 0.02)
+		: EnvelopeFollowerFilter(SampleRate, 0.02, 0.06)
 	{
 		SetThreshold(0);
 	}

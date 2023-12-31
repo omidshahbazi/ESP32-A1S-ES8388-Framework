@@ -5,13 +5,17 @@
 #include "IDSP.h"
 #include "../Math.h"
 #include "../Debug.h"
+#include "../Filters/LowPassFilter.h"
 
 class Overdrive : public IDSP
 {
 public:
-	Overdrive(void)
-		: m_Drive(0)
+	Overdrive(uint32 SampleRate)
+		: m_LowPassFilter(SampleRate),
+		  m_Drive(0)
 	{
+		m_LowPassFilter.SetCutoffFrequency(2 * KHz);
+		m_LowPassFilter.SetDeltaTime(0.1);
 		SetDrive(1);
 	}
 
@@ -30,10 +34,17 @@ public:
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
-			Buffer[i] = Math::SoftClip(Buffer[i], (1 + m_Drive) * 2.5);
+		{
+			double input = m_LowPassFilter.Process(Buffer[i]);
+
+			input = Math::SoftClip(input, (1 + m_Drive) * 100);
+
+			Buffer[i] = Math::Clamp(input, -1, 1);
+		}
 	}
 
 private:
+	LowPassFilter m_LowPassFilter;
 	float m_Drive;
 };
 

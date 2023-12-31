@@ -35,7 +35,7 @@ public:
 	template <typename T, typename U, typename V>
 	static T Lerp(T Min, U Max, V Time)
 	{
-		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must be float or double");
 
 		Time = Clamp01(Time);
 
@@ -63,7 +63,7 @@ public:
 	template <typename T>
 	static T SoftClip(T Value, float Factor)
 	{
-		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must be float or double");
 
 		// return atan(Value) * Factor;
 
@@ -73,7 +73,7 @@ public:
 	template <typename T>
 	static T HardClip(T Value, float Factor)
 	{
-		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must be float or double");
 
 		return (abs(Value) > Factor ? Sign(Value) : Value);
 	}
@@ -81,17 +81,17 @@ public:
 	template <typename T>
 	static T ExponentialSaturation(T Value, float Factor)
 	{
-		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must be float or double");
+
+		return pow(fabs(Value), 2) * Math::Sign(Value) * Factor;
 
 		// return exp(fabs(Value) * Factor) * Math::Sign(Value) * 0.01;
-
-		return exp(fabs(Value) * Factor) * Math::Sign(Value) * 0.6;
 	}
 
 	template <typename T>
 	static T AsymmetricSineSaturation(T Value, float Factor)
 	{
-		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must be float or double");
 
 		return sin(Value * HALF_PI_VALUE) * Factor;
 	}
@@ -99,7 +99,7 @@ public:
 	template <typename T>
 	static T FoldbackDistortion(T Value, float Factor)
 	{
-		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must float or double");
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must be float or double");
 
 		return (abs(Value) > Factor ? Value : -1);
 	}

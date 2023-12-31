@@ -88,7 +88,7 @@ public:
 
 		if (needsADC)
 		{
-			CHECK_CALL(ES8388Interface::SetInputToMixerGain((ES8388Interface::InputModes)m_InputMode, 6));
+			CHECK_CALL(SetInputToMixerGain(6));
 
 			CHECK_CALL(ES8388Interface::SetNoiseGateEnabled((ES8388Interface::InputModes)m_InputMode, EnableNoiseGate));
 			CHECK_CALL(ES8388Interface::SetAutomaticLevelControlEnabled((ES8388Interface::InputModes)m_InputMode, EnableAutomaticLevelControl));
@@ -112,7 +112,7 @@ public:
 
 		if (needsDAC)
 		{
-			CHECK_CALL(ES8388Interface::SetDigitalVolume((ES8388Interface::OutputModes)m_OutputMode, 0));
+			CHECK_CALL(SetDigitalVolume(0));
 			CHECK_CALL(SetOutputVolume(4.5F));
 		}
 

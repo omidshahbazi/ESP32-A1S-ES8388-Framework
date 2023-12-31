@@ -23,7 +23,7 @@ public:
 
 		ASSERT(mem != nullptr, "Couldn't allocate memory: %i of %iB", Count, sizeof(T));
 
-		Log::WriteInfo("Memory", "%ib Allocated Count: %i, ELement Size: %i, Available RAM: %ib", length, Count, sizeof(T), ESP.getFreeHeap());
+		Log::WriteDebug("Memory", "%ib Allocated Count: %i, ELement Size: %i, Available RAM: %ib", length, Count, sizeof(T), ESP.getFreeHeap());
 
 		Set(mem, 0, Count);
 
