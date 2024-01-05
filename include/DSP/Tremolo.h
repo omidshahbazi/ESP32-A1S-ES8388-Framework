@@ -42,7 +42,7 @@ public:
 
 		m_Rate = Value;
 
-		m_DeltaPhase = Math::TWO_PI_VALUE * Math::Lerp(MIN_FREQUENCY, 4 * KHz, m_Rate) / m_SampleRate;
+		m_DeltaPhase = Math::TWO_PI_VALUE * Math::Lerp(1.0, 25, m_Rate) / m_SampleRate;
 	}
 	float GetRate(void)
 	{
@@ -53,12 +53,11 @@ public:
 	{
 		for (uint16 i = 0; i < Count; ++i)
 		{
-			double modulation = (1 - m_Depth) + (m_Depth * 0.5 * (1 + sin(m_Phase)));
+			float modulation = (1 - m_Depth) + (m_Depth * 0.5 * (1 + sin(m_Phase)));
 
 			Buffer[i] *= modulation;
 
 			m_Phase += m_DeltaPhase;
-
 			if (m_Phase >= Math::TWO_PI_VALUE)
 				m_Phase -= Math::TWO_PI_VALUE;
 		}
@@ -69,8 +68,8 @@ private:
 	float m_Rate;
 	uint32 m_SampleRate;
 
-	double m_DeltaPhase;
-	double m_Phase;
+	float m_DeltaPhase;
+	float m_Phase;
 };
 
 #endif

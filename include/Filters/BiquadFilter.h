@@ -109,13 +109,13 @@ private:
 public:
 	// Needs a 1 stage BiquadFilter
 	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
-	// CenterFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
+	// CutoffFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
 	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
-	static void SetLowPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth, float Resonance = 1)
+	static void SetLowPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CutoffFrequency, float Bandwidth, float Resonance = 1)
 	{
 		ASSERT(Filter != nullptr, "Filter cannot be null");
 
-		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth, Resonance);
+		const Parameters params = GetParameters(SampleRate, CutoffFrequency, Bandwidth, Resonance);
 
 		Coefficients coeffs;
 		coeffs.a0 = params.k * params.k * params.normalized;
@@ -129,13 +129,13 @@ public:
 
 	// Needs a 1 stage BiquadFilter
 	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
-	// CenterFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
+	// CutoffFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
 	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
-	static void SetHighPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth, float Resonance = 1)
+	static void SetHighPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CutoffFrequency, float Bandwidth, float Resonance = 1)
 	{
 		ASSERT(Filter != nullptr, "Filter cannot be null");
 
-		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth, Resonance);
+		const Parameters params = GetParameters(SampleRate, CutoffFrequency, Bandwidth, Resonance);
 
 		Coefficients coeffs;
 		coeffs.a0 = params.normalized;

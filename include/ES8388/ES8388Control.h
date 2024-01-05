@@ -662,7 +662,7 @@ public:
 		DACControl4_LDACVOL_11000000 = 0b11000000, // Digital volume control attenuates the signal in 0.5dB incremental from 0dB to –96dB, –96dB, Floor((Expected dB between [-96dB, 0dB]) * -2) would be the interpolated value between these two
 
 		DACControl5_RDACVOL_00000000 = 0b00000000, // Digital volume control attenuates the signal in 0.5dB incremental from 0dB to –96dB, 0dB, Floor((Expected dB between [-96dB, 0dB]) * -2) would be the interpolated value between these two
-		DACControl5_RDACVOL_11000000 = 0b00000001, // Digital volume control attenuates the signal in 0.5dB incremental from 0dB to –96dB, –96dB, Floor((Expected dB between [-96dB, 0dB]) * -2) would be the interpolated value between these two
+		DACControl5_RDACVOL_11000000 = 0b11000000, // Digital volume control attenuates the signal in 0.5dB incremental from 0dB to –96dB, –96dB, Floor((Expected dB between [-96dB, 0dB]) * -2) would be the interpolated value between these two
 
 		DACControl6_DEEMP_0 = 0b00000000, // disable digital click free power up and down
 		DACControl6_DEEMP_1 = 0b00001000, // enable digital click free power up and down (default)

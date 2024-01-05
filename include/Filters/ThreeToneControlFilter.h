@@ -7,6 +7,7 @@
 #include "BandPassFilter.h"
 #include "HighPassFilter.h"
 
+// TODO: This doesn't work properly
 class ThreeToneControlFilter : public Filter
 {
 public:
@@ -18,9 +19,14 @@ public:
 		  m_BandPassFilter(SampleRate),
 		  m_HighPassFilter(SampleRate)
 	{
-		m_LowPassFilter.SetCenterFrequency(100);
-		m_BandPassFilter.SetFrequencies(100, 5000);
-		m_HighPassFilter.SetCenterFrequency(5000);
+		m_LowPassFilter.SetCutoffFrequency(100);
+		// m_LowPassFilter.SetResonance(6);
+
+		m_BandPassFilter.SetFrequencies(100, 5 * KHz);
+		m_BandPassFilter.SetResonance(6);
+
+		m_HighPassFilter.SetCutoffFrequency(5 * KHz);
+		// m_HighPassFilter.SetResonance(6);
 	}
 
 	//[-20dB, 0dB]
@@ -64,6 +70,11 @@ public:
 		return (m_LowPassFilter.Process(Value) * pow(10, m_LowTone / 20)) +
 			   (m_BandPassFilter.Process(Value) * pow(10, m_MidTone / 20)) +
 			   (m_HighPassFilter.Process(Value) * pow(10, m_HighTone / 20));
+
+		// return (m_LowPassFilter.Process(Value) * pow(10, m_LowTone / 20)) +
+		// 	   (m_BandPassFilter.Process(Value) * pow(10, m_MidTone / 20));
+
+		// return m_HighPassFilter.Process(Value) * pow(10, m_HighTone / 20);
 	}
 
 private:

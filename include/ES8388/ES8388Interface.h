@@ -841,13 +841,13 @@ public:
 		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1))
 			value = ES8388Control::Read(ES8388Control::Registers::DACControl24, ES8388Control::Masks::DACControl24_LOUT1VOL);
 
-		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1))
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Right1))
 			value = ES8388Control::Read(ES8388Control::Registers::DACControl25, ES8388Control::Masks::DACControl25_ROUT1VOL);
 
-		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1))
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left2))
 			value = ES8388Control::Read(ES8388Control::Registers::DACControl26, ES8388Control::Masks::DACControl26_LOUT2VOL);
 
-		if (Bitwise::IsEnabled(OutputMode, OutputModes::Left1))
+		if (Bitwise::IsEnabled(OutputMode, OutputModes::Right2))
 			value = ES8388Control::Read(ES8388Control::Registers::DACControl27, ES8388Control::Masks::DACControl27_ROUT2VOL);
 
 		return ((uint8)value * 1.5F) - 45;

@@ -33,11 +33,13 @@ public:
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
+		float drive = Math::Max(m_Drive, 0.01);
+
 		for (uint16 i = 0; i < Count; ++i)
 		{
 			double input = m_LowPassFilter.Process(Buffer[i]);
 
-			input = Math::SoftClip(input, (m_Drive + 1) * 100);
+			input = Math::SoftClip(input, drive * 50);
 
 			Buffer[i] = Math::Clamp(input, -1, 1);
 		}

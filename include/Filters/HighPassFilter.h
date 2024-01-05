@@ -2,6 +2,8 @@
 #ifndef HIGH_PASS_FILTER_H
 #define HIGH_PASS_FILTER_H
 
+#ifdef SIMPLE_LOW_HIGH_PASS_FILTER
+
 #include "Filter.h"
 #include "../Math.h"
 #include "../Debug.h"
@@ -78,4 +80,71 @@ public:
 	static constexpr double MAX_CUTOFF_FREQUENCY = 14066.730469;
 };
 
+#else
+
+#include "BiquadFilter.h"
+#include "../Math.h"
+#include "../Debug.h"
+
+class HighPassFilter : private BiquadFilter
+{
+public:
+	HighPassFilter(uint32 SampleRate)
+		: BiquadFilter(1),
+		  m_SampleRate(SampleRate),
+		  m_CutoffFrequency(1),
+		  m_Resonance(1)
+	{
+		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
+
+		SetCutoffFrequency(MAX_FREQUENCY);
+		SetResonance(1);
+	}
+
+	//[MIN_FREQUENCY, MAX_FREQUENCY]
+	void SetCutoffFrequency(float Value)
+	{
+		ASSERT(MIN_FREQUENCY <= Value && Value <= MAX_FREQUENCY, "Invalid Value");
+
+		m_CutoffFrequency = Value;
+
+		Update();
+	}
+	float GetCutoffFrequency(void) const
+	{
+		return m_CutoffFrequency;
+	}
+
+	//(0, 4000]
+	void SetResonance(float Value)
+	{
+		ASSERT(0 < Value && Value <= 4000, "Invalid Value");
+
+		m_Resonance = Value;
+
+		Update();
+	}
+	float GetResonance(void) const
+	{
+		return m_Resonance;
+	}
+
+	double Process(double Value) override
+	{
+		return BiquadFilter::Process(Value);
+	}
+
+private:
+	void Update(void)
+	{
+		BiquadFilter::SetHighPassFilterCoefficients(this, m_SampleRate, m_CutoffFrequency, Math::Min(m_CutoffFrequency * 2, MAX_FREQUENCY), m_Resonance);
+	}
+
+private:
+	uint32 m_SampleRate;
+	float m_CutoffFrequency;
+	float m_Resonance;
+};
+
+#endif
 #endif

@@ -3,31 +3,16 @@
 #define REVERB_H
 
 #include "IDSP.h"
-#include "../Math.h"
-#include "../Memory.h"
+#include "../Filters/DelayFilter.h"
 
 class Reverb : public IDSP
 {
 public:
 	Reverb(uint32 SampleRate)
-		: m_SampleRate(SampleRate),
-		  m_DelayTime(0),
-		  m_Feedback(0),
-		  m_DelayBuffer(nullptr),
-		  m_DelayBufferLength(0),
-		  m_DelayBufferIndex(0)
+		: m_DelayFilter(SampleRate, MAX_DELAY_TIME)
 	{
-		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
-
-		m_DelayBuffer = Memory::Allocate<float>(MAX_DELAY_TIME * m_SampleRate, true);
-
 		SetDelayTime(0.5);
 		SetFeedback(0.5);
-	}
-
-	~Reverb(void)
-	{
-		Memory::Deallocate(m_DelayBuffer);
 	}
 
 	//[0, MAX_DELAY_TIME]
@@ -35,13 +20,11 @@ public:
 	{
 		ASSERT(0 <= Value && Value <= MAX_DELAY_TIME, "Invalid Value");
 
-		m_DelayTime = Value;
-
-		m_DelayBufferLength = Math::Max(m_DelayTime * m_SampleRate, 1);
+		m_DelayFilter.SetTime(Value);
 	}
 	float GetDelayTime(void)
 	{
-		return m_DelayTime;
+		return m_DelayFilter.GetTime();
 	}
 
 	//[0, 1]
@@ -49,35 +32,21 @@ public:
 	{
 		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
-		m_Feedback = Value;
+		m_DelayFilter.SetFeedback(Value);
 	}
 	float GetFeedback(void)
 	{
-		return m_Feedback;
+		return m_DelayFilter.GetFeedback();
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
-		{
-			double delayedSample = m_DelayBuffer[m_DelayBufferIndex];
-
-			Buffer[i] += m_Feedback * delayedSample;
-
-			m_DelayBuffer[m_DelayBufferIndex] = Buffer[i];
-
-			m_DelayBufferIndex = ++m_DelayBufferIndex % m_DelayBufferLength;
-		}
+			Buffer[i] = m_DelayFilter.Process(Buffer[i], true);
 	}
 
 private:
-	uint32 m_SampleRate;
-	float m_DelayTime;
-	float m_Feedback;
-
-	float *m_DelayBuffer;
-	uint32 m_DelayBufferLength;
-	uint32 m_DelayBufferIndex;
+	DelayFilter m_DelayFilter;
 
 public:
 	static constexpr float MAX_DELAY_TIME = 1;
