@@ -5,12 +5,12 @@
 #include "IDSP.h"
 #include "../Filters/DelayFilter.h"
 
-class Sustain : public IDSP
+class Sustain : public IDSP, private DelayFilter
 {
 public:
 	Sustain(uint32 SampleRate)
-		: m_DelayFilter(SampleRate, MAX_DELAY_TIME),
-		  m_BufferLength(m_DelayFilter.GetBufferLength())
+		: DelayFilter(SampleRate, MAX_DELAY_TIME),
+		  m_BufferLength(DelayFilter::GetBufferLength())
 	{
 		SetFeedback(1);
 	}
@@ -20,25 +20,24 @@ public:
 	{
 		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
-		m_DelayFilter.SetFeedback(Value);
+		DelayFilter::SetFeedback(Value);
 	}
 	float GetFeedback(void)
 	{
-		return m_DelayFilter.GetFeedback();
+		return DelayFilter::GetFeedback();
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
 		{
-			float delayedSample = m_DelayFilter.GetDelayedSample(m_BufferLength / 2);
+			float delayedSample = DelayFilter::GetDelayedSample(m_BufferLength / 2);
 
-			Buffer[i] = m_DelayFilter.Process(Buffer[i], false);
+			Buffer[i] = DelayFilter::Process(Buffer[i], false);
 		}
 	}
 
 private:
-	DelayFilter m_DelayFilter;
 	uint32 m_BufferLength;
 
 	static constexpr float MAX_DELAY_TIME = 1;

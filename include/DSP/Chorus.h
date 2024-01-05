@@ -17,7 +17,8 @@ public:
 		  m_DelayBuffer(nullptr),
 		  m_DelayBufferLength(0),
 		  m_DelayBufferIndex(0),
-		  m_CurrentPhase(0)
+		  m_DeltaPhase(0),
+		  m_Phase(0)
 	{
 		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
@@ -25,7 +26,7 @@ public:
 
 		SetDepth(0.5);
 		SetRate(0.5);
-		SetDelayTime(0.5);
+		SetDelayTime(0);
 	}
 
 	~Chorus(void)
@@ -51,6 +52,8 @@ public:
 		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
 		m_Rate = Value;
+
+		m_DeltaPhase = Math::TWO_PI_VALUE * Math::Lerp(1.0, 25, m_Rate) / m_SampleRate;
 	}
 	float GetRate(void)
 	{
@@ -75,47 +78,51 @@ public:
 	{
 		for (uint16 i = 0; i < Count; ++i)
 		{
-			double modulation = m_Depth * sin(Math::TWO_PI_VALUE * m_Rate * m_CurrentPhase);
-			m_CurrentPhase += 1.0 / m_SampleRate;
-			if (m_CurrentPhase > 1.0)
-				m_CurrentPhase -= 1.0;
+			float modulation = m_Depth * sin(m_Phase);
 
-			double delayedSample = GetDelayedSample(m_DelayTime + modulation);
+			float delayedSample = GetDelayedSample(m_DelayTime);
 
-			Buffer[i] = (Buffer[i] + delayedSample) / 2.0;
+			Buffer[i] += delayedSample;
 
 			m_DelayBuffer[m_DelayBufferIndex] = Buffer[i];
 
 			m_DelayBufferIndex = ++m_DelayBufferIndex % m_DelayBufferLength;
+
+			m_Phase += m_DeltaPhase;
+			if (m_Phase >= Math::TWO_PI_VALUE)
+				m_Phase -= Math::TWO_PI_VALUE;
 		}
 	}
 
 private:
-	double GetDelayedSample(double delayTime)
+	float GetDelayedSample(float DelayTime)
 	{
-		uint32 index = delayTime * m_SampleRate;
-		double fraction = (delayTime * m_SampleRate) - index;
+		// uint32 index = DelayTime * m_SampleRate;
+		// double fraction = (DelayTime * m_SampleRate) - index;
 
-		uint32 indexDelayed = (m_DelayBufferIndex + index) % m_DelayBufferLength;
-		uint32 indexNext = (indexDelayed + 1) % m_DelayBufferLength;
+		// uint32 indexDelayed = (m_DelayBufferIndex + index) % m_DelayBufferLength;
+		// uint32 indexNext = (indexDelayed + 1) % m_DelayBufferLength;
 
-		return Math::Lerp(m_DelayBuffer[indexDelayed], m_DelayBuffer[indexNext], fraction);
+		// return Math::Lerp(m_DelayBuffer[indexDelayed], m_DelayBuffer[indexNext], fraction);
+
+		return m_DelayBuffer[(uint32)(DelayTime * m_SampleRate)];
 	}
 
 private:
 	uint32 m_SampleRate;
-	double m_Depth;
-	double m_Rate;
-	double m_DelayTime;
+	float m_Depth;
+	float m_Rate;
+	float m_DelayTime;
 
 	float *m_DelayBuffer;
 	uint32 m_DelayBufferLength;
 	uint16 m_DelayBufferIndex;
 
-	double m_CurrentPhase;
+	float m_DeltaPhase;
+	float m_Phase;
 
 public:
-	static constexpr float MAX_DELAY_TIME = 1;
+	static constexpr float MAX_DELAY_TIME = 1; // 0.050;
 };
 
 #endif
