@@ -137,7 +137,7 @@ public:
 private:
 	void Update(void)
 	{
-		BiquadFilter::SetLowPassFilterCoefficients(this, m_SampleRate, m_CutoffFrequency, Math::Min(m_CutoffFrequency * 2, MAX_FREQUENCY), m_Resonance);
+		BiquadFilter::SetLowPassFilterCoefficients(this, m_SampleRate, m_CutoffFrequency, m_Resonance);
 	}
 
 private:

@@ -97,7 +97,7 @@ public:
 	{
 		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
-		SetCutoffFrequency(MAX_FREQUENCY);
+		SetCutoffFrequency(MIN_FREQUENCY);
 		SetResonance(1);
 	}
 
@@ -137,7 +137,7 @@ public:
 private:
 	void Update(void)
 	{
-		BiquadFilter::SetHighPassFilterCoefficients(this, m_SampleRate, m_CutoffFrequency, Math::Min(m_CutoffFrequency * 2, MAX_FREQUENCY), m_Resonance);
+		BiquadFilter::SetHighPassFilterCoefficients(this, m_SampleRate, m_CutoffFrequency, m_Resonance);
 	}
 
 private:
