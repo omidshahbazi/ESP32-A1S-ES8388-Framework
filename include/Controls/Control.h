@@ -54,6 +54,11 @@ protected:
 		return analogRead((uint8)m_Pin);
 	}
 
+	bool DigitalRead(void) const
+	{
+		return (digitalRead((uint8)m_Pin) != LOW);
+	}
+
 	void DigitalWrite(bool Value)
 	{
 		digitalWrite((uint8)m_Pin, Value);

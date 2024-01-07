@@ -45,7 +45,6 @@ protected:
 
 		if (abs(prevValue - m_Value) >= 0.01F)
 		{
-
 			Log::WriteDebug("Potentiometer", "Potentiometer GPIOPins::Pin%i value: %f, diff %f", (uint8)GetPin(), m_Value, abs(prevValue - m_Value));
 
 			if (m_OnChanged != nullptr)
