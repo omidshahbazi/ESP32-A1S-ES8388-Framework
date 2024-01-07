@@ -27,6 +27,7 @@ private:
 	{
 		float quality;
 		float normalizedFrequency;
+		float sqrNormalizedFrequency;
 		float normalized;
 	};
 
@@ -101,7 +102,8 @@ private:
 
 		params.quality = Resonance * Frequency / Math::Max(1, Bandwidth);
 		params.normalizedFrequency = tan(Math::PI_VALUE * Frequency / SampleRate);
-		params.normalized = 1 / (1 + (params.normalizedFrequency / params.quality) + (params.normalizedFrequency * params.normalizedFrequency));
+		params.sqrNormalizedFrequency = params.normalizedFrequency * params.normalizedFrequency;
+		params.normalized = 1 / (1 + (params.normalizedFrequency / params.quality) + params.sqrNormalizedFrequency);
 
 		return params;
 	}
@@ -118,11 +120,11 @@ public:
 		const Parameters params = GetParameters(SampleRate, CutoffFrequency, CutoffFrequency, Resonance);
 
 		Coefficients coeffs;
-		coeffs.a0 = params.normalizedFrequency * params.normalizedFrequency * params.normalized;
+		coeffs.a0 = params.sqrNormalizedFrequency * params.normalized;
 		coeffs.a1 = 2 * coeffs.a0;
 		coeffs.a2 = coeffs.a0;
-		coeffs.b1 = 2 * ((params.normalizedFrequency * params.normalizedFrequency) - 1) * params.normalized;
-		coeffs.b2 = (1 - (params.normalizedFrequency / params.quality) + (params.normalizedFrequency * params.normalizedFrequency)) * params.normalized;
+		coeffs.b1 = 2 * (params.sqrNormalizedFrequency - 1) * params.normalized;
+		coeffs.b2 = (1 - (params.normalizedFrequency / params.quality) + params.sqrNormalizedFrequency) * params.normalized;
 
 		Filter->SetCoefficients(&coeffs);
 	}
@@ -141,8 +143,8 @@ public:
 		coeffs.a0 = params.normalized;
 		coeffs.a1 = -2 * coeffs.a0;
 		coeffs.a2 = coeffs.a0;
-		coeffs.b1 = 2 * ((params.normalizedFrequency * params.normalizedFrequency) - 1) * params.normalized;
-		coeffs.b2 = (1 - (params.normalizedFrequency / params.quality) + (params.normalizedFrequency * params.normalizedFrequency)) * params.normalized;
+		coeffs.b1 = 2 * (params.sqrNormalizedFrequency - 1) * params.normalized;
+		coeffs.b2 = (1 - (params.normalizedFrequency / params.quality) + params.sqrNormalizedFrequency) * params.normalized;
 
 		Filter->SetCoefficients(&coeffs);
 	}
@@ -161,8 +163,8 @@ public:
 		coeffs.a0 = (params.normalizedFrequency / params.quality) * params.normalized;
 		coeffs.a1 = 0;
 		coeffs.a2 = -coeffs.a0;
-		coeffs.b1 = 2 * ((params.normalizedFrequency * params.normalizedFrequency) - 1) * params.normalized;
-		coeffs.b2 = (1 - (params.normalizedFrequency / params.quality) + (params.normalizedFrequency * params.normalizedFrequency)) * params.normalized;
+		coeffs.b1 = 2 * (params.sqrNormalizedFrequency - 1) * params.normalized;
+		coeffs.b2 = (1 - (params.normalizedFrequency / params.quality) + params.sqrNormalizedFrequency) * params.normalized;
 
 		Filter->SetCoefficients(&coeffs);
 	}
@@ -176,11 +178,11 @@ public:
 		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth, Resonance);
 
 		Coefficients coeffs;
-		coeffs.a0 = (1 + (params.normalizedFrequency * params.normalizedFrequency)) * params.normalized;
-		coeffs.a1 = 2 * ((params.normalizedFrequency * params.normalizedFrequency) - 1) * params.normalized;
+		coeffs.a0 = (1 + params.sqrNormalizedFrequency) * params.normalized;
+		coeffs.a1 = 2 * (params.sqrNormalizedFrequency - 1) * params.normalized;
 		coeffs.a2 = coeffs.a0;
 		coeffs.b1 = coeffs.a1;
-		coeffs.b2 = (1 - (params.normalizedFrequency / params.quality) + (params.normalizedFrequency * params.normalizedFrequency)) * params.normalized;
+		coeffs.b2 = (1 - (params.normalizedFrequency / params.quality) + params.sqrNormalizedFrequency) * params.normalized;
 
 		Filter->SetCoefficients(&coeffs);
 	}
