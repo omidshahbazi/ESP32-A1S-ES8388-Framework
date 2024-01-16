@@ -24,7 +24,7 @@ public:
 		m_Buffer = Memory::Allocate<float>(m_MaxTime * m_SampleRate, true);
 
 		SetTime(m_MaxTime);
-		SetTime(1);
+		SetFeedback(1);
 	}
 
 	~DelayFilter(void)
@@ -63,17 +63,21 @@ public:
 		return m_BufferLength;
 	}
 
-	//[0, BufferLength - 1]
-	float GetDelayedSample(uint32 Offset) const
+	float GetSample(int32 Offset) const
 	{
-		ASSERT(0 <= Offset && Offset <= m_BufferLength - 1, "Invalid Value");
+		return GetCircularSample(m_BufferIndex + Offset);
+	}
 
-		return m_Buffer[(m_BufferIndex + Offset) % m_BufferLength] * m_Feedback;
+	float GetLerpedSample(int32 Offset, float Fraction) const
+	{
+		int32 index = m_BufferIndex + Offset;
+
+		return Math::Lerp(GetCircularSample(index), GetCircularSample(index + 1), Fraction);
 	}
 
 	double Process(double Value, bool Additive)
 	{
-		float delayedSample = GetDelayedSample(0);
+		float delayedSample = GetCircularSample(m_BufferIndex);
 
 		m_Buffer[m_BufferIndex] = Value;
 
@@ -86,6 +90,15 @@ public:
 	}
 
 private:
+	float GetCircularSample(int32 Index) const
+	{
+		Index = Index % m_BufferLength;
+		if (Index < 0)
+			Index = m_BufferLength - Index;
+
+		return m_Buffer[Index] * m_Feedback;
+	}
+
 	double Process(double Value) override
 	{
 		return 0;

@@ -36,16 +36,12 @@ typedef uint32_t uint32;
 
 enum class GPIOPins
 {
-	Pin2 = (uint8)GPIO_NUM_2,	// Analog/Digital - Input/Output (Cannot be Connected in Root Mode)
 	Pin4 = (uint8)GPIO_NUM_4,	// Analog/Digital - Input/Output (Cannot be Connected in Root Mode)
-	Pin12 = (uint8)GPIO_NUM_12, // Analog/Digital - Input/Output (Cannot be Connected in Root Mode)
 	Pin13 = (uint8)GPIO_NUM_13, // Analog/Digital - Input
 	Pin14 = (uint8)GPIO_NUM_14, // Analog/Digital - Input/Output
 	Pin15 = (uint8)GPIO_NUM_15, // Analog/Digital - Input/Output
 	Pin34 = (uint8)GPIO_NUM_34, // Analog/Digital - Input
 
-	Pin5 = (uint8)GPIO_NUM_5,	// Digital - Input/Output
-	Pin18 = (uint8)GPIO_NUM_18, // Digital - Input/Output
 	Pin19 = (uint8)GPIO_NUM_19, // Digital - Input/Output
 	Pin21 = (uint8)GPIO_NUM_21, // Digital - Input/Output
 	Pin22 = (uint8)GPIO_NUM_22, // Digital - Input/Output (Cannot be Connected in Root Mode)

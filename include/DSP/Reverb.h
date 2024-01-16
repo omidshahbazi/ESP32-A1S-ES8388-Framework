@@ -5,11 +5,11 @@
 #include "IDSP.h"
 #include "../Filters/DelayFilter.h"
 
-class Reverb : public IDSP, private DelayFilter
+class Reverb : public IDSP
 {
 public:
 	Reverb(uint32 SampleRate)
-		: DelayFilter(SampleRate, MAX_DELAY_TIME)
+		: m_Delay(SampleRate, MAX_DELAY_TIME)
 	{
 		SetDelayTime(0.5);
 		SetFeedback(0.5);
@@ -18,13 +18,11 @@ public:
 	//[0, MAX_DELAY_TIME]
 	void SetDelayTime(float Value)
 	{
-		ASSERT(0 <= Value && Value <= MAX_DELAY_TIME, "Invalid Value");
-
-		DelayFilter::SetTime(Value);
+		m_Delay.SetTime(Value);
 	}
 	float GetDelayTime(void)
 	{
-		return DelayFilter::GetTime();
+		return m_Delay.GetTime();
 	}
 
 	//[0, 1]
@@ -32,18 +30,21 @@ public:
 	{
 		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
-		DelayFilter::SetFeedback(Value);
+		m_Delay.SetFeedback(Value);
 	}
 	float GetFeedback(void)
 	{
-		return DelayFilter::GetFeedback();
+		return m_Delay.GetFeedback();
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
-			Buffer[i] = DelayFilter::Process(Buffer[i], true);
+			Buffer[i] = m_Delay.Process(Buffer[i], true);
 	}
+
+private:
+	DelayFilter m_Delay;
 
 public:
 	static constexpr float MAX_DELAY_TIME = 1;

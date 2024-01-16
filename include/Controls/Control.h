@@ -5,8 +5,14 @@
 #include "../Common.h"
 #include <Arduino.h>
 
+#define PROCESS_RATE 10
+
+class ControlFactory;
+
 class Control
 {
+	friend class ControlFactory;
+
 protected:
 	enum class Modes
 	{
@@ -33,14 +39,6 @@ public:
 		return m_Enabled;
 	}
 
-	void Process(void)
-	{
-		if (!m_Enabled)
-			return;
-
-		Update();
-	}
-
 protected:
 	virtual void Update(void) = 0;
 
@@ -62,6 +60,15 @@ protected:
 	void DigitalWrite(bool Value)
 	{
 		digitalWrite((uint8)m_Pin, Value);
+	}
+
+private:
+	void Process(void)
+	{
+		if (!m_Enabled)
+			return;
+
+		Update();
 	}
 
 private:

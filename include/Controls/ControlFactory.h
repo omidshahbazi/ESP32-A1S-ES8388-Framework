@@ -44,7 +44,7 @@ private:
 	{
 		while (true)
 		{
-			Task::Delay(1);
+			Task::Delay(1000 / PROCESS_RATE);
 
 			for (Control *control : m_Controls)
 				control->Process();

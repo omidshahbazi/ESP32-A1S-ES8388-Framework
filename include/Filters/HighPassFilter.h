@@ -72,9 +72,9 @@ private:
 private:
 	uint32 m_SampleRate;
 	float m_DeltaTime;
-	double m_CutoffFrequency;
-	double m_Alpha;
-	double m_CapacitorVoltage;
+	float m_CutoffFrequency;
+	float m_Alpha;
+	float m_CapacitorVoltage;
 
 public:
 	static constexpr double MAX_CUTOFF_FREQUENCY = 14066.730469;

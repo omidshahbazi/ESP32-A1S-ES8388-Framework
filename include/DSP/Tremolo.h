@@ -5,22 +5,19 @@
 #include "IDSP.h"
 #include "../Math.h"
 #include "../Debug.h"
+#include "../Filters/OscillatorFilter.h"
 
 class Tremolo : public IDSP
 {
 
 public:
 	Tremolo(uint32 SampleRate)
-		: m_SampleRate(SampleRate),
+		: m_Oscillator(SampleRate),
 		  m_Depth(0),
-		  m_Rate(0),
-		  m_DeltaPhase(0),
-		  m_Phase(0)
+		  m_Rate(0)
 	{
-		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
-
 		SetDepth(0.5);
-		SetRate(0.5);
+		SetRate(1);
 	}
 
 	//[0, 1]
@@ -42,7 +39,7 @@ public:
 
 		m_Rate = Value;
 
-		m_DeltaPhase = Math::TWO_PI_VALUE * Math::Lerp(1.0, 25, m_Rate) / m_SampleRate;
+		m_Oscillator.SetFrequency(Math::Lerp(0.1, 25, m_Rate));
 	}
 	float GetRate(void)
 	{
@@ -53,23 +50,16 @@ public:
 	{
 		for (uint16 i = 0; i < Count; ++i)
 		{
-			float modulation = (1 - m_Depth) + (m_Depth * 0.5 * (1 + sin(m_Phase)));
+			float modulation = (1 - m_Depth) + (m_Depth * 0.5 * (1 + m_Oscillator.Process()));
 
 			Buffer[i] *= modulation;
-
-			m_Phase += m_DeltaPhase;
-			if (m_Phase >= Math::TWO_PI_VALUE)
-				m_Phase -= Math::TWO_PI_VALUE;
 		}
 	}
 
 private:
+	OscillatorFilter m_Oscillator;
 	float m_Depth;
 	float m_Rate;
-	uint32 m_SampleRate;
-
-	float m_DeltaPhase;
-	float m_Phase;
 };
 
 #endif

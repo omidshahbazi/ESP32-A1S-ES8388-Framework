@@ -5,18 +5,30 @@
 #include "IDSP.h"
 #include "../Math.h"
 #include "../Debug.h"
-#include "../Filters/LowPassFilter.h"
 
 class Overdrive : public IDSP
 {
 public:
 	Overdrive(uint32 SampleRate)
-		: m_LowPassFilter(SampleRate),
+		: m_Gain(0),
 		  m_Drive(0)
 	{
-		m_LowPassFilter.SetCutoffFrequency(2 * KHz);
-		m_LowPassFilter.SetDeltaTime(0.1);
+		SetGain(1);
 		SetDrive(1);
+	}
+
+	//[0, 1]
+	void SetGain(float Value)
+	{
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+
+		m_Gain = Value;
+
+		m_Multiplier = Math::Lerp(10.0, 80, m_Gain);
+	}
+	float GetGain(void)
+	{
+		return m_Gain;
 	}
 
 	//[0, 1]
@@ -25,6 +37,8 @@ public:
 		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
 		m_Drive = Value;
+
+		m_Threshold = Math::Lerp(0.45, 0.23, m_Drive);
 	}
 	float GetDrive(void)
 	{
@@ -33,21 +47,16 @@ public:
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
-		float drive = Math::Max(m_Drive, 0.01);
-
 		for (uint16 i = 0; i < Count; ++i)
-		{
-			double input = m_LowPassFilter.Process(Buffer[i]);
-
-			input = Math::SoftClip(input, drive * 50);
-
-			Buffer[i] = Math::Clamp(input, -1, 1);
-		}
+			Buffer[i] = Math::SymmetricalSoftClip(Buffer[i] * m_Multiplier, m_Threshold) / m_Multiplier;
 	}
 
 private:
-	LowPassFilter m_LowPassFilter;
+	float m_Gain;
 	float m_Drive;
+
+	float m_Multiplier;
+	float m_Threshold;
 };
 
 #endif

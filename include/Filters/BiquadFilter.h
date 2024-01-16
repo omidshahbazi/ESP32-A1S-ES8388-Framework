@@ -94,13 +94,13 @@ public:
 private:
 	static Parameters GetParameters(uint32 SampleRate, float Frequency, float Bandwidth, float Resonance)
 	{
-		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
-		ASSERT(MIN_FREQUENCY <= Frequency && Frequency <= MAX_FREQUENCY, "Invalid Frequency");
-		ASSERT(0 <= Bandwidth && Bandwidth <= MAX_FREQUENCY, "Invalid Bandwidth %f", Bandwidth);
+		ASSERT(1 <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
+		ASSERT(0 < Frequency && Frequency <= MAX_FREQUENCY, "Invalid Frequency");
+		ASSERT(0 <= Bandwidth && Bandwidth <= MAX_FREQUENCY, "Invalid Bandwidth");
 
 		Parameters params;
 
-		params.quality = Resonance * Frequency / Math::Max(1, Bandwidth);
+		params.quality = Resonance * Frequency / Math::Max(0.0001, Bandwidth);
 		params.normalizedFrequency = tan(Math::PI_VALUE * Frequency / SampleRate);
 		params.sqrNormalizedFrequency = params.normalizedFrequency * params.normalizedFrequency;
 		params.normalized = 1 / (1 + (params.normalizedFrequency / params.quality) + params.sqrNormalizedFrequency);
@@ -110,9 +110,8 @@ private:
 
 public:
 	// Needs a 1 stage BiquadFilter
-	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
-	// CutoffFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
-	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
+	// SampleRate [1, MAX_SAMPLE_RATE]
+	// CutoffFrequency [1, MAX_FREQUENCY]
 	static void SetLowPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CutoffFrequency, float Resonance = 1)
 	{
 		ASSERT(Filter != nullptr, "Filter cannot be null");
@@ -130,9 +129,8 @@ public:
 	}
 
 	// Needs a 1 stage BiquadFilter
-	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
-	// CutoffFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
-	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
+	// SampleRate [1, MAX_SAMPLE_RATE]
+	// CutoffFrequency [1, MAX_FREQUENCY]
 	static void SetHighPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CutoffFrequency, float Resonance = 1)
 	{
 		ASSERT(Filter != nullptr, "Filter cannot be null");
@@ -150,9 +148,9 @@ public:
 	}
 
 	// Needs a 1 stage BiquadFilter
-	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
-	// CenterFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
-	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
+	// SampleRate [1, MAX_SAMPLE_RATE]
+	// CenterFrequency [1, MAX_FREQUENCY]
+	// Bandwidth [1, MAX_FREQUENCY]
 	static void SetBandPassFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth, float Resonance = 1)
 	{
 		ASSERT(Filter != nullptr, "Filter cannot be null");
@@ -170,9 +168,9 @@ public:
 	}
 
 	// Needs a 1 stage BiquadFilter
-	// SampleRate [MIN_SAMPLE_RATE, MAX_SAMPLE_RATE]
-	// CenterFrequency [MIN_FREQUENCY, MAX_FREQUENCY]
-	// Bandwidth [MIN_FREQUENCY, MAX_FREQUENCY]
+	// SampleRate [1, MAX_SAMPLE_RATE]
+	// CenterFrequency [1, MAX_FREQUENCY]
+	// Bandwidth [1, MAX_FREQUENCY]
 	static void SetBandStopFilterCoefficients(BiquadFilter *Filter, uint32 SampleRate, float CenterFrequency, float Bandwidth, float Resonance = 1)
 	{
 		const Parameters params = GetParameters(SampleRate, CenterFrequency, Bandwidth, Resonance);

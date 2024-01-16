@@ -70,6 +70,24 @@ public:
 		return tanh(Value) * Factor;
 	}
 
+	// Factor [0, 1]
+	template <typename T>
+	static T SymmetricalSoftClip(T Value, float Factor)
+	{
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must be float or double");
+
+		T absValue = abs(Value);
+
+		if (absValue < Factor)
+			return 2 * Value;
+
+		if (Factor <= absValue && absValue < Factor * 2)
+			return ((3 - pow(2 - (3 * absValue), 2)) / 3) * Sign(Value);
+
+		// if (Factor * 2 <= absValue)
+		return Sign(Value);
+	}
+
 	template <typename T>
 	static T HardClip(T Value, float Factor)
 	{

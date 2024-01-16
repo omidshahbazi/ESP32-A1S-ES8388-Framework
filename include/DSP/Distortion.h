@@ -15,7 +15,7 @@ public:
 		  m_Rate(0)
 	{
 		m_LowPassFilter.SetCutoffFrequency(2 * KHz);
-		m_LowPassFilter.SetDeltaTime(0.001);
+		// m_LowPassFilter.SetDeltaTime(0.001);
 		SetRate(1);
 	}
 

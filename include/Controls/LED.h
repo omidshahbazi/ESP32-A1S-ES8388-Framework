@@ -40,6 +40,7 @@ public:
 		UpdatePin();
 	}
 
+	//(0, 10]
 	void SetBlinking(float BlinkRate)
 	{
 		ASSERT(0 < BlinkRate && BlinkRate <= 1000, "Invalid BlinkRate");
