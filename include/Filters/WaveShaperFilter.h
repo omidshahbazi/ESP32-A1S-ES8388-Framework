@@ -3,31 +3,79 @@
 #define WAVE_SHAPER_FILTER_H
 
 #include "Filter.h"
-#include "../Tables.h"
 #include "../Math.h"
 
 class WaveShaperFilter : public Filter
 {
 public:
-	WaveShaperFilter(void)
+	struct TablePoints
 	{
-		for (uint16 i = 0; i < TABLE_SIZE; ++i)
-		{
-			float x = ((float)i - 127.5f) / 127.5f;
+	public:
+		float InputValue;
+		float OutputValue;
+	};
 
-			m_TransferFunctionTable[i] = 2 / (1 + expf(-6 * x)) - 1;
-		}
+public:
+	WaveShaperFilter(void)
+		: m_Table(nullptr),
+		  m_Length(0)
+	{
+	}
+
+	void SetTable(const TablePoints *Table, uint8 Length)
+	{
+		ASSERT(Table != nullptr, "Invalid Table");
+		ASSERT(Length > 1, "Invalid Length");
+
+		m_Table = Table;
+		m_Length = Length;
+	}
+	const TablePoints *GetTable(void) const
+	{
+		return m_Table;
+	}
+	uint8 GetLength(void) const
+	{
+		return m_Length;
 	}
 
 	double Process(double Value) override
 	{
-		double val = (Value + 1) * 127.5f;
-		val = Math::Clamp(val, 0, 255);
+		const TablePoints *prev = nullptr;
+		const TablePoints *next = nullptr;
+		for (uint32 i = 0; i < m_Length; ++i)
+		{
+			const TablePoints &curr = m_Table[i];
 
-		return Math::TableLookupLinear(m_TransferFunctionTable, val);
+			if (Value > curr.InputValue)
+			{
+				prev = &curr;
+
+				continue;
+			}
+
+			next = &curr;
+			break;
+		}
+
+		if (prev == nullptr)
+		{
+			prev = &m_Table[0];
+		}
+
+		if (next == nullptr)
+		{
+			next = &m_Table[m_Length - 1];
+		}
+
+		float pointsDiff = next->InputValue - prev->InputValue;
+		float frac = (pointsDiff == 0 ? 0 : (Value - prev->InputValue) / pointsDiff);
+
+		return Math::Lerp(prev->OutputValue, next->OutputValue, frac);
 	}
 
 private:
-	float m_TransferFunctionTable[TABLE_SIZE];
+	const TablePoints *m_Table;
+	uint8 m_Length;
 };
 #endif

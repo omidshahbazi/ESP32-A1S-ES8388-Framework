@@ -10,9 +10,12 @@ class NoiseGateFilter : private EnvelopeFollowerFilter
 {
 public:
 	NoiseGateFilter(uint32 SampleRate)
-		: EnvelopeFollowerFilter(SampleRate, 0.02, 0.06)
+		: EnvelopeFollowerFilter(SampleRate)
 	{
 		SetThreshold(0);
+
+		EnvelopeFollowerFilter::SetAttackTime(0.02);
+		EnvelopeFollowerFilter::SetReleaseTime(0.06);
 	}
 
 	//[0, 1]

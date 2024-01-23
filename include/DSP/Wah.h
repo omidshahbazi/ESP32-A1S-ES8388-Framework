@@ -52,6 +52,7 @@ public:
 		return m_Type;
 	}
 
+	//[0, 1]
 	void SetRatio(float Value)
 	{
 		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
