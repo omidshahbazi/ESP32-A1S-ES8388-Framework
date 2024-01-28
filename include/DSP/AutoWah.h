@@ -8,7 +8,7 @@
 
 class AutoWah : private Wah
 {
-#define ENVELOP_AVERAGE_DURATION 0.5
+#define ENVELOP_AVERAGE_DURATION 0.1
 
 public:
 	AutoWah(uint32 SampleRate)
@@ -18,26 +18,8 @@ public:
 		  m_EnvelopeSum(0),
 		  m_EnvelopeSampleCount(0)
 	{
-		m_EnvelopeFollowerFilter.SetAttackTime(0.002);
-		m_EnvelopeFollowerFilter.SetReleaseTime(0.002);
-	}
-
-	void SetAttack(float value)
-	{
-		float val = Math::Lerp(0.002, 0.1, value);
-
-		m_EnvelopeFollowerFilter.SetAttackTime(val);
-
-		printf("att %f\n", val);
-	}
-
-	void SetRelease(float value)
-	{
-		float val = Math::Lerp(0.002, 0.1, value);
-
-		m_EnvelopeFollowerFilter.SetReleaseTime(val);
-
-		printf("rel %f\n", val);
+		m_EnvelopeFollowerFilter.SetAttackTime(0.015841);
+		m_EnvelopeFollowerFilter.SetReleaseTime(0.045401);
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
@@ -52,8 +34,6 @@ public:
 				ratio = Math::Clamp01(ratio);
 
 				Wah::SetRatio(ratio);
-
-				printf("ratio %f\n", ratio);
 
 				m_EnvelopeSum = 0;
 				m_EnvelopeSampleCount = 0;
