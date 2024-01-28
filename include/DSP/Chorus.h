@@ -12,22 +12,20 @@ class Chorus : public IDSP
 public:
 	Chorus(uint32 SampleRate)
 		: m_Oscillator(SampleRate),
-		  m_Delay(SampleRate, MAX_DELAY_TIME),
+		  m_Delay(SampleRate, MAX_DELAY_TIME * 2),
 		  m_SampleRate(SampleRate),
-		  m_Depth(0),
-		  m_Rate(0)
+		  m_Depth(0)
 	{
 		ASSERT(MIN_SAMPLE_RATE <= SampleRate && SampleRate <= MAX_SAMPLE_RATE, "Invalid SampleRate");
 
 		SetDepth(1);
 		SetRate(1);
-		SetDelayTime(MAX_DELAY_TIME);
 	}
 
-	//[0, 1]
+	//[0, MAX_DEPTH]
 	void SetDepth(float Value)
 	{
-		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+		ASSERT(0 <= Value && Value <= MAX_DEPTH, "Invalid Value");
 
 		m_Depth = Value;
 	}
@@ -36,28 +34,16 @@ public:
 		return m_Depth;
 	}
 
-	//[0, 1]
+	//(0, 4]
 	void SetRate(float Value)
 	{
-		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+		ASSERT(0 < Value && Value <= 4, "Invalid Value");
 
-		m_Rate = Value;
-
-		m_Oscillator.SetFrequency(Math::Lerp(0.01, 4, m_Rate));
+		m_Oscillator.SetFrequency(Value);
 	}
 	float GetRate(void)
 	{
-		return m_Rate;
-	}
-
-	//[0, MAX_DELAY_TIME]
-	void SetDelayTime(float Value)
-	{
-		m_Delay.SetTime(Value);
-	}
-	float GetDelayTime(void)
-	{
-		return m_Delay.GetTime();
+		return m_Oscillator.GetFrequency();
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
@@ -66,11 +52,11 @@ public:
 		{
 			m_Delay.Process(Buffer[i], false);
 
-			float modulationIndex = m_Oscillator.Process() * m_Depth * m_SampleRate;
+			float modulationIndex = abs(m_Oscillator.Process()) * m_Depth;
 
-			float delayedSample = m_Delay.GetLerpedSample(modulationIndex, abs(modulationIndex - (int32)modulationIndex));
+			float delayedSample = m_Delay.GetLerpedSample(modulationIndex, modulationIndex - (int32)modulationIndex);
 
-			Buffer[i] += delayedSample;
+			Buffer[i] = (Buffer[i] + delayedSample) * 0.5;
 		}
 	}
 
@@ -79,10 +65,10 @@ private:
 	OscillatorFilter m_Oscillator;
 	DelayFilter m_Delay;
 	float m_Depth;
-	float m_Rate;
 
 public:
 	static constexpr float MAX_DELAY_TIME = 0.025;
+	static constexpr float MAX_DEPTH = 100;
 };
 
 #endif

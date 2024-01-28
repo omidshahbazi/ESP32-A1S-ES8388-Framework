@@ -92,11 +92,7 @@ public:
 private:
 	float GetCircularSample(int32 Index) const
 	{
-		Index = Index % m_BufferLength;
-		if (Index < 0)
-			Index = m_BufferLength - Index;
-
-		return m_Buffer[Index] * m_Feedback;
+		return m_Buffer[Index % m_BufferLength] * m_Feedback;
 	}
 
 	double Process(double Value) override

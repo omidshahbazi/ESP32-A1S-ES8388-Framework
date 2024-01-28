@@ -40,10 +40,8 @@ protected:
 
 		m_Value = value / 1023.0F;
 
-		float lpfValue = m_Filter.Process(m_Value);
-
 		if (0 < m_Value && m_Value < 1)
-			m_Value = Math::Clamp01(lpfValue);
+			m_Value = Math::Clamp01(m_Filter.Process(m_Value));
 
 		if (abs(prevValue - m_Value) >= 0.005F)
 		{
