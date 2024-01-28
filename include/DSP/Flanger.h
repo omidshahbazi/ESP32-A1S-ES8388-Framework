@@ -1,16 +1,16 @@
 #pragma once
-#ifndef CHORUS_H
-#define CHORUS_H
+#ifndef FLANGER_H
+#define FLANGER_H
 
 #include "IDSP.h"
 #include "../Math.h"
 #include "../Filters/OscillatorFilter.h"
 #include "../Filters/DelayFilter.h"
 
-class Chorus : public IDSP
+class Flanger : public IDSP
 {
 public:
-	Chorus(uint32 SampleRate)
+	Flanger(uint32 SampleRate)
 		: m_Oscillator(SampleRate),
 		  m_Delay(SampleRate, MAX_DELAY_TIME * 2),
 		  m_SampleRate(SampleRate),
@@ -21,6 +21,7 @@ public:
 
 		SetDepth(1);
 		SetRate(1);
+		SetFeedback(0.5);
 		SetWetRate(0.5);
 	}
 
@@ -49,6 +50,18 @@ public:
 	}
 
 	//[0, 1]
+	void SetFeedback(float Value)
+	{
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+
+		m_Delay.SetFeedback(Value);
+	}
+	float GetFeedback(void)
+	{
+		return m_Delay.GetFeedback();
+	}
+
+	//[0, 1]
 	void SetWetRate(float Value)
 	{
 		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
@@ -64,7 +77,7 @@ public:
 	{
 		for (uint16 i = 0; i < Count; ++i)
 		{
-			m_Delay.Process(Buffer[i], false);
+			m_Delay.Process(Buffer[i], true);
 
 			float modulationIndex = abs(m_Oscillator.Process()) * m_Depth;
 

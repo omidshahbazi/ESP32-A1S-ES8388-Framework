@@ -9,7 +9,9 @@ class Sustain : public IDSP
 {
 public:
 	Sustain(uint32 SampleRate)
-		: m_Delay(SampleRate, MAX_DELAY_TIME)
+		: m_Delay(SampleRate, MAX_DELAY_TIME),
+		  m_Active(false),
+		  m_Wet(false)
 	{
 		SetFeedback(1);
 	}
@@ -26,18 +28,53 @@ public:
 		return m_Delay.GetFeedback();
 	}
 
+	void SetActive(bool Value)
+	{
+		m_Active = Value;
+
+		printf("Act %i\n", Value);
+	}
+	bool GetActive(void)
+	{
+		return m_Active;
+	}
+
+	void SetWet(bool Value)
+	{
+		m_Wet = Value;
+
+		printf("Wet %i\n", Value);
+	}
+	bool GetWet(void)
+	{
+		return m_Wet;
+	}
+
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
 		{
-			float delayedSample = m_Delay.GetSample(m_Delay.GetBufferLength() / 2);
+			float delayedSample = m_Delay.GetSample(m_DelayOffset);
+			m_DelayOffset = (m_DelayOffset + 1) % m_Delay.GetBufferLength();
 
-			Buffer[i] = m_Delay.Process(Buffer[i], false);
+			if (m_Active)
+			{
+				if (m_Wet)
+					Buffer[i] = delayedSample;
+				else
+					Buffer[i] += delayedSample;
+			}
+			else
+				m_Delay.Process(Buffer[i], false);
 		}
 	}
 
 private:
 	DelayFilter m_Delay;
+	bool m_Active;
+	bool m_Wet;
+
+	uint32 m_DelayOffset;
 
 	static constexpr float MAX_DELAY_TIME = 1;
 };

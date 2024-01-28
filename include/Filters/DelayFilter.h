@@ -14,6 +14,7 @@ public:
 		  m_MaxTime(MaxTime),
 		  m_Time(0),
 		  m_Feedback(0),
+		  m_OutputMixRate(0),
 		  m_Buffer(nullptr),
 		  m_BufferLength(0),
 		  m_BufferIndex(0)
@@ -25,6 +26,7 @@ public:
 
 		SetTime(m_MaxTime);
 		SetFeedback(1);
+		SetOutputMixRate(0.5);
 	}
 
 	~DelayFilter(void)
@@ -58,6 +60,18 @@ public:
 		return m_Feedback;
 	}
 
+	//[0, 1]
+	void SetOutputMixRate(float Value)
+	{
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+
+		m_OutputMixRate = Value;
+	}
+	float GetOutputMixRate(void)
+	{
+		return m_OutputMixRate;
+	}
+
 	uint32 GetBufferLength(void) const
 	{
 		return m_BufferLength;
@@ -86,7 +100,7 @@ public:
 
 		m_BufferIndex = (m_BufferIndex + 1) % m_BufferLength;
 
-		return Value + delayedSample;
+		return Math::Lerp(Value, delayedSample, m_OutputMixRate);
 	}
 
 private:
@@ -105,6 +119,7 @@ private:
 	float m_MaxTime;
 	float m_Time;
 	float m_Feedback;
+	float m_OutputMixRate;
 
 	float *m_Buffer;
 	uint32 m_BufferLength;

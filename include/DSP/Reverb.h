@@ -37,6 +37,18 @@ public:
 		return m_Delay.GetFeedback();
 	}
 
+	//[0, 1]
+	void SetWetRate(float Value)
+	{
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+
+		m_Delay.SetOutputMixRate(Value);
+	}
+	float GetWetRate(void)
+	{
+		return m_Delay.GetOutputMixRate();
+	}
+
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)

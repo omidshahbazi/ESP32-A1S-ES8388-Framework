@@ -32,18 +32,16 @@ public:
 		return m_Depth;
 	}
 
-	//[0, 1]
+	//(0, 25]
 	void SetRate(float Value)
 	{
-		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
+		ASSERT(0 < Value && Value <= 25, "Invalid Value");
 
-		m_Rate = Value;
-
-		m_Oscillator.SetFrequency(Math::Lerp(0.1, 25, m_Rate));
+		m_Oscillator.SetFrequency(Value);
 	}
 	float GetRate(void)
 	{
-		return m_Rate;
+		return m_Oscillator.GetFrequency();
 	}
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
