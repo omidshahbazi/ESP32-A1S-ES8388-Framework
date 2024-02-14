@@ -13,7 +13,6 @@ public:
 	Compressor(uint32 SampleRate)
 		: m_EnvelopeFollowerFilter(SampleRate)
 	{
-		SetThreshold(1);
 		SetRatio(1);
 	}
 

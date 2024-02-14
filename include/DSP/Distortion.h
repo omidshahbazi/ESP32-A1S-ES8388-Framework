@@ -6,22 +6,37 @@
 #include "../Math.h"
 #include "../Debug.h"
 #include "../Filters/LowPassFilter.h"
-#include "../Filters/WaveShaperFilter.h"
+#include "../Filters/NoiseGateFilter.h"
 
 class Distortion : public IDSP
 {
 public:
 	Distortion(uint32 SampleRate)
-		: m_LowPassFilter(SampleRate),
-		  m_Rate(0)
+		: m_Gain(0),
+		  m_Rate(0),
+		  m_Factor(0),
+		  m_Multiplier(0)
 	{
+		SetGain(1);
 		SetRate(1);
+	}
 
-		m_LowPassFilter.SetCutoffFrequency(500);
+	//[0, 1]
+	void SetGain(float Value)
+	{
+		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
-		static const WaveShaperFilter::TablePoints SHAPER_TABLE[] = {{-1, -1}, {-0.8, -0.2}, {-0.7, -0.5}, {-0.6, -0.2}, {-0.5, -0.5}, {0, 0}, {0.5, 0.5}, {0.6, 0.2}, {0.7, 0.5}, {0.8, 0.2}, {1, 1}};
+		m_Gain = Value;
 
-		m_WaveShaperFilter.SetTable(SHAPER_TABLE, 11);
+		m_Factor = Math::Lerp(0.001, 0.9, m_Gain);
+
+		printf("Gain %f\n", m_Factor);
+
+		// 0.001000
+	}
+	float GetGain(void)
+	{
+		return m_Gain;
 	}
 
 	//[0, 1]
@@ -30,6 +45,12 @@ public:
 		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
 		m_Rate = Value;
+
+		m_Multiplier = Math::Lerp(100.0, 1500, m_Rate);
+
+		printf("Rate %f\n", m_Multiplier);
+
+		// 693.623718
 	}
 	float GetRate(void)
 	{
@@ -38,20 +59,16 @@ public:
 
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
-		float multiplier = (m_Rate + 1) * 40;
-
 		for (uint16 i = 0; i < Count; ++i)
-		{
-			double input = m_LowPassFilter.Process(Buffer[i]);
-
-			Buffer[i] = m_WaveShaperFilter.Process(input * multiplier) / multiplier;
-		}
+			Buffer[i] = Math::ExponentialSaturation(Buffer[i] * m_Multiplier, m_Factor) / m_Multiplier;
 	}
 
 private:
-	LowPassFilter m_LowPassFilter;
-	WaveShaperFilter m_WaveShaperFilter;
+	float m_Gain;
 	float m_Rate;
+
+	float m_Factor;
+	float m_Multiplier;
 };
 
 #endif

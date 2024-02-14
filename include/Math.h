@@ -65,9 +65,7 @@ public:
 	{
 		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must be float or double");
 
-		// return atan(Value) * Factor;
-
-		return tanh(Value) * Factor;
+		return atan(Value) * Factor;
 	}
 
 	// Factor [0, 1]
@@ -94,6 +92,21 @@ public:
 		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must be float or double");
 
 		return (abs(Value) > Factor ? Sign(Value) : Value);
+	}
+
+	template <typename T>
+	static T ExponentialDiodClip(T Value)
+	{
+		static_assert(std::is_same<T, float>() || std::is_same<T, double>(), "T must be float or double");
+
+		if (Value < 0)
+			Value = -1 + exp(Value);
+		else if (Value > 0)
+			Value = 1 - exp(-Value);
+		else
+			Value = 0;
+
+		return Value;
 	}
 
 	template <typename T>
