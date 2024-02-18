@@ -5,8 +5,7 @@
 #include "IDSP.h"
 #include "../Math.h"
 #include "../Debug.h"
-#include "../Filters/LowPassFilter.h"
-#include "../Filters/NoiseGateFilter.h"
+#include "../Filters/WaveShaperFilter.h"
 
 class Distortion : public IDSP
 {
@@ -17,6 +16,9 @@ public:
 		  m_Factor(0),
 		  m_Multiplier(0)
 	{
+		static WaveShaperFilter::TablePoints points[] = {{-1, -0.8}, {-0.5, -0.8}, {0, 0}, {0.5, 0.8}, {1, 0.8}};
+		m_WaveShaperFilter.SetTable(points, 5);
+
 		SetGain(1);
 		SetRate(1);
 	}
@@ -28,11 +30,7 @@ public:
 
 		m_Gain = Value;
 
-		m_Factor = Math::Lerp(0.001, 0.9, m_Gain);
-
-		printf("Gain %f\n", m_Factor);
-
-		// 0.001000
+		m_Factor = Math::Lerp(1.0, 4, m_Gain);
 	}
 	float GetGain(void)
 	{
@@ -46,11 +44,7 @@ public:
 
 		m_Rate = Value;
 
-		m_Multiplier = Math::Lerp(100.0, 1500, m_Rate);
-
-		printf("Rate %f\n", m_Multiplier);
-
-		// 693.623718
+		m_Multiplier = Math::Lerp(50.0, 400, m_Rate);
 	}
 	float GetRate(void)
 	{
@@ -60,10 +54,12 @@ public:
 	void ProcessBuffer(double *Buffer, uint16 Count) override
 	{
 		for (uint16 i = 0; i < Count; ++i)
-			Buffer[i] = Math::ExponentialSaturation(Buffer[i] * m_Multiplier, m_Factor) / m_Multiplier;
+			Buffer[i] = m_Factor * m_WaveShaperFilter.Process(Buffer[i] * m_Multiplier) / m_Multiplier;
 	}
 
 private:
+	WaveShaperFilter m_WaveShaperFilter;
+
 	float m_Gain;
 	float m_Rate;
 
