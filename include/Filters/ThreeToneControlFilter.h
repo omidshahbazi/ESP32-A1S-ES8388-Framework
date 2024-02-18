@@ -20,9 +20,23 @@ public:
 		  m_BandPassFilter(SampleRate),
 		  m_HighPassFilter(SampleRate)
 	{
-		m_LowPassFilter.SetCutoffFrequency(150);
-		m_BandPassFilter.SetFrequencies(100, 5 * KHz);
-		m_HighPassFilter.SetCutoffFrequency(4.5 * KHz);
+		SetBorderFrequencies(150, 5 * KHz, 5);
+	}
+
+	//[MIN_FREQUENCY, MAX_FREQUENCY]
+	//[0, (LowMid / 10) - (MIN_FREQUENCY / 10)]
+	void SetBorderFrequencies(float LowMid, float MidHigh, float Threshold = 5)
+	{
+		const float LowMidThreshold = Threshold * 10;
+		const float MidHighThreshold = (Threshold * 0.1) * KHz;
+
+		ASSERT(MIN_FREQUENCY <= LowMid && LowMid <= MAX_FREQUENCY, "Invalid LowMid");
+		ASSERT(MIN_FREQUENCY <= MidHigh && MidHigh <= MAX_FREQUENCY, "Invalid MidHigh");
+		ASSERT(MIN_FREQUENCY <= LowMid - LowMidThreshold, "Invalid Threshold");
+
+		m_LowPassFilter.SetCutoffFrequency(LowMid);
+		m_BandPassFilter.SetFrequencies(LowMid - LowMidThreshold, MidHigh);
+		m_HighPassFilter.SetCutoffFrequency(MidHigh - MidHighThreshold);
 	}
 
 	//[-20dB, 20dB]
