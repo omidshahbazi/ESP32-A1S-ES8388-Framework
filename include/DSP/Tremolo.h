@@ -57,7 +57,6 @@ public:
 private:
 	OscillatorFilter m_Oscillator;
 	float m_Depth;
-	float m_Rate;
 };
 
 #endif
