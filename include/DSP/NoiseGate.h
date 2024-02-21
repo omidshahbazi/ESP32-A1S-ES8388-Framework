@@ -18,7 +18,7 @@ public:
 	{
 		m_NoiseGateFilter.SetThreshold(Value);
 	}
-	float GetThreshold(void)
+	float GetThreshold(void) const
 	{
 		return m_NoiseGateFilter.GetThreshold();
 	}

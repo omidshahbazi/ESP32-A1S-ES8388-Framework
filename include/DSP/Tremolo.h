@@ -27,19 +27,19 @@ public:
 
 		m_Depth = Value;
 	}
-	float GetDepth(void)
+	float GetDepth(void) const
 	{
 		return m_Depth;
 	}
 
-	//(0, 25]
+	//(0.01, 25]
 	void SetRate(float Value)
 	{
 		ASSERT(0 < Value && Value <= 25, "Invalid Value");
 
 		m_Oscillator.SetFrequency(Value);
 	}
-	float GetRate(void)
+	float GetRate(void) const
 	{
 		return m_Oscillator.GetFrequency();
 	}

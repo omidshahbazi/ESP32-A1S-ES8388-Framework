@@ -32,7 +32,7 @@ public:
 
 		m_Factor = Math::Lerp(1.0, 4, m_Gain);
 	}
-	float GetGain(void)
+	float GetGain(void) const
 	{
 		return m_Gain;
 	}
@@ -46,7 +46,7 @@ public:
 
 		m_Multiplier = Math::Lerp(50.0, 400, m_Rate);
 	}
-	float GetRate(void)
+	float GetRate(void) const
 	{
 		return m_Rate;
 	}

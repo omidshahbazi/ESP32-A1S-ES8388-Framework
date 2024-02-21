@@ -20,7 +20,7 @@ public:
 	{
 		m_Delay.SetTime(Value);
 	}
-	float GetDelayTime(void)
+	float GetDelayTime(void) const
 	{
 		return m_Delay.GetTime();
 	}
@@ -32,7 +32,7 @@ public:
 
 		m_Delay.SetFeedback(Value);
 	}
-	float GetFeedback(void)
+	float GetFeedback(void) const
 	{
 		return m_Delay.GetFeedback();
 	}
@@ -44,7 +44,7 @@ public:
 
 		m_Delay.SetOutputMixRate(Value);
 	}
-	float GetWetRate(void)
+	float GetWetRate(void) const
 	{
 		return m_Delay.GetOutputMixRate();
 	}

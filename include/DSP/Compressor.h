@@ -25,7 +25,7 @@ public:
 
 		printf("rat %f\n", Value);
 	}
-	float GetRatio(void)
+	float GetRatio(void) const
 	{
 		return m_Ratio;
 	}

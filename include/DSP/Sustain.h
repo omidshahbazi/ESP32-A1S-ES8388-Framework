@@ -23,7 +23,7 @@ public:
 
 		m_Delay.SetFeedback(Value);
 	}
-	float GetFeedback(void)
+	float GetFeedback(void) const
 	{
 		return m_Delay.GetFeedback();
 	}
@@ -34,7 +34,7 @@ public:
 
 		printf("Act %i\n", Value);
 	}
-	bool GetActive(void)
+	bool GetActive(void) const
 	{
 		return m_Active;
 	}
@@ -45,7 +45,7 @@ public:
 
 		printf("Wet %i\n", Value);
 	}
-	bool GetWet(void)
+	bool GetWet(void) const
 	{
 		return m_Wet;
 	}

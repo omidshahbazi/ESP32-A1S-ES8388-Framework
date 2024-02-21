@@ -77,7 +77,7 @@ public:
 		return m_BufferLength;
 	}
 
-	float GetSample(int32 Offset) const
+	float GetSample(int32 Offset = 0) const
 	{
 		return GetCircularSample(m_BufferIndex + Offset);
 	}
@@ -96,7 +96,7 @@ public:
 		m_Buffer[m_BufferIndex] = Value;
 
 		if (Additive)
-			m_Buffer[m_BufferIndex] += delayedSample;
+			m_Buffer[m_BufferIndex] = delayedSample;
 
 		m_BufferIndex = (m_BufferIndex + 1) % m_BufferLength;
 

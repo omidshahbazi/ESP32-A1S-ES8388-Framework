@@ -10,11 +10,13 @@
 
 class Phaser : public IDSP
 {
+private:
+	static const uint8 DELAY_STAGE_COUNT = 2;
 
 public:
 	Phaser(uint32 SampleRate)
 		: m_Oscillator(SampleRate),
-		  m_Delay(SampleRate, MAX_DELAY_TIME * 2),
+		  m_Delays{{SampleRate, MAX_DELAY_TIME * 2}, {SampleRate, MAX_DELAY_TIME * 2}},
 		  m_Depth(0),
 		  m_WetRate(0)
 	{
@@ -30,19 +32,19 @@ public:
 
 		m_Depth = Value;
 	}
-	float GetDepth(void)
+	float GetDepth(void) const
 	{
 		return m_Depth;
 	}
 
-	//(0, 25]
+	//(0.1, 3.7]
 	void SetRate(float Value)
 	{
-		ASSERT(0 < Value && Value <= 25, "Invalid Value");
+		ASSERT(0.1 < Value && Value <= 25, "Invalid Value");
 
 		m_Oscillator.SetFrequency(Value);
 	}
-	float GetRate(void)
+	float GetRate(void) const
 	{
 		return m_Oscillator.GetFrequency();
 	}
@@ -54,7 +56,7 @@ public:
 
 		m_WetRate = Value;
 	}
-	float GetWetRate(void)
+	float GetWetRate(void) const
 	{
 		return m_WetRate;
 	}
@@ -63,19 +65,26 @@ public:
 	{
 		for (uint16 i = 0; i < Count; ++i)
 		{
-			m_Delay.Process(Buffer[i], false);
+			double output = Buffer[i];
 
 			float modulationIndex = abs(m_Oscillator.Process()) * m_Depth;
 
-			float delayedSample = m_Delay.GetLerpedSample(modulationIndex, modulationIndex - (int32)modulationIndex);
+			for (uint8 j = 0; j < DELAY_STAGE_COUNT; ++j)
+			{
+				m_Delays[j].Process(output, false);
 
-			Buffer[i] = Math::Lerp(Buffer[i], delayedSample, m_WetRate);
+				output += m_Delays[j].GetLerpedSample(modulationIndex, modulationIndex - (int32)modulationIndex);
+			}
+
+			output /= DELAY_STAGE_COUNT;
+
+			Buffer[i] = Math::Lerp(Buffer[i], output, m_WetRate);
 		}
 	}
 
 private:
 	OscillatorFilter m_Oscillator;
-	DelayFilter m_Delay;
+	DelayFilter m_Delays[DELAY_STAGE_COUNT];
 	float m_Depth;
 	float m_WetRate;
 
