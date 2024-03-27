@@ -89,6 +89,11 @@ public:
 		return Math::Lerp(GetCircularSample(index), GetCircularSample(index + 1), Fraction);
 	}
 
+	void MoveForward(void)
+	{
+		m_BufferIndex = (m_BufferIndex + 1) % m_BufferLength;
+	}
+
 	double Process(double Value, bool Additive)
 	{
 		float delayedSample = GetCircularSample(m_BufferIndex);
@@ -98,7 +103,7 @@ public:
 		if (Additive)
 			m_Buffer[m_BufferIndex] = delayedSample;
 
-		m_BufferIndex = (m_BufferIndex + 1) % m_BufferLength;
+		MoveForward();
 
 		return Math::Lerp(Value, delayedSample, m_OutputMixRate);
 	}

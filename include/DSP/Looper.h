@@ -54,7 +54,9 @@ public:
 			double input = Buffer[i];
 			float delayLine = m_Delay.GetSample();
 
-			if (m_Mode != Modes::Replay)
+			if (m_Mode == Modes::Replay)
+				m_Delay.MoveForward();
+			else
 				Buffer[i] = m_Delay.Process(input, (m_Mode == Modes::Additive));
 
 			Buffer[i] = (input + (delayLine * m_Volume)) * 0.5;
