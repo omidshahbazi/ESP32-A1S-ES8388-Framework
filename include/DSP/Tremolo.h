@@ -13,8 +13,7 @@ class Tremolo : public IDSP
 public:
 	Tremolo(uint32 SampleRate)
 		: m_Oscillator(SampleRate),
-		  m_Depth(0),
-		  m_Rate(0)
+		  m_Depth(0)
 	{
 		SetDepth(0.5);
 		SetRate(1);

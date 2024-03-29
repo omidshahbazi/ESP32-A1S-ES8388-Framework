@@ -43,7 +43,7 @@ public:
 
 		m_BufferLength = Math::Max(m_Time * m_SampleRate, 1);
 	}
-	float GetTime(void)
+	float GetTime(void) const
 	{
 		return m_Time;
 	}
@@ -55,7 +55,7 @@ public:
 
 		m_Feedback = Value;
 	}
-	float GetFeedback(void)
+	float GetFeedback(void) const
 	{
 		return m_Feedback;
 	}
@@ -67,7 +67,7 @@ public:
 
 		m_OutputMixRate = Value;
 	}
-	float GetOutputMixRate(void)
+	float GetOutputMixRate(void) const
 	{
 		return m_OutputMixRate;
 	}
