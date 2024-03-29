@@ -3,8 +3,8 @@
 #define ES8388_H
 
 #include "ES8388Interface.h"
-#include "../Bitwise.h"
-#include "../Debug.h"
+#include "../DSP/Bitwise.h"
+#include "../DSP/Debug.h"
 #include "../ESPDebug.h"
 #include "../I2CUtils.h"
 

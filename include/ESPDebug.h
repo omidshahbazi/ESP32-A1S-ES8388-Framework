@@ -2,7 +2,7 @@
 #ifndef ESP_DEBUG_H
 #define ESP_DEBUG_H
 
-#include "Debug.h"
+#include "DSP/Debug.h"
 
 #define ESP_CHECK_CALL(Expression)                                                     \
 	do                                                                                 \
