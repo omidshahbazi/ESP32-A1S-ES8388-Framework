@@ -1,3 +1,6 @@
 [submodule "include/DSP"]
 	path = include/DSP
 	url = git@github.com:omidshahbazi/DigitalSignalProcessing.git
+[submodule "include/MicrocontrollerFramework"]
+	path = include/MicrocontrollerFramework
+	url = git@github.com:omidshahbazi/MicrocontrollerFramework.git
