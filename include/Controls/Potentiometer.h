@@ -18,7 +18,7 @@ public:
 		  m_Filter(1),
 		  m_Value(-1)
 	{
-		BiquadFilter::SetLowPassFilterCoefficients(&m_Filter, PROCESS_RATE, 0.5);
+		BiquadFilter<float>::SetLowPassFilterCoefficients(&m_Filter, PROCESS_RATE, 0.5);
 	}
 
 	float GetValue(void) const
@@ -53,7 +53,7 @@ protected:
 	}
 
 private:
-	BiquadFilter m_Filter;
+	BiquadFilter<float> m_Filter;
 	float m_Value;
 	EventHandler m_OnChanged;
 };
