@@ -4,6 +4,7 @@
 
 #include "ES8388/ES8388.h"
 #include "Memory.h"
+#include <Esp.h>
 #include <driver/i2s.h>
 
 // ESP32-A1S Product Specification.pdf
