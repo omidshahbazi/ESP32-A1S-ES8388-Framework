@@ -169,13 +169,6 @@ public:
 		return (analogRead(Pin) / (float)m_MaxAnalogValue);
 	}
 
-	void AnalogWrite(uint8 Pin, float Value) override
-	{
-		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
-
-		analogWrite(Pin, Value * m_MaxAnalogValue);
-	}
-
 	bool DigitalRead(uint8 Pin) const override
 	{
 		return (digitalRead((uint8)Pin) != LOW);
