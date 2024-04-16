@@ -15,5 +15,6 @@ enum class GPIOPins
 	Pin19 = (uint8)GPIO_NUM_19, // Digital - Input/Output
 	Pin21 = (uint8)GPIO_NUM_21, // Digital - Input/Output
 	Pin22 = (uint8)GPIO_NUM_22, // Digital - Input/Output (Cannot be Connected in Root Mode)
-	Pin23 = (uint8)GPIO_NUM_23	// Digital - Input/Output
+	Pin23 = (uint8)GPIO_NUM_23, // Digital - Input/Output,
+	COUNT
 };

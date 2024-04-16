@@ -36,11 +36,6 @@ public:
 		vTaskDelete(nullptr);
 	}
 
-	static void Delay(uint16 Ms)
-	{
-		vTaskDelay(Ms / portTICK_PERIOD_MS);
-	}
-
 private:
 	static void Stub(void *Args)
 	{

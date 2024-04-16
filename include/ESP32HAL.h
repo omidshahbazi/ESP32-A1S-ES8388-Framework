@@ -2,7 +2,7 @@
 #ifndef ESP32_HAL_H
 #define ESP32_HAL_H
 
-#include "framework/include/DSP/IHAL.h"
+#include "DSP/IHAL.h"
 #include "Common.h"
 #include "DSP/Debug.h"
 #include <Esp.h>
@@ -36,7 +36,6 @@ public:
 		SetPWMResolution(16);
 	}
 
-private:
 	void *Allocate(uint16 Size) override
 	{
 		uint32 ramType = MALLOC_CAP_DEFAULT;
@@ -219,6 +218,11 @@ private:
 	void Break(void) const override
 	{
 		esp_restart();
+	}
+
+	void Delay(uint16 Ms) const override
+	{
+		vTaskDelay(Ms / portTICK_PERIOD_MS);
 	}
 
 private:
