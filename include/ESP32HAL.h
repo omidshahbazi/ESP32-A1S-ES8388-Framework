@@ -36,6 +36,21 @@ public:
 		SetPWMResolution(16);
 	}
 
+	void SetAnalogReadResolution(uint8 Value)
+	{
+		ASSERT(8 <= Value && Value <= 12, "Invalid Value");
+
+		m_AnalogReadResolution = Value;
+		m_MaxAnalogValue = 1 << Value;
+
+		analogReadResolution(m_AnalogReadResolution);
+	}
+
+	uint8 GetAnalogReadResolution(void) const
+	{
+		return m_AnalogReadResolution;
+	}
+
 	void *Allocate(uint16 Size) override
 	{
 		uint32 ramType = MALLOC_CAP_DEFAULT;
@@ -149,21 +164,6 @@ public:
 		}
 	}
 
-	void SetAnalogReadResolution(uint8 Value) override
-	{
-		ASSERT(8 <= Value && Value <= 12, "Invalid Value");
-
-		m_AnalogReadResolution = Value;
-		m_MaxAnalogValue = 1 << Value;
-
-		analogReadResolution(m_AnalogReadResolution);
-	}
-
-	uint8 GetAnalogReadResolution(void) const override
-	{
-		return m_AnalogReadResolution;
-	}
-
 	float AnalogRead(uint8 Pin) const override
 	{
 		return (analogRead(Pin) / (float)m_MaxAnalogValue);
@@ -183,21 +183,7 @@ public:
 	{
 		ASSERT(0 <= Value && Value <= 1, "Invalid Value");
 
-		PWMChannel *channel = nullptr, *it = m_PWMChannels;
-		for (auto &pwmChannel : m_PWMChannels)
-		{
-			if (!pwmChannel.Used || pwmChannel.Pin != Pin)
-			{
-				++it;
-
-				continue;
-			}
-
-			channel = it;
-
-			break;
-		}
-
+		PWMChannel *channel = FindPWMChannel(Pin);
 		ASSERT(channel != nullptr, "Couldn't find the channel attached to the Pin %i", Pin);
 
 		ledcWrite(channel->Channel, Value * m_PWMMaxDutyCycle);
@@ -210,7 +196,10 @@ public:
 
 	void Break(void) const override
 	{
-		esp_restart();
+		// esp_restart();
+		while (1)
+		{
+		}
 	}
 
 	void Delay(uint16 Ms) const override
@@ -221,40 +210,7 @@ public:
 private:
 	void InitializePWM(uint8 Pin)
 	{
-		PWMChannel *channel = nullptr, *it = m_PWMChannels;
-		for (auto &pwmChannel : m_PWMChannels)
-		{
-			if (!pwmChannel.Used || pwmChannel.Pin != Pin)
-			{
-				++it;
-
-				continue;
-			}
-
-			channel = it;
-
-			break;
-		}
-
-		if (channel == nullptr)
-		{
-			it = m_PWMChannels;
-			for (auto &pwmChannel : m_PWMChannels)
-			{
-				if (pwmChannel.Used)
-				{
-					++it;
-
-					continue;
-				}
-
-				channel = it;
-
-				break;
-			}
-
-			ASSERT(channel != nullptr, "Out of PWM channel");
-		}
+		PWMChannel *channel = FindOrGetPWMChannel(Pin);
 
 		channel->Pin = Pin;
 		channel->Used = true;
@@ -264,12 +220,45 @@ private:
 		ledcAttachPin(Pin, channel->Channel);
 	}
 
-private:
-	PWMChannel m_PWMChannels[SOC_LEDC_CHANNEL_NUM];
-	uint8 m_PWMResolution;
-	uint32 m_PWMMaxDutyCycle;
-	uint32 m_AnalogReadResolution;
-	uint32 m_MaxAnalogValue;
-};
+	PWMChannel *FindPWMChannel(uint8 Pin)
+	{
+		for (auto &pwmChannel : m_PWMChannels)
+		{
+			if (!pwmChannel.Used || pwmChannel.Pin != Pin)
+				continue;
+
+			return &pwmChannel;
+		}
+
+		return nullptr;
+	}
+
+	PWMChannel *FindOrGetPWMChannel(uint8 Pin)
+	{
+		PWMChannel *channel = FindPWMChannel(Pin);
+		if (channel != nullptr)
+			return chann;
+
+		for (auto &pwmChannel : m_PWMChannels)
+		{
+			if (pwmChannel.Used)
+				continue;
+
+			return &pwmChannel;
+
+			break;
+		}
+
+		ASSERT(false, "Out of PWM channel");
+	}
+}
+
+private : PWMChannel m_PWMChannels[SOC_LEDC_CHANNEL_NUM];
+uint8 m_PWMResolution;
+uint32 m_PWMMaxDutyCycle;
+uint32 m_AnalogReadResolution;
+uint32 m_MaxAnalogValue;
+}
+;
 
 #endif
