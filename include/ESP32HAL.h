@@ -6,6 +6,9 @@
 #include "Common.h"
 #include "DSP/Debug.h"
 #include <Esp.h>
+#include <chrono>
+
+using namespace std::chrono;
 
 const int PWM_FREQUENCY = 240;
 const int PWM_CHANNEL = 1;
@@ -166,16 +169,22 @@ public:
 
 	float AnalogRead(uint8 Pin) const override
 	{
+		ASSERT(IsAnAnaloglPin(Pin), "Pin %i is not an analog pin", Pin);
+
 		return (analogRead(Pin) / (float)m_MaxAnalogValue);
 	}
 
 	bool DigitalRead(uint8 Pin) const override
 	{
+		ASSERT(IsADigitalPin(Pin), "Pin %i is not an digital pin", Pin);
+
 		return (digitalRead((uint8)Pin) != LOW);
 	}
 
 	void DigitalWrite(uint8 Pin, bool Value) override
 	{
+		ASSERT(IsADigitalPin(Pin), "Pin %i is not an digital pin", Pin);
+
 		digitalWrite(Pin, Value);
 	}
 
@@ -189,6 +198,11 @@ public:
 		ledcWrite(channel->Channel, Value * m_PWMMaxDutyCycle);
 	}
 
+	float GetTimeSinceStartup(void) const override
+	{
+		return duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count() / 1000.0F;
+	}
+
 	void Print(const char *Value) const
 	{
 		printf(Value);
@@ -199,6 +213,7 @@ public:
 		// esp_restart();
 		while (1)
 		{
+			Delay(1);
 		}
 	}
 
@@ -237,7 +252,7 @@ private:
 	{
 		PWMChannel *channel = FindPWMChannel(Pin);
 		if (channel != nullptr)
-			return chann;
+			return channel;
 
 		for (auto &pwmChannel : m_PWMChannels)
 		{
@@ -251,14 +266,13 @@ private:
 
 		ASSERT(false, "Out of PWM channel");
 	}
-}
 
-private : PWMChannel m_PWMChannels[SOC_LEDC_CHANNEL_NUM];
-uint8 m_PWMResolution;
-uint32 m_PWMMaxDutyCycle;
-uint32 m_AnalogReadResolution;
-uint32 m_MaxAnalogValue;
-}
-;
+private:
+	PWMChannel m_PWMChannels[SOC_LEDC_CHANNEL_NUM];
+	uint8 m_PWMResolution;
+	uint32 m_PWMMaxDutyCycle;
+	uint32 m_AnalogReadResolution;
+	uint32 m_MaxAnalogValue;
+};
 
 #endif
