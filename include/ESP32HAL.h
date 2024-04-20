@@ -39,25 +39,10 @@ public:
 		SetPWMResolution(16);
 	}
 
-	void SetAnalogReadResolution(uint8 Value)
-	{
-		ASSERT(8 <= Value && Value <= 12, "Invalid Value");
-
-		m_AnalogReadResolution = Value;
-		m_MaxAnalogValue = 1 << Value;
-
-		analogReadResolution(m_AnalogReadResolution);
-	}
-
-	uint8 GetAnalogReadResolution(void) const
-	{
-		return m_AnalogReadResolution;
-	}
-
-	void *Allocate(uint16 Size) override
+	void *Allocate(uint32 Size, bool OnSDRAM = false) override
 	{
 		uint32 ramType = MALLOC_CAP_DEFAULT;
-		// if (FromExternalRAM)
+		// if (OnSDRAM)
 		// 	ramType = MALLOC_CAP_SPIRAM;
 
 		return heap_caps_malloc(Size, ramType);
@@ -220,6 +205,22 @@ public:
 	void Delay(uint16 Ms) const override
 	{
 		vTaskDelay(Ms / portTICK_PERIOD_MS);
+	}
+
+protected:
+	void SetAnalogReadResolution(uint8 Value)
+	{
+		ASSERT(8 <= Value && Value <= 12, "Invalid Value");
+
+		m_AnalogReadResolution = Value;
+		m_MaxAnalogValue = 1 << Value;
+
+		analogReadResolution(m_AnalogReadResolution);
+	}
+
+	uint8 GetAnalogReadResolution(void) const
+	{
+		return m_AnalogReadResolution;
 	}
 
 private:

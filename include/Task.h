@@ -24,7 +24,7 @@ public:
 		if (Name == nullptr)
 			Name = "Unknown";
 
-		TaskInfo *taskInfo = Memory::Allocate<TaskInfo>(1, true);
+		TaskInfo *taskInfo = Memory::Allocate<TaskInfo>();
 		taskInfo->Entrypoint = Entrypoint;
 		BaseType_t result = xTaskCreatePinnedToCore(Stub, Name, StackSize, taskInfo, Priority, nullptr, CoreID);
 
