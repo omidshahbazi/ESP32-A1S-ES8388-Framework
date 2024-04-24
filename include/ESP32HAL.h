@@ -139,7 +139,7 @@ public:
 		switch (Mode)
 		{
 		case PinModes::Input:
-			pinMode(Pin, INPUT);
+			pinMode(Pin, INPUT_PULLDOWN);
 			break;
 
 		case PinModes::Output:
