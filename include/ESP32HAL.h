@@ -37,15 +37,32 @@ public:
 
 		SetAnalogReadResolution(12);
 		SetPWMResolution(16);
+
+		// I guess that's a lie that they mentioned in the overview of the ESP32-A1S which it has 4Mb PSRAM
+		// printf("mem MALLOC_CAP_EXEC %i \n", heap_caps_get_free_size(MALLOC_CAP_EXEC));
+		// printf("mem MALLOC_CAP_32BIT %i \n", heap_caps_get_free_size(MALLOC_CAP_32BIT));
+		// printf("mem MALLOC_CAP_8BIT %i \n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+		// printf("mem MALLOC_CAP_DMA %i \n", heap_caps_get_free_size(MALLOC_CAP_DMA));
+		// printf("mem MALLOC_CAP_PID2 %i \n", heap_caps_get_free_size(MALLOC_CAP_PID2));
+		// printf("mem MALLOC_CAP_PID3 %i \n", heap_caps_get_free_size(MALLOC_CAP_PID3));
+		// printf("mem MALLOC_CAP_PID4 %i \n", heap_caps_get_free_size(MALLOC_CAP_PID4));
+		// printf("mem MALLOC_CAP_PID5 %i \n", heap_caps_get_free_size(MALLOC_CAP_PID5));
+		// printf("mem MALLOC_CAP_PID6 %i \n", heap_caps_get_free_size(MALLOC_CAP_PID6));
+		// printf("mem MALLOC_CAP_PID7 %i \n", heap_caps_get_free_size(MALLOC_CAP_PID7));
+		// printf("mem MALLOC_CAP_SPIRAM %i \n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+		// printf("mem MALLOC_CAP_INTERNAL %i \n", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+		// printf("mem MALLOC_CAP_DEFAULT %i \n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
+		// printf("mem MALLOC_CAP_IRAM_8BIT %i \n", heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT));
+		// printf("mem MALLOC_CAP_RETENTION %i \n", heap_caps_get_free_size(MALLOC_CAP_RETENTION));
+		// printf("mem MALLOC_CAP_RTCRAM %i \n", heap_caps_get_free_size(MALLOC_CAP_RTCRAM));
 	}
 
 	void *Allocate(uint32 Size, bool OnSDRAM = false) override
 	{
-		uint32 ramType = MALLOC_CAP_DEFAULT;
-		// if (OnSDRAM)
-		// 	ramType = MALLOC_CAP_SPIRAM;
+		if (OnSDRAM)
+			return heap_caps_malloc(Size, MALLOC_CAP_8BIT);
 
-		return heap_caps_malloc(Size, ramType);
+		return heap_caps_malloc(Size, MALLOC_CAP_DEFAULT);
 	}
 
 	void Deallocate(void *Memory) override
