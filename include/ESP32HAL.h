@@ -74,8 +74,6 @@ public:
 	{
 		switch (Pin)
 		{
-		case (uint8)GPIOPins::Pin4:
-		case (uint8)GPIOPins::Pin12:
 		case (uint8)GPIOPins::Pin13:
 		case (uint8)GPIOPins::Pin14:
 		case (uint8)GPIOPins::Pin15:
@@ -101,8 +99,6 @@ public:
 	{
 		switch (Pin)
 		{
-		case (uint8)GPIOPins::Pin4:
-		case (uint8)GPIOPins::Pin12:
 		case (uint8)GPIOPins::Pin14:
 		case (uint8)GPIOPins::Pin15:
 		case (uint8)GPIOPins::Pin19:
@@ -120,8 +116,6 @@ public:
 	{
 		switch (Pin)
 		{
-		case (uint8)GPIOPins::Pin4:
-		case (uint8)GPIOPins::Pin12:
 		case (uint8)GPIOPins::Pin14:
 		case (uint8)GPIOPins::Pin15:
 		case (uint8)GPIOPins::Pin19:
