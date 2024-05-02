@@ -67,7 +67,7 @@ public:
 	{
 		Log::WriteInfo(TAG, "Intializing");
 
-		CHECK_CALL(ES8388Interface::TurnOn(false, ES8388Interface::MiddleVoltageResistances::R50K));
+		CHECK_CALL(ES8388Interface::TurnOn(false, ES8388Interface::MiddleVoltageResistances::R500K));
 
 		bool needsADC = (m_InputMode != InputModes::None);
 		bool needsDAC = (m_OutputMode != OutputModes::None);
