@@ -207,9 +207,10 @@ public:
 	void Break(void) const override
 	{
 		// esp_restart();
+
 		while (1)
 		{
-			Delay(1);
+			Delay(1000);
 		}
 	}
 
