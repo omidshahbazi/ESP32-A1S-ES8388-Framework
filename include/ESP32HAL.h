@@ -191,17 +191,18 @@ public:
 
 	void SetPinMode(uint8 Pin, PinModes Mode) override
 	{
-		ASSERT(Mode != PinModes::Input || IsAnInputPin(Pin), "Pin %i is not an input pin", Pin);
-		ASSERT(Mode != PinModes::Output || IsAnOutputPin(Pin), "Pin %i is not an output pin", Pin);
+		ASSERT((Mode != PinModes::AnalogInput && Mode != PinModes::DigitalInput) || IsAnInputPin(Pin), "Pin %i is not an input pin", Pin);
+		ASSERT(Mode != PinModes::DigitalOutput || IsAnOutputPin(Pin), "Pin %i is not an output pin", Pin);
 		ASSERT(Mode != PinModes::PWM || IsAPWMPin(Pin), "Pin %i is not an PWM pin", Pin);
 
 		switch (Mode)
 		{
-		case PinModes::Input:
+		case PinModes::AnalogInput:
+		case PinModes::DigitalInput:
 			pinMode(Pin, INPUT_PULLDOWN);
 			break;
 
-		case PinModes::Output:
+		case PinModes::DigitalOutput:
 			pinMode(Pin, OUTPUT);
 			break;
 
