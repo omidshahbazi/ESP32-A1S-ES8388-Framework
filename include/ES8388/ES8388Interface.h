@@ -586,13 +586,13 @@ public:
 		value = (dBTarget + 16.5F) / 1.5F;
 		ES8388Control::Write(ES8388Control::Registers::ADCControl11, (ES8388Control::Values)(value << 4), ES8388Control::Masks::ADCControl11_ALCLVL);
 
-		value = log2(((HoldTime + 1000) / 0.67F) - 1000);
+		value = Math::Log2(((HoldTime + 1000) / 0.67F) - 1000);
 		ES8388Control::Write(ES8388Control::Registers::ADCControl11, (ES8388Control::Values)value, ES8388Control::Masks::ADCControl11_ALCHLD);
 
-		value = log2(AttackTime / 0.053F);
+		value =  Math::Log2(AttackTime / 0.053F);
 		ES8388Control::Write(ES8388Control::Registers::ADCControl12, (ES8388Control::Values)value, ES8388Control::Masks::ADCControl12_ALCATK);
 
-		value = log2(DecayTime / 0.21F);
+		value = Math::Log2(DecayTime / 0.21F);
 		ES8388Control::Write(ES8388Control::Registers::ADCControl12, (ES8388Control::Values)(value << 4), ES8388Control::Masks::ADCControl12_ALCDCY);
 
 		value = WindowsSize / 16;

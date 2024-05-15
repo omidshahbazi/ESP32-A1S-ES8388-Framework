@@ -6,6 +6,8 @@
 #include "Common.h"
 #include "DSP/Debug.h"
 #include <Esp.h>
+#include <EEPROM.h>
+#include <nvs_flash.h>
 #include <chrono>
 
 using namespace std::chrono;
@@ -13,8 +15,11 @@ using namespace std::chrono;
 const int PWM_FREQUENCY = 240;
 const int PWM_CHANNEL = 1;
 
+template <uint16 PersistentSlotCount, uint8 PersistentSlotSize>
 class ESP32HAL : public IHAL
 {
+	static_assert(PersistentSlotCount == 0 || PersistentSlotSize != 0, "PersistentSlotSize must be greater than zero");
+
 private:
 	struct PWMChannel
 	{
@@ -22,6 +27,20 @@ private:
 		bool Used;
 		uint8 Channel;
 		uint8 Pin;
+	};
+
+	struct PersistentSlot
+	{
+	public:
+		bool IsInitialized;
+		uint8 Data[PersistentSlotSize];
+	};
+
+	struct PersistentData
+	{
+	public:
+		uint8 Signature[10];
+		PersistentSlot Data[PersistentSlotCount];
 	};
 
 public:
@@ -37,6 +56,35 @@ public:
 
 		SetAnalogReadResolution(12);
 		SetPWMResolution(16);
+
+		if (PersistentSlotCount != 0)
+		{
+			nvs_flash_init();
+			ASSERT(m_EEPROM.begin(sizeof(PersistentData)), "Couldn't initialize the EEPROM");
+			m_EEPROM.readBytes(0, &m_PersistentData, sizeof(PersistentData));
+
+			uint8 expected = 0;
+			bool failed = false;
+			for (const uint8 sign : m_PersistentData.Signature)
+			{
+				if (sign == expected++)
+					continue;
+
+				failed = true;
+				break;
+			}
+
+			if (failed)
+			{
+				Memory::Set(&m_PersistentData, 0);
+
+				expected = 0;
+				for (uint8 &sign : m_PersistentData.Signature)
+					sign = expected++;
+
+				SavePersistentData();
+			}
+		}
 
 		// I guess that's a lie that they mentioned in the overview of the ESP32-A1S which it has 4Mb PSRAM
 		// printf("mem MALLOC_CAP_EXEC %i \n", heap_caps_get_free_size(MALLOC_CAP_EXEC));
@@ -194,6 +242,53 @@ public:
 		ledcWrite(channel->Channel, Value * m_PWMMaxDutyCycle);
 	}
 
+	void InitializePersistentData(uint16 ID) override
+	{
+		ASSERT(PersistentSlotCount != 0, "PersistentSlotCount cannot be zero");
+
+		PersistentSlot *slot = GetPersistentSlot(ID);
+		ASSERT(!slot->IsInitialized, "Slot has already initialized");
+
+		slot->IsInitialized = true;
+	}
+
+	bool ContainsPersistentData(uint16 ID) override
+	{
+		ASSERT(PersistentSlotCount != 0, "PersistentSlotCount cannot be zero");
+
+		return GetPersistentSlot(ID)->IsInitialized;
+	}
+
+	void SetPersistentData(uint16 ID, const void *const Data, uint8 Size) override
+	{
+		ASSERT(PersistentSlotCount != 0, "PersistentSlotCount cannot be zero");
+		ASSERT(Size <= PersistentSlotSize, "Size cannot be greater than PersistentSlotSize");
+
+		PersistentSlot *slot = GetPersistentSlot(ID);
+		ASSERT(slot->IsInitialized, "Slot hasn't initialized yet");
+
+		Memory::Copy(reinterpret_cast<const uint8 *const>(Data), slot->Data, Size);
+	}
+
+	void GetPersistentData(uint16 ID, void *Data, uint8 Size) override
+	{
+		ASSERT(PersistentSlotCount != 0, "PersistentSlotCount cannot be zero");
+		ASSERT(Size <= PersistentSlotSize, "Size cannot be greater than PersistentSlotSize");
+
+		PersistentSlot *slot = GetPersistentSlot(ID);
+		ASSERT(slot->IsInitialized, "Slot hasn't initialized yet");
+
+		Memory::Copy(slot->Data, reinterpret_cast<uint8 *>(Data), Size);
+	}
+
+	void SavePersistentData(void) override
+	{
+		ASSERT(PersistentSlotCount != 0, "PersistentSlotCount cannot be zero");
+
+		m_EEPROM.writeBytes(0, &m_PersistentData, sizeof(PersistentData));
+		m_EEPROM.commit();
+	}
+
 	float GetTimeSinceStartup(void) const override
 	{
 		return duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count() / 1000.0F;
@@ -280,12 +375,22 @@ private:
 		ASSERT(false, "Out of PWM channel");
 	}
 
+	PersistentSlot *GetPersistentSlot(uint16 ID)
+	{
+		ASSERT(ID <= PersistentSlotCount, "ID is out of bound of the PersistentSlotCount");
+
+		return &m_PersistentData.Data[ID];
+	}
+
 private:
 	PWMChannel m_PWMChannels[SOC_LEDC_CHANNEL_NUM];
 	uint8 m_PWMResolution;
 	uint32 m_PWMMaxDutyCycle;
 	uint32 m_AnalogReadResolution;
 	uint32 m_MaxAnalogValue;
+
+	EEPROMClass m_EEPROM;
+	PersistentData m_PersistentData;
 };
 
 #endif
