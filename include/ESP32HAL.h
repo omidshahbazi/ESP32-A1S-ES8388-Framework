@@ -282,6 +282,14 @@ public:
 		Memory::Copy(slot->Data, reinterpret_cast<uint8 *>(Data), Size);
 	}
 
+	void EreasPersistentData(void) override
+	{
+		ASSERT(PersistentSlotCount != 0, "PersistentSlotCount cannot be zero");
+
+		Memory::Set(&m_PersistentData, 0);
+		SavePersistentData();
+	}
+
 	void SavePersistentData(void) override
 	{
 		ASSERT(PersistentSlotCount != 0, "PersistentSlotCount cannot be zero");
