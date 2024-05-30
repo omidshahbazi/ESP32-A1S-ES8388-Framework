@@ -298,6 +298,11 @@ public:
 		m_EEPROM.commit();
 	}
 
+	uint32 GetTimeSinceStartupMs(void) const override
+	{
+		return duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count();
+	}
+
 	float GetTimeSinceStartup(void) const override
 	{
 		return duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count() / 1000.0F;
